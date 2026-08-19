@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens
+   ---------------------------------------------------------------------------
+   Every value here is lifted verbatim from the live site. The old codebase had
+   no theme at all — `tailwind.config.js` shipped an empty `theme.extend` and the
+   brand red appeared as a hardcoded `#E9162F` in 212 separate places. Naming the
+   values once is what stops that happening again, so prefer a token over a hex
+   literal in every case.
+
+   The surface ramp is deliberately fine-grained. The original design used a
+   dozen near-identical darks that accumulated over time rather than being
+   chosen; they are preserved exactly so the rebuild matches pixel for pixel,
+   but they are named by the role they actually play in the UI.
+--------------------------------------------------------------------------- */
+@theme {
+  /* Brand */
+  --color-brand: #e9162f;
+  --color-brand-hover: #d11428;
+
+  /* Two further red variants exist in the current site (#c41226, #c11227).
+     They appear to be drift rather than intent — see DESIGN-NOTES.md. They are
+     kept so nothing shifts visually; consolidate only once confirmed. */
+  --color-brand-alt: #c41226;
+  --color-brand-deep: #c11227;
+
+  /* Surfaces, darkest first */
+  --color-canvas: #000000;        /* body background, as computed live */
+  --color-admin: #050505;         /* admin screens */
+  --color-tile-well: #0d0d0d;     /* product card image area */
+  --color-card: #0f0f10;          /* cards and panels */
+  --color-card-hover: #17171b;    /* table row hover */
+  --color-tile: #1a1a1a;          /* product card body */
+  --color-surface: #1c1c1c;       /* page sections */
+  --color-surface-raised: #2b2b2b;/* product detail panel */
+
+  /* Lines and text */
+  --color-line: #232327;
+  --color-muted: #9ca3af;
+
+  /* The live site renders in Arial. A `Geom Graphic W03 Bold Italic` file is
+     committed three times in the old repo and a `rubik` family is referenced in
+     CSS, but neither is ever loaded via @font-face, so neither has any effect.
+     Matching the live rendering means Arial. */
+  --font-sans: Arial, Helvetica, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: #ffffff;
+  font-family: var(--font-sans);
+}
+
+/* The reCAPTCHA v3 badge is hidden because the required legal notice is shown
+   in the footer instead. Google permits this only when that notice is present —
+   do not remove the footer text without also restoring this badge. */
+.grecaptcha-badge {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Respect a reduced-motion preference across the app. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
