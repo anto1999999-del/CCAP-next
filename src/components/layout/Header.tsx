@@ -11,6 +11,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/lib/cart/CartProvider";
+import Container from "./Container";
 
 /**
  * Site header.
@@ -90,8 +91,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-900 bg-black px-4 text-white shadow-md lg:px-10">
-        <div className="container mx-auto flex min-h-16 items-center justify-between py-2">
+      <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-900 bg-black text-white shadow-md">
+        <Container className="flex min-h-16 items-center justify-between py-2">
           <div className="flex flex-shrink-0 items-center">
             <Link
               href="/"
@@ -212,10 +213,10 @@ export default function Header() {
               )}
             </button>
           </div>
-        </div>
+        </Container>
 
         {mobileOpen && (
-          <div className="bg-surface flex flex-col space-y-2 p-4 text-center md:hidden">
+          <Container className="bg-surface flex flex-col space-y-2 py-4 text-center md:hidden">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
@@ -267,7 +268,7 @@ export default function Header() {
             >
               Contact Us
             </Link>
-          </div>
+          </Container>
         )}
       </header>
 

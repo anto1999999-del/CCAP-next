@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
+import Container from "./Container";
 
 /**
  * Site footer.
@@ -138,10 +139,10 @@ export default function Footer() {
     <div className="bg-surface text-white">
       {/* Customer help band. The background image carries the red. */}
       <div
-        className="bg-cover bg-center px-4 py-6 text-white lg:px-10"
+        className="bg-cover bg-center py-6 text-white"
         style={{ backgroundImage: "url(/images/section.webp)" }}
       >
-        <div className="max-w-screen-lg">
+        <Container>
           <h3 className="mb-2 text-lg font-bold lg:text-xl">Customer Help</h3>
           <p className="mb-4">
             Can&rsquo;t find the part you need? Our friendly team is ready to help.
@@ -152,10 +153,10 @@ export default function Footer() {
           >
             Call Us Now
           </a>
-        </div>
+        </Container>
       </div>
 
-      <div className="px-4 py-8 text-sm lg:px-16">
+      <Container className="py-8 text-sm">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <ContactDetails />
 
@@ -209,7 +210,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
 
       {/*
         Google requires this notice whenever the reCAPTCHA badge is hidden by

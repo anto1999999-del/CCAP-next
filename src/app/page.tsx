@@ -2,6 +2,7 @@ import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
 import ContactFormSection from "@/components/ContactFormSection";
+import Container from "@/components/layout/Container";
 import { HOMEPAGE_FAQS, faqSchema } from "@/lib/faqs";
 import { homeBusinessSchema } from "@/lib/schema/business";
 
@@ -198,8 +199,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-admin px-6 py-16 text-white md:py-24">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-admin py-16 text-white md:py-24">
+        <Container>
           <div className="mb-10 text-center md:mb-12">
             <p className="text-brand mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em]">
               USED AUTO PARTS NSW
@@ -227,11 +228,11 @@ export default function HomePage() {
               ),
             )}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-admin px-6 pb-16 text-white md:pb-24">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-admin pb-16 text-white md:pb-24">
+        <Container>
           <div className="mb-10 text-center md:mb-12">
             <h2 className="text-3xl font-extrabold tracking-tight md:text-5xl">
               Why Choose a Used Auto Part?
@@ -260,11 +261,11 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-admin px-6 pb-16 text-white md:pb-28">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-admin pb-16 text-white md:pb-28">
+        <Container>
           <div className="mb-10 text-center md:mb-12">
             <h2 className="text-3xl font-extrabold tracking-tight md:text-5xl">
               Why Customers Choose Central Coast
@@ -305,7 +306,7 @@ export default function HomePage() {
               Central Coast Auto Parts has you covered.
             </span>
           </p>
-        </div>
+        </Container>
       </section>
 
       <FaqSection faqs={HOMEPAGE_FAQS} />
