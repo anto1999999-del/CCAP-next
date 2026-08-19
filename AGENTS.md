@@ -63,3 +63,14 @@ docs/           decisions and findings for the owner
 
 `npm run dev` then compare against the live site. `npm run build` must pass and
 `npm run lint` must be clean before anything is committed.
+
+**Check what is painted, not just what is in the HTML.** Content and metadata
+can be correct while the page still looks wrong. Read back computed styles —
+backgrounds, colours, sizes — and compare them against the live site.
+
+**Restart the dev server after adding a file that introduces new utility
+classes.** Tailwind v4 does not always pick up a newly created source file, and
+serves a stale stylesheet instead: the markup is right, the classes are on the
+elements, and they paint as transparent. A clean `npm run build` shows the
+truth. This has already caused one "where is the design" moment; if styles look
+missing, rebuild before debugging anything else.
