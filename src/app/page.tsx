@@ -1,6 +1,7 @@
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
+import ContactFormSection from "@/components/ContactFormSection";
 import { HOMEPAGE_FAQS, faqSchema } from "@/lib/faqs";
 import { homeBusinessSchema } from "@/lib/schema/business";
 
@@ -308,6 +309,8 @@ export default function HomePage() {
       </section>
 
       <FaqSection faqs={HOMEPAGE_FAQS} />
+
+      <ContactFormSection />
     </div>
   );
 }
