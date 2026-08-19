@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { site, absoluteUrl } from "@/lib/site";
+import { CartProvider } from "@/lib/cart/CartProvider";
+import Header from "@/components/layout/Header";
 import "./globals.css";
 
 /**
@@ -141,7 +143,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <CartProvider>
+          <Header />
+          {children}
+        </CartProvider>
         <script
           type="application/ld+json"
           // Serialised server-side from a literal defined above; no user input
