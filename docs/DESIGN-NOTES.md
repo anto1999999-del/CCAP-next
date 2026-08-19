@@ -58,3 +58,22 @@ Twelve near-identical dark values are in use. They are preserved exactly and
 named by role in `globals.css`, but they read as accumulation rather than a
 designed scale. Worth revisiting once the port is complete and the real usage
 of each is visible in one place.
+
+### 6. The same category is named two different things
+Home calls the fifth "What We Supply" card **Suspension & Steering**; About
+calls the identical card, with identical wording, **Mechanical Components**.
+Both are preserved so neither page loses a phrase it may rank for, via an
+override in `lib/content/sections.ts`.
+**Decision needed:** pick one name, then delete the override.
+
+### 7. Fixed while porting About
+Recorded here because they were real defects, not styling choices:
+
+- The hero background pointed at `/src/image/AboutUs.webp` — a build-source
+  path. It resolved only because the raw `src/` tree is publicly served from the
+  production webroot. Now a normal asset under `/images/`.
+- The hero used `items-LEFT`, which is not a class in any framework and did
+  nothing.
+- The hero had no overlay, so the white heading sat directly on a photograph
+  and its contrast depended entirely on which part of the image was behind it.
+  A 45% black scrim now guarantees it.
