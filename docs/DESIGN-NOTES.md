@@ -59,12 +59,23 @@ named by role in `globals.css`, but they read as accumulation rather than a
 designed scale. Worth revisiting once the port is complete and the real usage
 of each is visible in one place.
 
+### 5b. Social profiles — RESOLVED 19 Aug 2026
+The footer and the structured data pointed at different Facebook, eBay and
+Gumtree accounts. Confirmed with the owner:
+
+- **Facebook** — both are genuine: one is the Page, one the Marketplace profile.
+  `sameAs` lists both; the footer links to Marketplace, where customers buy.
+- **eBay** — `/usr/central_coast_auto_parts` redirects to
+  `/str/centralcoastautopartsaus`, so the `/str/` form is canonical.
+- **Gumtree** — `/web/s-user/1499623032693` is the live seller profile. The
+  `/s-seller/...` URL previously in the structured data is not.
+
 ### 6. The same category is named two different things
 Home calls the fifth "What We Supply" card **Suspension & Steering**; About
 calls the identical card, with identical wording, **Mechanical Components**.
 Both are preserved so neither page loses a phrase it may rank for, via an
 override in `lib/content/sections.ts`.
-**Decision needed:** pick one name, then delete the override.
+**Owner's decision, 19 Aug 2026: keep both.** The override stays.
 
 ### 7. Fixed while porting About
 Recorded here because they were real defects, not styling choices:

@@ -47,11 +47,26 @@ export const site = {
     displayLine: "MON-FRI 8:00 AM - 5:00 PM AND SAT 9:00 AM TO 2:00 PM",
   },
 
+  /**
+   * Official profiles, published as `sameAs` in the Organization schema.
+   *
+   * Confirmed with the owner 2026-08-19, resolving a disagreement between what
+   * the footer linked to and what the structured data claimed:
+   *
+   * - Both Facebook URLs are real and both belong to the business — one is the
+   *   Page, the other the Marketplace profile. `sameAs` takes a list, so both
+   *   are listed rather than one being dropped.
+   * - eBay: /usr/central_coast_auto_parts permanently redirects to the /str/
+   *   address, so the /str/ form is the canonical one and is used everywhere.
+   * - Gumtree: the /web/s-user/ address is the live seller profile. The
+   *   /s-seller/ URL previously in the structured data is not.
+   */
   social: [
     "https://www.facebook.com/profile.php?id=61556394574657",
+    "https://www.facebook.com/marketplace/profile/61555589287454/",
     "https://www.instagram.com/centralcoastautoparts",
-    "https://www.gumtree.com.au/s-seller/Central%20Coast%20Auto%20Parts/1029451812",
-    "https://www.ebay.com.au/usr/central_coast_auto_parts",
+    "https://www.gumtree.com.au/web/s-user/1499623032693",
+    "https://www.ebay.com.au/str/centralcoastautopartsaus",
   ],
 
   analytics: {

@@ -12,11 +12,11 @@ import Container from "./Container";
  * it rather than being decided here from `usePathname`, so the footer itself
  * ships no JavaScript at all.
  *
- * The profile links below are the ones the live footer uses. Note they disagree
- * with the `sameAs` entries in the Organization schema — see DESIGN-NOTES.md.
- * Both are reproduced as-is until the correct profiles are confirmed, because
- * pointing structured data at the wrong profile is worse than the current
- * inconsistency.
+ * The profile links below and the `sameAs` entries in the Organization schema
+ * used to point at different Facebook, eBay and Gumtree accounts. Confirmed
+ * with the owner and reconciled 2026-08-19 — see the note in lib/site.ts. The
+ * footer links to the Marketplace profile because that is where customers buy;
+ * the schema lists both Facebook addresses.
  */
 
 const NAV_LINKS = [
