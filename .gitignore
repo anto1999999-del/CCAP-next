@@ -42,3 +42,5 @@ next-env.d.ts
 
 # scratch output from CSS inspection
 out.css
+p404.html
+np.log
