@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { site, absoluteUrl } from "@/lib/site";
 import { CartProvider } from "@/lib/cart/CartProvider";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 /**
@@ -108,8 +109,8 @@ function organizationSchema() {
             "Friday",
             "Saturday",
           ],
-          opens: "08:00",
-          closes: "17:00",
+          opens: site.hours.opens,
+          closes: site.hours.closes,
         },
       },
       {
@@ -146,6 +147,7 @@ export default function RootLayout({
         <CartProvider>
           <Header />
           {children}
+          <Footer />
         </CartProvider>
         <script
           type="application/ld+json"

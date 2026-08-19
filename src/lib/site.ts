@@ -30,11 +30,21 @@ export const site = {
     state: "NSW",
     postcode: "2261",
     country: "AU",
+    /**
+     * How the address is written in the footer. Held separately from the parts
+     * above because structured data wants the full "Street" while the footer
+     * has always abbreviated it, and reassembling one from the other in the
+     * view means string surgery every time it is rendered.
+     */
+    displayLine: "23 Hereford ST, Berkeley Vale NSW 2261",
   },
 
   hours: {
-    weekdays: "Mon–Fri 8:00am – 5:00pm",
-    saturday: "Sat 9:00am – 2:00pm",
+    /** Structured-data form, 24-hour. */
+    opens: "08:00",
+    closes: "17:00",
+    /** Exactly as the footer prints it. */
+    displayLine: "MON-FRI 8:00 AM - 5:00 PM AND SAT 9:00 AM TO 2:00 PM",
   },
 
   social: [
