@@ -88,3 +88,19 @@ Recorded here because they were real defects, not styling choices:
 - The hero had no overlay, so the white heading sat directly on a photograph
   and its contrast depended entirely on which part of the image was behind it.
   A 45% black scrim now guarantees it.
+
+### 8. Terms page had no metadata of its own
+It set no title, description or canonical, so it inherited the home page's —
+two different pages telling Google they are the same thing. It also had 23 `h2`
+headings and no `h1`. Both fixed; the copy is untouched.
+
+### 9. Prata is requested but never loaded
+Terms headings carry `font-family: "Prata", serif`, and no `@font-face` or font
+link for Prata exists anywhere in the codebase, so they fall back to the
+browser's default serif while the rest of the site is Arial. Reproduced exactly.
+**Decision needed:** load Prata properly, or drop it and use the site font.
+
+### 10. The contact block existed in two versions
+The footer rendered one version on every page not named in two hardcoded path
+lists; Home, About, Contact and Sell Your Car embedded a second directly. They
+differ in heading size and rule width. Now one component used everywhere.

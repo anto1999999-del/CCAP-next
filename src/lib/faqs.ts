@@ -55,6 +55,43 @@ export const HOMEPAGE_FAQS: readonly Faq[] = [
   },
 ] as const;
 
+/**
+ * Contact page FAQs — a different, shorter set aimed at someone about to get in
+ * touch, rather than the broader questions on the home page.
+ */
+export const CONTACT_FAQS: readonly Faq[] = [
+  {
+    question: "Do you sell new or used parts?",
+    answer:
+      "We specialize in used and recycled car parts from 4x4s, vans, hybrids, and light vehicles. All parts are tested for quality before sale.",
+  },
+  {
+    question: "Can I order parts online?",
+    answer:
+      "Yes, we ship across NSW and Australia. You can also pick up directly from our Berkeley Vale yard.",
+  },
+  {
+    question: "Do you buy unwanted cars?",
+    answer:
+      "Yes, we buy old, damaged, and scrap cars. Use our contact form or call us for a free quote.",
+  },
+  {
+    question: "What payment methods do you accept?",
+    answer:
+      "We accept cash, EFTPOS, bank transfer, and secure online payments.",
+  },
+  {
+    question: "Do your parts come with a warranty?",
+    answer:
+      "Yes, many parts come with a limited warranty. Details depend on the item – please ask our team before purchase.",
+  },
+  {
+    question: "How do I request a part?",
+    answer:
+      "Simply use our Request a Quote form or call us on 02 4388 1818 with your vehicle make, model, and year.",
+  },
+] as const;
+
 /** FAQPage structured data for a set of questions. */
 export function faqSchema(faqs: readonly Faq[]) {
   return {

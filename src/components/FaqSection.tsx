@@ -15,19 +15,34 @@ import type { Faq } from "@/lib/faqs";
  * `hidden` is driven by the same state so assistive technology does not
  * announce collapsed answers, while crawlers still read them.
  */
-export default function FaqSection({ faqs }: { faqs: readonly Faq[] }) {
+export default function FaqSection({
+  faqs,
+  intro = "Everything you need to know about Central Coast Auto Parts",
+  /**
+   * The gradient starts from whichever surface the preceding section ended on,
+   * so the seam is invisible: Home comes off #050505, Contact off #1c1c1c.
+   *
+   * Passed as a complete class rather than a colour, because Tailwind generates
+   * utilities by scanning source text — it can only produce `from-[#1c1c1c]` if
+   * that exact string appears somewhere it reads. Both variants are therefore
+   * written out literally: the default here, and the override at the call site.
+   */
+  fromClass = "from-[#050505]",
+}: {
+  faqs: readonly Faq[];
+  intro?: string;
+  fromClass?: string;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <div className="bg-gradient-to-b from-[#050505] to-black py-16 md:py-20">
+    <div className={`bg-gradient-to-b ${fromClass} to-black py-16 md:py-20`}>
       <div className="mx-auto max-w-4xl px-4 md:px-8 lg:px-16">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-gray-400">
-            Everything you need to know about Central Coast Auto Parts
-          </p>
+          <p className="text-lg text-gray-400">{intro}</p>
         </div>
 
         <div className="space-y-4">
