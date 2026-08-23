@@ -21,6 +21,51 @@ export const PARTS_PER_PAGE = 20;
 /** The supplier's page size cap, kept so a hand-edited URL cannot ask for more. */
 const MAX_PAGE_SIZE = 100;
 
+/**
+ * Every part that matches, in the order they should be shown.
+ *
+ * Separate from paging because it is the expensive half and the half that can
+ * be reused: page 3 of a filtered catalogue is a slice of the same list as page
+ * 2, so working it out again to show twenty rows is pure waste.
+ */
+export function orderedMatches({
+  catalog,
+  filters,
+  query = "",
+}: {
+  catalog: readonly CatalogPart[];
+  filters: PartFilters;
+  query?: string;
+}): CatalogPart[] {
+  const matched = dedupeParts(
+    filterParts(catalog, filters).filter((part) => matchesQuery(part, query)),
+  );
+
+  const narrowed = Boolean(filters.make || filters.model || query);
+  return arrangeParts(matched, narrowed);
+}
+
+/** Cut one page out of an ordered result set. */
+export function paginate(
+  ordered: readonly CatalogPart[],
+  page: number,
+  pageSize = PARTS_PER_PAGE,
+): PartsPage {
+  const size = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.trunc(pageSize) || 1));
+  const totalResults = ordered.length;
+  const pageCount = Math.max(1, Math.ceil(totalResults / size));
+  // A page number past the end shows the last page rather than nothing at all.
+  const safePage = Math.min(Math.max(1, Math.trunc(page) || 1), pageCount);
+  const start = (safePage - 1) * size;
+
+  return {
+    parts: ordered.slice(start, start + size),
+    page: safePage,
+    pageCount,
+    totalResults,
+  };
+}
+
 export function queryParts({
   catalog,
   filters,
@@ -34,27 +79,7 @@ export function queryParts({
   page?: number;
   pageSize?: number;
 }): PartsPage {
-  const size = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.trunc(pageSize) || 1));
-
-  const matched = dedupeParts(
-    filterParts(catalog, filters).filter((part) => matchesQuery(part, query)),
-  );
-
-  const narrowed = Boolean(filters.make || filters.model || query);
-  const ordered = arrangeParts(matched, narrowed);
-
-  const totalResults = ordered.length;
-  const pageCount = Math.max(1, Math.ceil(totalResults / size));
-  // A page number past the end shows the last page rather than nothing at all.
-  const safePage = Math.min(Math.max(1, Math.trunc(page) || 1), pageCount);
-  const start = (safePage - 1) * size;
-
-  return {
-    parts: ordered.slice(start, start + size),
-    page: safePage,
-    pageCount,
-    totalResults,
-  };
+  return paginate(orderedMatches({ catalog, filters, query }), page, pageSize);
 }
 
 /** Find one part by the identifiers in its URL. */

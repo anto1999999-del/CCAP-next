@@ -50,3 +50,6 @@ content/parts/
 
 # The catalogue sync writes its progress here.
 sync.log
+
+# Cached part photographs, fetched from the supplier as needed.
+.cache/

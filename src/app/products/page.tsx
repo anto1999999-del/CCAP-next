@@ -4,9 +4,7 @@ import FaqSection from "@/components/FaqSection";
 import PartCard from "@/components/parts/PartCard";
 import PartsFilters from "@/components/parts/PartsFilters";
 import PartsPagination from "@/components/parts/PartsPagination";
-import { loadCatalog } from "@/lib/parts/catalog";
-import { deriveFilterOptions } from "@/lib/parts/filter";
-import { PARTS_PER_PAGE, queryParts } from "@/lib/parts/query";
+import { getCatalogPage } from "@/lib/parts/repository";
 import { partKey } from "@/lib/parts/identity";
 import { productsListSchema } from "@/lib/schema/products";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
@@ -60,19 +58,15 @@ export default async function ProductsPage({
   const query = one(params, "q");
 
   /*
-    The whole catalogue is in memory here, so filtering, counting and paging all
-    happen before anything is sent. That is what lets this page be server
-    rendered: the old one fetched its parts from the browser, so a crawler, and
-    anyone whose scripts had not loaded, saw an empty page with a spinner.
+    The whole catalogue is in memory on the server, so filtering, counting and
+    paging all happen before anything is sent. That is what lets this page be
+    server rendered: the old one fetched its parts from the browser, so a
+    crawler, and anyone whose scripts had not loaded, saw a spinner.
   */
-  const { parts: catalog, available, syncedAt } = await loadCatalog();
-  const options = deriveFilterOptions(catalog, filters);
-  const page = queryParts({
-    catalog,
+  const { page, options, available, syncedAt } = await getCatalogPage({
     filters,
     query,
     page: Number(one(params, "page")) || 1,
-    pageSize: PARTS_PER_PAGE,
   });
 
   return (

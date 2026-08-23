@@ -179,3 +179,47 @@ as the sync runs, so neither the sync nor the site ever holds all 291MB.
 
 Pages read the catalogue from disk once and re-read only when the file changes,
 so a sync is picked up without a restart.
+
+## 18. Part photographs: why none of them loaded, and why they were slow
+
+Two separate problems, found together.
+
+**They did not load at all.** The catalogue records image paths as
+`/v1/image/...`, but the supplier serves them from `/ops/v1/image/...`. Asking
+for the path as recorded returns a redirect that goes nowhere, so every
+photograph failed. The old site got this right by prefixing `/image-proxy/ops`
+in the browser, which is why the bug did not exist there.
+
+Worth recording how it was missed: the check counted images left in the page
+that had failed to load. The card replaces a failed photograph with its own
+"No photo" box, so failed images were no longer in the page to be counted, and
+the check reported success. Counting what is present cannot detect what is
+absent.
+
+**They were slow.** The supplier takes one to three seconds per image, so a grid
+of twenty parts cost about two seconds an image on a cold cache.
+`scripts/warm-part-images.mjs` now fetches every thumbnail once through the
+site, after a sync, at about ten a second, so a customer's first view is already
+on disk. Measured after warming: the page's HTML in 51ms and its twenty
+photographs in 46ms each, against 1,921ms each before.
+
+The cache lives in `.cache/part-images` inside the project, not the system temp
+directory, which gets cleaned out from under a long-running server and would
+throw the warm-up away. `PART_IMAGE_CACHE_DIR` moves it.
+
+**On the droplet, after each nightly sync, run the warm-up:**
+
+    node scripts/sync-parts-catalog.mjs
+    node scripts/warm-part-images.mjs --base http://localhost:3000
+
+## 19. The catalogue's expensive work is cached against the catalogue itself
+
+Filtering 32,698 parts, deriving which years and makes exist, and spreading the
+results across vehicles costs about 100ms, and it was being repeated on every
+request for an answer that cannot change until the next sync. Results are now
+kept against the catalogue array itself, so a sync replaces it and everything
+cached from it is dropped: there is no expiry to tune and nothing to invalidate
+by hand.
+
+Measured on a production build: a filtered page falls from 388ms to 29ms when it
+is asked for a second time, and paging inside those filters is 19ms.

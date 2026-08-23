@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import type { NextRequest } from "next/server";
 
@@ -25,13 +24,26 @@ import type { NextRequest } from "next/server";
 const UPSTREAM = process.env.PARTS_API_URL ?? "http://api.carparts-au.com";
 const TIMEOUT_MS = 15_000;
 
+/**
+ * The catalogue records image paths as /v1/image/..., but the supplier serves
+ * them from /ops/v1/image/... . Asking for the path as recorded gets a 301 to
+ * somewhere that does not answer, which is why every photograph was missing.
+ */
+const UPSTREAM_PREFIX = "/ops";
+
 /** A month. These URLs are content-addressed, so the bytes cannot change. */
 const CACHE_SECONDS = 2_592_000;
 
+/**
+ * Kept inside the project rather than in the system temp directory, which gets
+ * cleaned out from under a long-running server. The overnight warm-up would be
+ * thrown away with it, and every customer would be back to waiting on the
+ * supplier. Point PART_IMAGE_CACHE_DIR elsewhere to put it on another disk.
+ */
 function cacheDir(): string {
   return (
     process.env.PART_IMAGE_CACHE_DIR?.trim() ??
-    path.join(os.tmpdir(), "ccap-part-images")
+    path.join(process.cwd(), ".cache", "part-images")
   );
 }
 
@@ -85,7 +97,7 @@ export async function GET(
   }
 
   try {
-    const upstream = await fetch(`${UPSTREAM}${imagePath}`, {
+    const upstream = await fetch(`${UPSTREAM}${UPSTREAM_PREFIX}${imagePath}`, {
       headers: { authorization: `Basic ${auth}`, accept: "image/*" },
       signal: AbortSignal.timeout(TIMEOUT_MS),
       cache: "no-store",
