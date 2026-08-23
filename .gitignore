@@ -44,3 +44,9 @@ next-env.d.ts
 out.css
 p404.html
 np.log
+
+# The synced parts catalogue is large and rebuilt by script, not edited.
+content/parts/
+
+# The catalogue sync writes its progress here.
+sync.log

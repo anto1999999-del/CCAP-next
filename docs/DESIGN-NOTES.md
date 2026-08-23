@@ -143,3 +143,23 @@ The gallery shows 26 photographed cars, which is a fraction of what the yard
 parts out. Copy that implied it was the full list ("every vehicle in the yard",
 "in the yard right now") was removed so the page reads as a showcase, not an
 inventory.
+
+## 15. The parts catalogue is now server rendered
+
+On the current site /products fetches its parts from the browser, so the HTML
+that arrives contains a spinner and nothing else. Search engines index that
+spinner: thirty thousand parts, and none of them are visible to a crawler.
+Filtered views have no URL of their own either, because the page keeps filters
+and the page number in component state, so a filtered catalogue cannot be
+linked to or shared.
+
+The rebuilt page renders on the server and puts the filters in the URL. The
+filter panel is an ordinary form, so it works before JavaScript loads and every
+combination is a real, indexable address.
+
+## 16. Supplier credentials were committed to the old repository
+
+`backend/utils/carpartsApi.js` contains the Pinnacle username and password in
+plain text, so they are in that repository's git history. The rebuild reads them
+from the environment, but that does not undo the exposure: **the password should
+be rotated with Pinnacle**, and the new one set only in the server's `.env`.
