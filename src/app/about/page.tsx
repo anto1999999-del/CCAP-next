@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
+import PageHero from "@/components/layout/PageHero";
 import ContactFormSection from "@/components/ContactFormSection";
 import {
   WhatWeSupply,
@@ -40,41 +41,14 @@ export default function AboutPage() {
         ])}
       />
 
-      {/*
-        The hero background is referenced from /images. The old build pointed at
-        `/src/image/AboutUs.webp` — a source path that only resolved because raw
-        source files are exposed on the production server. It worked, but it
-        depended on shipping the source tree publicly.
-      */}
-      <div className="relative flex h-80 flex-col justify-center bg-cover bg-center text-left lg:h-96">
-        <Image
-          src="/images/AboutUs.webp"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Darkened so the heading keeps its contrast whatever the photo does. */}
-        <div className="absolute inset-0 bg-black/45" />
-        <Container className="relative">
-          <h1 className="text-5xl font-bold text-white lg:text-8xl">ABOUT US</h1>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <Link
-              href="/products"
-              className="bg-brand hover:bg-brand-hover rounded-md px-4 py-2 font-semibold text-white transition-colors"
-            >
-              VIEW PARTS
-            </Link>
-            <Link
-              href="/contact"
-              className="bg-brand hover:bg-brand-hover rounded-md px-4 py-2 font-semibold text-white transition-colors"
-            >
-              CONTACT US
-            </Link>
-          </div>
-        </Container>
-      </div>
+      <PageHero
+        title="ABOUT US"
+        image="/images/AboutUs.webp"
+        actions={[
+          { href: "/products", label: "VIEW PARTS" },
+          { href: "/contact", label: "CONTACT US" },
+        ]}
+      />
 
       <div className="bg-surface py-16 md:py-20">
         <Container>
