@@ -137,3 +137,115 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Article body
+   ---------------------------------------------------------------------------
+   Styling for post content, which arrives as HTML rather than as components, so
+   it cannot carry utility classes. Kept to element selectors scoped under one
+   class, so it can never leak into the rest of the site.
+
+   Colours come from the same tokens as everywhere else, and body text uses
+   gray-300 rather than a dimmer grey: these articles are long-form and are the
+   pages people actually sit and read.
+--------------------------------------------------------------------------- */
+.blog-body {
+  color: var(--color-gray-300);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.blog-body > * + * {
+  margin-top: 1.25rem;
+}
+
+.blog-body h2,
+.blog-body h3,
+.blog-body h4 {
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  scroll-margin-top: 6rem; /* clears the fixed header when linked to */
+}
+
+.blog-body h2 { font-size: 1.6rem; }
+.blog-body h3 { font-size: 1.3rem; }
+.blog-body h4 { font-size: 1.1rem; }
+
+.blog-body a {
+  color: var(--color-brand-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.blog-body a:hover { color: #ffffff; }
+
+.blog-body strong { color: #ffffff; font-weight: 700; }
+
+.blog-body ul,
+.blog-body ol {
+  padding-left: 1.5rem;
+}
+
+.blog-body ul { list-style: disc; }
+.blog-body ol { list-style: decimal; }
+.blog-body li { margin-top: 0.5rem; }
+.blog-body li::marker { color: var(--color-brand-text); }
+
+.blog-body img {
+  border-radius: 0.75rem;
+  height: auto;
+  max-width: 100%;
+}
+
+.blog-body figure { margin-top: 2rem; }
+
+.blog-body figcaption {
+  color: var(--color-gray-400);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.blog-body blockquote {
+  border-left: 3px solid var(--color-brand);
+  color: #ffffff;
+  font-style: italic;
+  padding-left: 1.25rem;
+}
+
+.blog-body hr {
+  border-color: rgb(255 255 255 / 0.1);
+  margin-block: 2.5rem;
+}
+
+/* Tables are common in these articles — repair costs, model comparisons — and
+   are the one thing likely to be wider than a phone. */
+.blog-body table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.blog-body th,
+.blog-body td {
+  border: 1px solid rgb(255 255 255 / 0.12);
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+}
+
+.blog-body th {
+  background: rgb(255 255 255 / 0.05);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.blog-body code {
+  background: rgb(255 255 255 / 0.08);
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+}

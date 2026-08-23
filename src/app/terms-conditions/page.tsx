@@ -54,15 +54,12 @@ export default function TermsPage() {
               className="border-brand/40 relative rounded-r-lg border-l-0 pl-0 sm:border-l-2 sm:pl-6"
             >
               {/*
-                Headings request Prata and fall back to serif, because Prata is
-                never actually loaded — there is no @font-face for it anywhere.
-                Reproduced so the page renders exactly as it does today; see
-                docs/DESIGN-NOTES.md.
+                These asked for a font called Prata, which was never loaded
+                anywhere in the codebase, so they fell back to the browser's
+                default serif while the rest of the site is Arial. Owner's call,
+                19 Aug 2026: drop it and use the site font.
               */}
-              <h2
-                className="mb-3 text-lg font-semibold tracking-tight text-white sm:text-xl"
-                style={{ fontFamily: '"Prata", serif' }}
-              >
+              <h2 className="mb-3 text-lg font-semibold tracking-tight text-white sm:text-xl">
                 {index + 1}. {section.title}
               </h2>
 

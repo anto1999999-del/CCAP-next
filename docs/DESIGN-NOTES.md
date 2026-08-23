@@ -98,7 +98,8 @@ headings and no `h1`. Both fixed; the copy is untouched.
 Terms headings carry `font-family: "Prata", serif`, and no `@font-face` or font
 link for Prata exists anywhere in the codebase, so they fall back to the
 browser's default serif while the rest of the site is Arial. Reproduced exactly.
-**Decision needed:** load Prata properly, or drop it and use the site font.
+**Owner's decision, 19 Aug 2026: dropped.** Terms headings now use the site
+font like everything else. No font file to load, and one less inconsistency.
 
 ### 10. The contact block existed in two versions
 The footer rendered one version on every page not named in two hardcoded path
