@@ -98,7 +98,7 @@ export default function TermsPage() {
         </div>
 
         <footer className="mt-16 border-t border-gray-800 pt-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             Last updated · Central Coast Auto Parts
           </p>
         </footer>

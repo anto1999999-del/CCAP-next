@@ -110,7 +110,7 @@ export default function AboutPage() {
                     <span key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-brand hover:underline"
+                        className="text-brand-text hover:underline"
                       >
                         {link.label}
                       </Link>
@@ -124,7 +124,7 @@ export default function AboutPage() {
                 <p>
                   Every part is carefully inspected before sale and all major
                   components are sold with a{" "}
-                  <span className="text-brand font-bold">warranty</span> for your
+                  <span className="text-brand-text font-bold">warranty</span> for your
                   peace of mind. We are a fully licensed operation (Licence No.{" "}
                   {site.contact.licence}) committed to quality and honest service
                   on every job.
@@ -137,7 +137,7 @@ export default function AboutPage() {
                   possible. Can&apos;t find what you need? Call us on{" "}
                   <a
                     href={`tel:${site.contact.phoneE164}`}
-                    className="text-brand font-semibold hover:underline"
+                    className="text-brand-text font-semibold hover:underline"
                   >
                     {site.contact.phone}
                   </a>{" "}
@@ -162,7 +162,7 @@ export default function AboutPage() {
       <section className="border-t border-white/5 bg-[#0a0a0a] py-16 text-white md:py-20">
         <Container>
           <div className="mb-10 text-center">
-            <p className="text-brand mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs">
+            <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs">
               LOCAL &amp; NATIONWIDE
             </p>
             <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
@@ -195,7 +195,7 @@ export default function AboutPage() {
           <>
             Whether you need a used engine, a replacement panel or want to sell
             your car fast —{" "}
-            <span className="text-brand font-semibold">
+            <span className="text-brand-text font-semibold">
               Central Coast Auto Parts has you covered.
             </span>
           </>

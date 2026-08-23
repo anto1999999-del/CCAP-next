@@ -33,7 +33,7 @@ function SectionHeading({
   return (
     <div className="mb-10 text-center md:mb-12">
       {eyebrow && (
-        <p className="text-brand mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em]">
+        <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em]">
           {eyebrow}
         </p>
       )}
@@ -63,7 +63,7 @@ function SupplyCardBody({ card, linked }: { card: SupplyCard; linked: boolean })
         {card.desc}
       </p>
       {linked && card.slug && (
-        <span className="text-brand mt-3 inline-block text-xs font-semibold tracking-wider uppercase">
+        <span className="text-brand-text mt-3 inline-block text-xs font-semibold tracking-wider uppercase">
           View {card.title} →
         </span>
       )}
@@ -193,7 +193,7 @@ export function WhyChooseUs({
 
         <p className="mx-auto mt-10 max-w-4xl text-center text-sm leading-relaxed text-white/75 md:mt-12 md:text-base">
           Serving customers across the{" "}
-          <span className="text-brand font-semibold">
+          <span className="text-brand-text font-semibold">
             Central Coast, Sydney, Newcastle
           </span>{" "}
           and all of Australia. {closing}

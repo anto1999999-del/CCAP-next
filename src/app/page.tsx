@@ -48,7 +48,7 @@ export default function HomePage() {
         }}
       >
         <div className="relative z-[1] mx-auto w-full max-w-4xl px-6 text-center">
-          <p className="text-brand mb-5 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em] md:text-sm">
+          <p className="text-brand-text mb-5 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em] md:text-sm">
             CENTRAL COAST AUTO PARTS — BERKELEY VALE NSW
           </p>
           <h1 className="mb-6 text-3xl leading-[1.15] font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
@@ -85,7 +85,7 @@ export default function HomePage() {
           <>
             Whether you need a used engine, a replacement panel or have a
             question —{" "}
-            <span className="text-brand font-semibold">
+            <span className="text-brand-text font-semibold">
               Central Coast Auto Parts has you covered.
             </span>
           </>

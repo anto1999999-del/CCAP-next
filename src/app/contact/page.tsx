@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 function SectionLabel({ lead, tail }: { lead: string; tail: string }) {
   return (
     <div className="mb-3 inline-flex items-center gap-2">
-      <p className="text-brand">
+      <p className="text-brand-text">
         {lead} <span className="font-medium text-gray-300">{tail}</span>
       </p>
       <span className="h-[1px] w-8 bg-gray-700 sm:h-[2px] sm:w-12" />
@@ -62,7 +62,7 @@ function StoreDetail({
         </svg>
       </div>
       <div className="flex flex-col">
-        <p className="text-brand mb-1 text-base font-black tracking-wider whitespace-nowrap uppercase">
+        <p className="text-brand-text mb-1 text-base font-black tracking-wider whitespace-nowrap uppercase">
           {label}
         </p>
         {children}
@@ -152,7 +152,7 @@ export default function ContactPage() {
                   >
                     <a
                       href={`tel:${site.contact.phoneE164}`}
-                      className={`${VALUE_CLASS} hover:text-brand break-words transition-colors`}
+                      className={`${VALUE_CLASS} hover:text-brand-text break-words transition-colors`}
                     >
                       {site.contact.phone}
                     </a>
@@ -170,7 +170,7 @@ export default function ContactPage() {
                   >
                     <a
                       href={`mailto:${site.contact.email}`}
-                      className={`${VALUE_CLASS} hover:text-brand break-all transition-colors md:whitespace-nowrap`}
+                      className={`${VALUE_CLASS} hover:text-brand-text break-all transition-colors md:whitespace-nowrap`}
                     >
                       {site.contact.email}
                     </a>

@@ -19,6 +19,21 @@
   --color-brand: #e9162f;
   --color-brand-hover: #d11428;
 
+  /**
+   * Brand red for SMALL TEXT on dark surfaces.
+   *
+   * #e9162f is the brand, and it stays the brand — it is used for every button,
+   * fill and rule. But as small text it does not carry: measured against the
+   * dark surfaces it sits on it scores 3.16 to 4.48, under the 4.5 minimum for
+   * body text, and worst exactly where it is used most (labels on #2a2a2a).
+   *
+   * This is the same hue lightened 32% toward white, which clears 4.5 on every
+   * surface in use (4.55 at worst, 6.46 at best) while still reading as the
+   * brand red. Large headings keep --color-brand: at 24px and above the
+   * threshold drops to 3.0 and the brand passes on its own.
+   */
+  --color-brand-text: #f06172;
+
   /* Two further red variants exist in the current site (#c41226, #c11227).
      They appear to be drift rather than intent — see DESIGN-NOTES.md. They are
      kept so nothing shifts visually; consolidate only once confirmed. */

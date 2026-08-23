@@ -70,7 +70,7 @@ export default function FaqSection({
                 >
                   <span
                     className={`pr-4 text-base font-semibold transition-colors md:text-lg ${
-                      isOpen ? "text-brand" : "group-hover:text-brand text-white"
+                      isOpen ? "text-brand-text" : "group-hover:text-brand-text text-white"
                     }`}
                   >
                     {faq.question}

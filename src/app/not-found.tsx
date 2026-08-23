@@ -51,7 +51,7 @@ export default function NotFound() {
         search our current stock by year, make and model, or call the yard on{" "}
         <a
           href={`tel:${site.contact.phoneE164}`}
-          className="text-brand font-semibold hover:underline"
+          className="text-brand-text font-semibold hover:underline"
         >
           (02) 4388 1818
         </a>{" "}

@@ -104,3 +104,17 @@ browser's default serif while the rest of the site is Arial. Reproduced exactly.
 The footer rendered one version on every page not named in two hardcoded path
 lists; Home, About, Contact and Sell Your Car embedded a second directly. They
 differ in heading size and rule width. Now one component used everywhere.
+
+### 11. Brand red is not readable as small text — RESOLVED 19 Aug 2026
+`#e9162f` scored 3.16 to 4.48 against the dark surfaces it sits on, under the
+4.5 minimum for body text, and worst exactly where it is used most (the
+Address/Phone/Email labels on `#2a2a2a`).
+
+A second token, `--color-brand-text: #f06172`, is the same hue lightened 32%
+toward white. It clears 4.5 everywhere (4.55 worst, 6.46 best) and still reads
+as the brand red. Applied to small text only — buttons, fills, rules and
+headings 24px and over keep `#e9162f`, which passes on its own at the 3.0
+threshold that applies to large text.
+
+All six pages now pass WCAG AA, verified by measuring computed colours against
+their effective backgrounds.
