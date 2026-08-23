@@ -53,3 +53,7 @@ sync.log
 
 # Cached part photographs, fetched from the supplier as needed.
 .cache/
+
+# Local run logs.
+prod.log
+warm.log
