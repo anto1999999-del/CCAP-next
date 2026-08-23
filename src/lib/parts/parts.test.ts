@@ -31,6 +31,9 @@ function part(overrides: Partial<CatalogPart> = {}): CatalogPart {
     itemTypeCode: "ENGINE",
     icDesc: null,
     price: 1500,
+    tag: null,
+    odoReading: null,
+    comments: null,
     images: null,
     ...overrides,
   };

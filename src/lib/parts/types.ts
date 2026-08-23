@@ -34,6 +34,12 @@ export type CatalogPart = {
   icDesc: string | null;
   /** Dollars, as sent by the supplier. Never trusted for charging. */
   price: string | number | null;
+  /** The yard's own tag on the shelf, quoted when someone rings up. */
+  tag: string | null;
+  /** Kilometres on the car this came off, as typed. Digits are not guaranteed. */
+  odoReading: string | number | null;
+  /** Free text from the yard, e.g. "small dent lower corner". */
+  comments: string | null;
   images: PartImage[] | null;
 };
 

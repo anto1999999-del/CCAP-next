@@ -2,7 +2,7 @@ import "server-only";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { dedupeParts } from "./identity";
-import type { CatalogPart } from "./types";
+import type { CatalogPart, PartImage } from "./types";
 
 /**
  * Where the catalogue is read from.
@@ -34,6 +34,10 @@ function catalogPath(): string {
   return configured
     ? path.resolve(configured)
     : path.join(process.cwd(), "content", "parts", "catalog.json");
+}
+
+function galleriesPath(): string {
+  return path.join(path.dirname(catalogPath()), "galleries.json");
 }
 
 let snapshot: CatalogSnapshot = EMPTY;
@@ -71,6 +75,25 @@ async function read(): Promise<CatalogSnapshot> {
   loadedFrom = { path: file, mtimeMs };
 
   return snapshot;
+}
+
+/**
+ * Every photograph of every part, keyed the way `partKey` keys them.
+ *
+ * Held apart from the catalogue because the grid needs one thumbnail per part
+ * and the detail page needs all six: carrying every image in the catalogue took
+ * the old backend from about 150MB resident to 1.2GB, on a 2GB droplet. Loaded
+ * on first use, so a visitor who never opens a part never pays for it.
+ */
+let galleries: Record<string, PartImage[]> | null = null;
+
+export async function loadGallery(key: string): Promise<PartImage[]> {
+  galleries ??= await readFile(galleriesPath(), "utf8")
+    .then((raw) => (JSON.parse(raw) as { galleries: Record<string, PartImage[]> }).galleries)
+    // No sync yet, or no galleries file: the catalogue's own image still shows.
+    .catch(() => ({}));
+
+  return galleries[key] ?? [];
 }
 
 export async function loadCatalog(): Promise<CatalogSnapshot> {
