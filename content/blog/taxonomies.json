@@ -1,0 +1,91 @@
+{
+  "categories": [
+    {
+      "name": "Blog",
+      "slug": "blog",
+      "count": 87
+    },
+    {
+      "name": "Gallery",
+      "slug": "gallery",
+      "count": 26
+    },
+    {
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "count": 0
+    }
+  ],
+  "tags": [
+    {
+      "name": "1GD-FTV",
+      "slug": "1gd-ftv",
+      "count": 1
+    },
+    {
+      "name": "1KD-FTV",
+      "slug": "1kd-ftv",
+      "count": 1
+    },
+    {
+      "name": "Cerato",
+      "slug": "cerato",
+      "count": 1
+    },
+    {
+      "name": "common problems",
+      "slug": "common-problems",
+      "count": 1
+    },
+    {
+      "name": "diesel ute",
+      "slug": "diesel-ute",
+      "count": 1
+    },
+    {
+      "name": "DPF",
+      "slug": "dpf",
+      "count": 1
+    },
+    {
+      "name": "engine problems",
+      "slug": "engine-problems",
+      "count": 1
+    },
+    {
+      "name": "Kia",
+      "slug": "kia",
+      "count": 1
+    },
+    {
+      "name": "Optima",
+      "slug": "optima",
+      "count": 1
+    },
+    {
+      "name": "Rio",
+      "slug": "rio",
+      "count": 1
+    },
+    {
+      "name": "Sportage",
+      "slug": "sportage",
+      "count": 1
+    },
+    {
+      "name": "Toyota HiLux",
+      "slug": "toyota-hilux",
+      "count": 1
+    },
+    {
+      "name": "used car parts",
+      "slug": "used-car-parts",
+      "count": 2
+    },
+    {
+      "name": "ute maintenance",
+      "slug": "ute-maintenance",
+      "count": 1
+    }
+  ]
+}
