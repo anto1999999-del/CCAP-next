@@ -4,17 +4,24 @@
  * The site does not read the supplier's API at request time: it does not honour
  * filter parameters, and it is slow often enough that a page which depends on
  * it is a page that sometimes does not load. This script is the only thing that
- * talks to it, and it writes two files:
+ * talks to it, and it writes:
  *
- *   catalog.json   every part, with ONE image each
- *   galleries.json every image, keyed by part
+ *   catalog.json       every part, with ONE image each
+ *   galleries/xx.ndjson every image, keyed by part, across 256 files
  *
- * Splitting them is what keeps the site's memory use sane. The grid needs a
- * thumbnail per part and nothing else; carrying all the images in the catalogue
- * took the old backend from roughly 150MB resident to 1.2GB, on a 2GB droplet.
- * The rest are not thrown away, because the product page cannot get them back:
- * the supplier's per-part image endpoint answered 0 of 14 requests when it was
- * measured, most of them hanging past fifteen seconds.
+ * Splitting them is what keeps memory use sane. The grid needs a thumbnail per
+ * part and nothing else; carrying every image in the catalogue took the old
+ * backend from roughly 150MB resident to 1.2GB, on a 2GB droplet. The galleries
+ * come to 290MB all together, so they are split across 256 files of about a
+ * megabyte: opening a part reads the one file its part is in.
+ *
+ * Those files are written a line at a time as the sync runs, so this script
+ * holds one page of parts at a time rather than the whole 290MB. That matters
+ * because it runs on the same 2GB droplet that serves the site.
+ *
+ * The extra images are not discarded, because the part page cannot get them
+ * back: the supplier's per-part image endpoint answered none of fourteen
+ * requests when it was measured, most of them hanging past fifteen seconds.
  *
  *   node scripts/sync-parts-catalog.mjs [--pages N] [--rows N]
  *
@@ -23,7 +30,9 @@
  * intact because the write happens once, at the end, after a checkpoint.
  */
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { createWriteStream } from "node:fs";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const BASE_URL = process.env.PARTS_API_URL ?? "http://api.carparts-au.com";
@@ -85,6 +94,11 @@ async function fetchPage(page) {
   throw new Error(`page ${page} failed after ${MAX_RETRIES} attempts: ${lastError?.message}`);
 }
 
+/** Which of the 256 gallery files a part's photographs live in. */
+function shardOf(key) {
+  return createHash("sha1").update(key).digest("hex").slice(0, 2);
+}
+
 function partKey(part) {
   const urgId = String(part?.urgId ?? "").trim().toLowerCase();
   const invNumber = String(part?.invNumber ?? "").trim();
@@ -98,11 +112,50 @@ function coverImage(images) {
   return images.find((image) => image?.type === "Part") ?? images[0] ?? null;
 }
 
+/** One append stream per shard, opened the first time a part lands in it. */
+function shardWriter(directory) {
+  const streams = new Map();
+  let written = 0;
+
+  return {
+    write(key, images) {
+      const shard = shardOf(key);
+      let stream = streams.get(shard);
+      if (!stream) {
+        stream = createWriteStream(path.join(directory, `${shard}.ndjson`));
+        streams.set(shard, stream);
+      }
+      stream.write(`${JSON.stringify({ k: key, i: images })}
+`);
+      written += 1;
+    },
+    get count() {
+      return written;
+    },
+    get files() {
+      return streams.size;
+    },
+    async close() {
+      await Promise.all(
+        [...streams.values()].map(
+          (stream) => new Promise((resolve) => stream.end(resolve)),
+        ),
+      );
+    },
+  };
+}
+
 async function main() {
   console.log(`syncing from ${BASE_URL} (${ROWS} rows per page)`);
 
+  const shardDir = path.join(OUT_DIR, "galleries");
+  // Replaced wholesale, so a part that has sold does not leave its photographs
+  // behind for whatever lands on its key next.
+  await rm(shardDir, { recursive: true, force: true });
+  await mkdir(shardDir, { recursive: true });
+  const galleries = shardWriter(shardDir);
+
   const catalog = [];
-  const galleries = {};
   const seen = new Set();
 
   let expectedPages = null;
@@ -130,7 +183,7 @@ async function main() {
 
       const images = Array.isArray(part.images) ? part.images : [];
       // Only worth storing when there is more than the catalogue already keeps.
-      if (key && images.length > 1) galleries[key] = images;
+      if (key && images.length > 1) galleries.write(key, images);
 
       const cover = coverImage(images);
       catalog.push({ ...part, images: cover ? [cover] : [] });
@@ -154,13 +207,10 @@ async function main() {
     path.join(OUT_DIR, "catalog.json"),
     JSON.stringify({ syncedAt, count: catalog.length, results: catalog }),
   );
-  await writeFile(
-    path.join(OUT_DIR, "galleries.json"),
-    JSON.stringify({ syncedAt, galleries }),
-  );
+  await galleries.close();
 
   console.log(
-    `wrote ${catalog.length} parts and ${Object.keys(galleries).length} galleries to ${OUT_DIR}`,
+    `wrote ${catalog.length} parts and ${galleries.count} galleries (${galleries.files} files) to ${OUT_DIR}`,
   );
 }
 

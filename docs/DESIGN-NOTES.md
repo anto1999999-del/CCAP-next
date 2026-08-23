@@ -163,3 +163,19 @@ combination is a real, indexable address.
 plain text, so they are in that repository's git history. The rebuild reads them
 from the environment, but that does not undo the exposure: **the password should
 be rotated with Pinnacle**, and the new one set only in the server's `.env`.
+
+## 17. The catalogue sync, and what it produces
+
+`node scripts/sync-parts-catalog.mjs` pulls the whole catalogue from the
+supplier. It takes about 35 minutes: the supplier caps a page at 10 rows and the
+catalogue is 3,376 pages, and the run is deliberately paced so it is not
+rate-limited. It should run overnight, the way the old one did.
+
+The last run: **32,698 parts**, 32,635 of them with more than one photograph.
+That produces a 22MB catalogue and 291MB of photograph records, and the split
+between them is why the site can hold the catalogue in memory at all. The
+photographs are written across 256 files of about a megabyte, a line at a time
+as the sync runs, so neither the sync nor the site ever holds all 291MB.
+
+Pages read the catalogue from disk once and re-read only when the file changes,
+so a sync is picked up without a restart.

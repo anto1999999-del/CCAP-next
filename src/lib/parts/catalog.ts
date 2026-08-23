@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { dedupeParts } from "./identity";
@@ -36,8 +37,9 @@ function catalogPath(): string {
     : path.join(process.cwd(), "content", "parts", "catalog.json");
 }
 
-function galleriesPath(): string {
-  return path.join(path.dirname(catalogPath()), "galleries.json");
+function galleryShardPath(key: string): string {
+  const shard = createHash("sha1").update(key).digest("hex").slice(0, 2);
+  return path.join(path.dirname(catalogPath()), "galleries", `${shard}.ndjson`);
 }
 
 let snapshot: CatalogSnapshot = EMPTY;
@@ -80,20 +82,50 @@ async function read(): Promise<CatalogSnapshot> {
 /**
  * Every photograph of every part, keyed the way `partKey` keys them.
  *
- * Held apart from the catalogue because the grid needs one thumbnail per part
- * and the detail page needs all six: carrying every image in the catalogue took
- * the old backend from about 150MB resident to 1.2GB, on a 2GB droplet. Loaded
- * on first use, so a visitor who never opens a part never pays for it.
+ * These are held apart from the catalogue, and split across 256 files, because
+ * together they are 290MB. The grid needs one thumbnail per part; only a part
+ * page needs the rest. Loading them all would put the site back where the old
+ * backend was, at 1.2GB resident on a 2GB droplet.
+ *
+ * A part page therefore reads the one file its part is in, about a megabyte.
+ * The few most recently read stay parsed, which covers the common case of
+ * someone looking through several parts, and the cache is capped so a crawler
+ * working through the catalogue cannot walk it up to 290MB.
  */
-let galleries: Record<string, PartImage[]> | null = null;
+type Shard = Map<string, PartImage[]>;
+
+const shards = new Map<string, Shard>();
+const MAX_CACHED_SHARDS = 8;
+
+function parseShard(contents: string): Shard {
+  const shard: Shard = new Map();
+  for (const line of contents.split("\n")) {
+    if (!line) continue;
+    const { k, i } = JSON.parse(line) as { k: string; i: PartImage[] };
+    shard.set(k, i);
+  }
+  return shard;
+}
 
 export async function loadGallery(key: string): Promise<PartImage[]> {
-  galleries ??= await readFile(galleriesPath(), "utf8")
-    .then((raw) => (JSON.parse(raw) as { galleries: Record<string, PartImage[]> }).galleries)
-    // No sync yet, or no galleries file: the catalogue's own image still shows.
-    .catch(() => ({}));
+  const file = galleryShardPath(key);
 
-  return galleries[key] ?? [];
+  let shard = shards.get(file);
+  if (!shard) {
+    shard = await readFile(file, "utf8")
+      .then(parseShard)
+      // No sync yet, or nothing in this shard: the catalogue's own image shows.
+      .catch(() => new Map<string, PartImage[]>());
+
+    // Oldest out first: Map preserves insertion order, so this is the least
+    // recently loaded shard.
+    if (shards.size >= MAX_CACHED_SHARDS) {
+      shards.delete(shards.keys().next().value!);
+    }
+    shards.set(file, shard);
+  }
+
+  return shard.get(key) ?? [];
 }
 
 export async function loadCatalog(): Promise<CatalogSnapshot> {
