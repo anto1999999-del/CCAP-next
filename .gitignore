@@ -56,4 +56,4 @@ sync.log
 
 # Local run logs.
 prod.log
-warm.log
+warm*.log

@@ -11,7 +11,12 @@
  * directly, so the files land exactly where the route looks for them and there
  * is only one piece of code that knows how they are stored.
  *
- *   node scripts/warm-part-images.mjs [--base http://localhost:3000] [--limit N]
+ *   node scripts/warm-part-images.mjs [--base http://localhost:3000] [--limit N] [--full]
+ *
+ * --full also warms the large copy of each part's leading photograph, which is
+ * the one a part page opens with. That is roughly another 11,000 images and
+ * about twenty minutes, and it is what makes a part page appear finished rather
+ * than filling in.
  *
  * Safe to re-run and safe to interrupt: an image already on disk is served from
  * there, so a second run costs a local request and nothing upstream.
@@ -33,23 +38,34 @@ function argValue(name) {
   return index === -1 ? null : process.argv[index + 1];
 }
 
-function thumbnailPath(part) {
+const WARM_FULL_SIZE = process.argv.includes("--full");
+
+/** The images worth having on disk before anybody asks for them. */
+function pathsFor(part) {
   const images = Array.isArray(part.images) ? part.images : [];
   const cover = images.find((image) => image?.type === "Part") ?? images[0];
-  const source = cover?.thumb ?? cover?.img;
-  return source ? `/part-image${source}` : null;
+  if (!cover) return [];
+
+  const wanted = [cover.thumb ?? cover.img];
+  if (WARM_FULL_SIZE && cover.img) wanted.push(cover.img);
+
+  return wanted.filter(Boolean).map((source) => `/part-image${source}`);
 }
 
 async function main() {
   const catalogFile = path.join(process.cwd(), "content", "parts", "catalog.json");
   const { results } = JSON.parse(await readFile(catalogFile, "utf8"));
 
-  const paths = results
-    .map(thumbnailPath)
-    .filter(Boolean)
-    .slice(0, LIMIT);
+  /*
+    Deduplicated: two thirds of the catalogue shares a photograph with another
+    part, so 32,698 parts come to about 11,000 distinct images. Asking for the
+    same one repeatedly would only prove the cache works.
+  */
+  const paths = [...new Set(results.flatMap(pathsFor))].slice(0, LIMIT);
 
-  console.log(`warming ${paths.length} thumbnails through ${BASE}`);
+  console.log(
+    `warming ${paths.length} distinct images through ${BASE}${WARM_FULL_SIZE ? " (thumbnails and full size)" : ""}`,
+  );
 
   let done = 0;
   let hits = 0;
@@ -87,7 +103,7 @@ async function main() {
 
   const minutes = ((Date.now() - started) / 60000).toFixed(1);
   console.log(
-    `warmed ${done - failed} thumbnails in ${minutes} minutes (${hits} were already cached, ${failed} failed)`,
+    `warmed ${done - failed} images in ${minutes} minutes (${hits} were already cached, ${failed} failed)`,
   );
 }
 

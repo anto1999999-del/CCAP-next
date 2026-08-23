@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import PartThumbnail from "./PartThumbnail";
-import { fullImageUrl } from "@/lib/parts/images";
+import { fullImageUrl, thumbUrl } from "@/lib/parts/images";
 import type { PartImage } from "@/lib/parts/types";
 
 /**
@@ -63,7 +63,7 @@ export default function PartGallery({
               }`}
             >
               <PartThumbnail
-                src={fullImageUrl(image)}
+                src={thumbUrl(image)}
                 alt=""
                 className="h-20 w-24 object-cover"
               />

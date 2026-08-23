@@ -42,6 +42,18 @@ export function fullImageUrl(image: PartImage): string {
   return proxied(image.img ?? image.thumb) ?? PART_IMAGE_PLACEHOLDER;
 }
 
+/**
+ * The small copy of one image.
+ *
+ * Worth asking for by name in a thumbnail strip: the supplier's small copies
+ * are about 12KB against roughly 200KB for the full ones, and they are the
+ * copies the overnight warm-up has already put on disk, so a strip of them
+ * appears at once instead of a photograph at a time.
+ */
+export function thumbUrl(image: PartImage): string {
+  return proxied(image.thumb ?? image.img) ?? PART_IMAGE_PLACEHOLDER;
+}
+
 export function hasPhoto(part: CatalogPart): boolean {
   return (part.images ?? []).some((image) => Boolean(image.thumb || image.img));
 }
