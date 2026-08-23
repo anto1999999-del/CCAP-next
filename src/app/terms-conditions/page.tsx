@@ -8,7 +8,7 @@ import { TERMS_SECTIONS } from "@/lib/content/terms";
  * Terms and conditions.
  *
  * The live page has no metadata of its own, so it inherits the home page's
- * title and description — two pages telling Google they are the same thing,
+ * title and description, two pages telling Google they are the same thing,
  * which is a duplicate-content signal for nothing. It also has 23 `h2`
  * headings and no `h1`. Both are fixed here.
  *
@@ -104,8 +104,8 @@ export default function TermsPage() {
       {/*
         The live site shows a contact form here, supplied by the footer, which
         rendered it on every page not named in two hardcoded lists. That block
-        existed in two slightly different versions — the footer's and the one
-        Home, About, Contact and Sell Your Car embedded directly — with
+        existed in two slightly different versions, the footer's and the one
+        Home, About, Contact and Sell Your Car embedded directly, with
         different heading sizes and rule widths. One component is now used
         everywhere, so every page presents the same form.
       */}

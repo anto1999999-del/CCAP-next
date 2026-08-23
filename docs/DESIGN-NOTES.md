@@ -119,3 +119,27 @@ threshold that applies to large text.
 
 All six pages now pass WCAG AA, verified by measuring computed colours against
 their effective backgrounds.
+
+## 12. Vehicle gallery meta was auto-generated and unusable
+
+The 26 gallery vehicles came across from WordPress with Yoast meta that had
+clearly been generated, not written: four descriptions repeat themselves
+mid-sentence, several run past 400 characters (Google shows about 160), and two
+titles contain the vehicle name twice. Titles and descriptions for
+`/gallery/<vehicle>` are therefore written by the template instead of carried
+across. The 87 articles have hand-written meta and keep theirs untouched.
+
+## 13. Em and en dashes removed site-wide
+
+At the owner's instruction, no em or en dash appears anywhere on the site. Our
+own copy was reworded; the 197 in the imported WordPress posts are converted as
+the content loads (`withoutDashes` in `src/lib/blog/html.ts`), so re-running the
+exporter cannot bring them back. A dash between two numbers becomes a hyphen so
+ranges keep their meaning; everywhere else it becomes a comma.
+
+## 14. Gallery wording deliberately avoids "every" and "in the yard"
+
+The gallery shows 26 photographed cars, which is a fraction of what the yard
+parts out. Copy that implied it was the full list ("every vehicle in the yard",
+"in the yard right now") was removed so the page reads as a showcase, not an
+inventory.

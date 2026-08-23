@@ -146,7 +146,7 @@ export function WhyUsedParts({ className = "" }: { className?: string }) {
 }
 
 /**
- * @param closing The final line differs between the two pages — Home ends "or
+ * @param closing The final line differs between the two pages, Home ends "or
  *   have a question", About "or want to sell your car fast".
  */
 export function WhyChooseUs({

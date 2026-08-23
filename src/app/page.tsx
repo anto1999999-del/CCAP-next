@@ -14,7 +14,7 @@ import { homeBusinessSchema } from "@/lib/schema/business";
  * Home page.
  *
  * Everything except the FAQ accordion is a server component, so the whole page
- * — headings, copy, category links, structured data — is in the initial HTML.
+ *, headings, copy, category links, structured data, is in the initial HTML.
  * The current site renders all of this in the browser from an empty div, so
  * this is the single largest SEO improvement in the migration.
  *
@@ -49,16 +49,16 @@ export default function HomePage() {
       >
         <div className="relative z-[1] mx-auto w-full max-w-4xl px-6 text-center">
           <p className="text-brand-text mb-5 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em] md:text-sm">
-            CENTRAL COAST AUTO PARTS — BERKELEY VALE NSW
+            CENTRAL COAST AUTO PARTS, BERKELEY VALE NSW
           </p>
           <h1 className="mb-6 text-3xl leading-[1.15] font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
-            Used Car Parts Central Coast NSW — Engines, Gearboxes, Panels & More
+            Used Car Parts Central Coast NSW: Engines, Gearboxes, Panels & More
           </h1>
           <p className="mx-auto mb-10 max-w-3xl text-sm leading-relaxed text-white/90 md:text-base lg:text-lg">
             Central Coast Auto Parts is a trusted used auto parts supplier and
             car wrecker based in Berkeley Vale, NSW. We stock quality second-hand
             engines, gearboxes, body panels, electrical components and mechanical
-            parts for everyday cars, 4x4s, vans and light commercials — all
+            parts for everyday cars, 4x4s, vans and light commercials, all
             tested, warranted and ready to ship Australia-wide.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
@@ -84,7 +84,7 @@ export default function HomePage() {
         closing={
           <>
             Whether you need a used engine, a replacement panel or have a
-            question —{" "}
+            question,{" "}
             <span className="text-brand-text font-semibold">
               Central Coast Auto Parts has you covered.
             </span>

@@ -20,7 +20,7 @@ import { site } from "@/lib/site";
  * one not to. Google resolved that in our favour, but a page whose own tags
  * disagree is a bug waiting to be read the other way.
  *
- * Next emits two robots tags here — a bare `noindex`, and `noindex, follow`
+ * Next emits two robots tags here, a bare `noindex`, and `noindex, follow`
  * from overriding the layout's inherited value. Both say the same thing (a bare
  * `noindex` implies `follow`, since following is the default), so there is no
  * conflict to resolve. No `robots` field is set below, because adding one only
@@ -42,8 +42,7 @@ export default function NotFound() {
       </h1>
 
       {/*
-        Deliberately lighter than the original, which used gray-600 on black —
-        about 3.2:1, below the 4.5:1 minimum for body text and genuinely hard to
+        Deliberately lighter than the original, which used gray-600 on black, about 3.2:1, below the 4.5:1 minimum for body text and genuinely hard to
         read. The copy is unchanged; only the contrast is corrected.
       */}
       <p className="mt-4 max-w-xl text-gray-300">

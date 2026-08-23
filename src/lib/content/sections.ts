@@ -2,7 +2,7 @@
  * Copy for the marketing sections shared by Home and About.
  *
  * These three sections were duplicated in full across both pages in the site
- * this replaces — same markup, same wording, maintained twice. They had already
+ * this replaces, same markup, same wording, maintained twice. They had already
  * started to drift apart (see SUPPLY_CARDS below), which is what duplication
  * always does eventually.
  */
@@ -32,7 +32,7 @@ export const SUPPLY_CARDS: readonly SupplyCard[] = [
     icon: "🧩",
     title: "Panels & Body Parts",
     slug: "body-panels",
-    desc: "Second-hand bumpers, guards, bonnets, doors, tailgates and exterior body parts at affordable prices — a fraction of dealer costs.",
+    desc: "Second-hand bumpers, guards, bonnets, doors, tailgates and exterior body parts at affordable prices, a fraction of dealer costs.",
   },
   {
     icon: "🔌",
@@ -50,7 +50,7 @@ export const SUPPLY_CARDS: readonly SupplyCard[] = [
     icon: "🚚",
     title: "Australia-Wide Delivery",
     slug: null,
-    desc: "We ship used auto parts to Sydney, Newcastle, Brisbane, Melbourne and everywhere in between — fast freight, secure packaging.",
+    desc: "We ship used auto parts to Sydney, Newcastle, Brisbane, Melbourne and everywhere in between, with fast freight, secure packaging.",
   },
   {
     icon: "🏷️",
@@ -62,7 +62,7 @@ export const SUPPLY_CARDS: readonly SupplyCard[] = [
     icon: "🔧",
     title: "Supply & Fit Available",
     slug: null,
-    desc: "Selected major components can be supplied and fitted through our workshop — ask our team about availability for your vehicle.",
+    desc: "Selected major components can be supplied and fitted through our workshop. Ask our team about availability for your vehicle.",
   },
 ] as const;
 
@@ -72,7 +72,7 @@ export const SUPPLY_CARDS: readonly SupplyCard[] = [
  * "Suspension & Steering".
  *
  * Preserved rather than unified so no page loses a phrase it currently ranks
- * for. Flagged in docs/DESIGN-NOTES.md — one name should win, and then this
+ * for. Flagged in docs/DESIGN-NOTES.md, one name should win, and then this
  * override should go.
  */
 export const ABOUT_SUPPLY_CARDS: readonly SupplyCard[] = SUPPLY_CARDS.map(
@@ -86,7 +86,7 @@ export const USED_PART_BENEFITS = [
   {
     icon: "✓",
     title: "Save Up to 70% vs New",
-    desc: "Quality used car parts cost a fraction of new dealer prices — without sacrificing reliability when sourced from a reputable wrecker.",
+    desc: "Quality used car parts cost a fraction of new dealer prices, without sacrificing reliability when sourced from a reputable wrecker.",
   },
   {
     icon: "💰",
@@ -96,7 +96,7 @@ export const USED_PART_BENEFITS = [
   {
     icon: "🔧",
     title: "Faster Turnaround",
-    desc: "In-stock used parts mean quicker repairs — no waiting weeks for back-ordered new parts. Get your car back on the road sooner.",
+    desc: "In-stock used parts mean quicker repairs, with no waiting weeks for back-ordered new parts. Get your car back on the road sooner.",
   },
 ] as const;
 
@@ -109,7 +109,7 @@ export const REASONS_TO_CHOOSE = [
   {
     icon: "📦",
     title: "Large Stock of Used Auto Parts",
-    desc: "Engines, gearboxes, body panels, electrical and mechanical parts across hundreds of makes and models — all in stock.",
+    desc: "Engines, gearboxes, body panels, electrical and mechanical parts across hundreds of makes and models, all in stock.",
   },
   {
     icon: "♻️",
@@ -119,7 +119,7 @@ export const REASONS_TO_CHOOSE = [
   {
     icon: "🛡️",
     title: "Warranty on Major Components",
-    desc: "All major used parts — including engines and gearboxes — are sold with warranty for added peace of mind.",
+    desc: "All major used parts, including engines and gearboxes, are sold with warranty for added peace of mind.",
   },
 ] as const;
 

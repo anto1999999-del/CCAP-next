@@ -6,61 +6,94 @@ import Container from "./Container";
 /**
  * The banner at the top of an interior page.
  *
- * One component, so every hero on the site is the same height, uses the same
- * scrim, aligns its heading to the same gutter as the rest of the page, and
- * sizes that heading the same way.
+ * One component, so every hero is the same height, aligns to the same gutter,
+ * and sizes its heading the same way. About and Sell Your Car were built
+ * separately and had drifted into looking like two different websites.
  *
- * They were built twice and diverged: About was 320px rising to 384px with a
- * dark overlay, a container-aligned heading at 48px/96px and two buttons; Sell
- * Your Car was 330px rising to 455px, no overlay at all, its heading fixed at
- * 40px and pushed in with a hardcoded 100px margin, centred on small screens and
- * left-aligned above 800px. Side by side they read as two different websites.
+ * Two treatments:
+ *
+ * - **photo**, a photograph behind a scrim. For pages whose image carries
+ *   meaning, like the yard shot on About.
+ * - **gradient**, the brand wash used on the home page hero, with no
+ *   photograph at all. This is the right choice whenever the available image
+ *   has words burnt into it. `cars-hero.webp` reads "EXPLORE OUR SALVAGE
+ *   VEHICLES", so putting a heading over it produced two competing titles.
  */
 
-type HeroAction = {
-  href: string;
-  label: string;
-};
+type HeroAction = { href: string; label: string };
 
 export default function PageHero({
   title,
+  eyebrow,
+  subtitle,
   image,
   actions = [],
   children,
 }: {
   title: string;
-  /** Path under /images. Loaded eagerly — it is the page's largest paint. */
-  image: string;
+  /** Small caps line above the title. */
+  eyebrow?: string;
+  subtitle?: string;
+  /** Path under /images. Omit for the gradient treatment. */
+  image?: string;
   actions?: readonly HeroAction[];
   children?: ReactNode;
 }) {
   return (
-    <div className="relative flex h-[330px] items-center sm:h-[380px] lg:h-[455px]">
-      <Image
-        src={image}
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-center"
-      />
-
-      {/*
-        The heading sits on a photograph, so its contrast would otherwise depend
-        on whichever part of the image happened to be behind it. This scrim
-        guarantees it. Sell Your Car had none at all.
-      */}
-      <div className="absolute inset-0 bg-black/45" />
+    <div
+      className="relative flex h-[330px] items-center sm:h-[380px] lg:h-[455px]"
+      style={
+        image
+          ? undefined
+          : {
+              backgroundColor: "#050505",
+              backgroundImage: `
+                radial-gradient(ellipse 120% 80% at 0% 50%, rgba(233, 22, 47, 0.45), transparent 55%),
+                radial-gradient(ellipse 70% 50% at 100% 0%, rgba(233, 22, 47, 0.12), transparent 45%),
+                linear-gradient(100deg, #2a0c10 0%, #12080a 28%, #080808 55%, #050505 100%)
+              `,
+            }
+      }
+    >
+      {image && (
+        <>
+          <Image
+            src={image}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+          {/*
+            The heading sits on a photograph, so its contrast would otherwise
+            depend on whichever part of the image happened to be behind it.
+          */}
+          <div className="absolute inset-0 bg-black/45" />
+        </>
+      )}
 
       <Container className="relative">
+        {eyebrow && (
+          <p className="text-brand-text mb-4 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em]">
+            {eyebrow}
+          </p>
+        )}
+
         <h1 className="text-[40px] leading-[1.05] font-bold tracking-[0.02em] text-white sm:text-5xl lg:text-7xl">
           {title}
         </h1>
 
+        {subtitle && (
+          <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base lg:text-lg">
+            {subtitle}
+          </p>
+        )}
+
         {children}
 
         {actions.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-4">
+          <div className="mt-6 flex flex-wrap gap-4">
             {actions.map((action) => (
               <Link
                 key={action.href}

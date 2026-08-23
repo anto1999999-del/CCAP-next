@@ -12,8 +12,8 @@ export type TermsSection = {
 /**
  * Terms and warranty conditions.
  *
- * This is a legal document. Do not reword, summarise or "tidy" any of it —
- * these clauses set the warranty period, the liability caps and the returns
+ * This is a legal document. Do not reword, summarise or "tidy" any of it.
+ * These clauses set the warranty period, the liability caps and the returns
  * window, and the business relies on them. Changes come from the owner only.
  */
 export const TERMS_SECTIONS: readonly TermsSection[] = [

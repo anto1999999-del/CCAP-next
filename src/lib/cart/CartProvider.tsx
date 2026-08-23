@@ -25,7 +25,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   // Reads straight from localStorage via the external store. On the server, and
-  // for the first client render, this is an empty cart — so the markup matches
+  // for the first client render, this is an empty cart, so the markup matches
   // and React can hydrate without a mismatch, then re-render with the real cart.
   const lines = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 

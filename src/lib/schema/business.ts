@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
  * LocalBusiness + WebSite structured data for the home page.
  *
  * Carried across unchanged from the current site. The figures in
- * `aggregateRating` describe real published reviews — do not invent, round or
+ * `aggregateRating` describe real published reviews, do not invent, round or
  * "refresh" them, and update them only from the actual review count. Fabricated
  * ratings are a manual-action risk in Search Console.
  */
@@ -20,7 +20,7 @@ export function homeBusinessSchema() {
         name: site.name,
         alternateName: "CCAP",
         description:
-          "Quality used car parts in Berkeley Vale, NSW. Engines, gearboxes, body panels and more — all with warranty. Auto wreckers serving the Central Coast, Sydney and all of NSW with nationwide delivery.",
+          "Quality used car parts in Berkeley Vale, NSW. Engines, gearboxes, body panels and more, all with warranty. Auto wreckers serving the Central Coast, Sydney and all of NSW with nationwide delivery.",
         url: `${site.url}/`,
         logo: {
           "@type": "ImageObject",

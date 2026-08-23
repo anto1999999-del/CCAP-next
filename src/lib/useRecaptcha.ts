@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef } from "react";
  *
  * Written directly against Google's API rather than pulling in a wrapper
  * library. The script is fetched on first use rather than on every page load,
- * so pages with no protected form pay nothing for it — the old site loaded it
+ * so pages with no protected form pay nothing for it, the old site loaded it
  * site-wide from the app root.
  *
  * The badge is hidden by CSS, which Google permits only while the required
@@ -56,7 +56,7 @@ export function useRecaptcha() {
 
   /**
    * Returns a token, or null when reCAPTCHA is unavailable. Null is passed to
-   * the server, which decides what to do with it — the client never gets to
+   * the server, which decides what to do with it, the client never gets to
    * conclude that a check passed.
    */
   return useCallback(async (action: string): Promise<string | null> => {

@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
  *
  * The sender address is fixed here rather than passed in. The implementation
  * this replaces accepted a `from` argument at every call site, then ignored it
- * and hardcoded the address anyway — so callers believed they were controlling
+ * and hardcoded the address anyway, so callers believed they were controlling
  * something they were not.
  */
 
@@ -21,7 +21,7 @@ let client: Resend | null = null;
 
 /**
  * Created on first use so the app boots without a key. Everything that does not
- * send email — the catalogue, cart, checkout — then works normally in local
+ * send email, the catalogue, cart, checkout, then works normally in local
  * development without one.
  */
 function resend(): Resend | null {
@@ -42,7 +42,7 @@ export async function sendEmail(params: {
 
   if (!mailer) {
     console.warn(
-      `[email] RESEND_API_KEY is not set — "${params.subject}" was not sent.`,
+      `[email] RESEND_API_KEY is not set, "${params.subject}" was not sent.`,
     );
     return { ok: false, reason: "not-configured" };
   }
@@ -57,7 +57,7 @@ export async function sendEmail(params: {
     });
 
     if (error) {
-      // Logged in full for diagnosis, never surfaced to the visitor — provider
+      // Logged in full for diagnosis, never surfaced to the visitor, provider
       // errors can carry address and account details.
       console.error("[email] Resend rejected the message:", error);
       return { ok: false, reason: "failed" };

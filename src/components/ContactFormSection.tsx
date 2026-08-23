@@ -1,7 +1,7 @@
 import ContactForm from "./ContactForm";
 
 /**
- * The "Contact Us – Central Coast NSW" block.
+ * The "Contact Us, Central Coast NSW" block.
  *
  * Appears at the foot of Home, About, Sell Your Car and Contact. The heading,
  * intro and rule are server-rendered; only the form itself is interactive.
@@ -28,7 +28,7 @@ export default function ContactFormSection({
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 text-center md:mb-10">
           <h2 className="text-brand mb-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-[2.5rem]">
-            Contact Us – Central Coast NSW
+            Contact Us, Central Coast NSW
           </h2>
           <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
             Have a question or need assistance? Our team is here to help. Fill in

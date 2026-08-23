@@ -23,7 +23,7 @@ export default function FaqSection({
    * so the seam is invisible: Home comes off #050505, Contact off #1c1c1c.
    *
    * Passed as a complete class rather than a colour, because Tailwind generates
-   * utilities by scanning source text — it can only produce `from-[#1c1c1c]` if
+   * utilities by scanning source text, it can only produce `from-[#1c1c1c]` if
    * that exact string appears somewhere it reads. Both variants are therefore
    * written out literally: the default here, and the override at the call site.
    */

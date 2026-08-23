@@ -13,7 +13,7 @@ export function sellYourCarServiceSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: "Sell Your Car — Central Coast Auto Parts",
+    name: "Sell Your Car | Central Coast Auto Parts",
     description:
       "Sell your used, damaged or unwanted car, van or light vehicle to Central Coast Auto Parts in Berkeley Vale NSW. We buy all makes and models across NSW and offer fast assessment and fair prices.",
     url: `${site.url}/sellyourcar`,

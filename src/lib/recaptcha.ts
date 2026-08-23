@@ -6,8 +6,8 @@ import "server-only";
  * Two deliberate differences from the implementation this replaces:
  *
  * 1. **It fails closed.** The old version returned `ok: true` from its catch
- *    block, so anything that stopped the request reaching Google — a network
- *    blip, a firewall, a deliberate flood — silently disabled the check. A
+ *    block, so anything that stopped the request reaching Google, a network
+ *    blip, a firewall, a deliberate flood, silently disabled the check. A
  *    verification that cannot be performed is not a verification that passed.
  *
  * 2. **Verification is skipped only when no secret is configured**, which is
@@ -19,7 +19,7 @@ import "server-only";
 
 const VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
-/** Google returns 0.0–1.0; below this we treat the caller as a bot. */
+/** Google returns 0.0-1.0; below this we treat the caller as a bot. */
 const MIN_SCORE = Number(process.env.RECAPTCHA_MIN_SCORE) || 0.5;
 
 /** How long to wait on Google before giving up. */

@@ -38,8 +38,8 @@ export const metadata: Metadata = {
   ],
   alternates: {
     // Emits the bare origin, where the current site emits it with a trailing
-    // slash. The two are the same resource — an empty path normalises to "/" —
-    // so crawlers treat them identically and no value is lost.
+    // slash. The two are the same resource, an empty path normalises to "/",
+  // so crawlers treat them identically and no value is lost.
     //
     // Do NOT reach for `trailingSlash: true` in next.config to close the gap:
     // that setting redirects every route on the site (/about -> /about/), which
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     title:
       "Used Car Parts Berkeley Vale NSW | Warranty-Backed | Central Coast Auto Parts",
     description:
-      "Quality used engines, gearboxes, body panels and more — all with warranty. Trusted car wreckers in Berkeley Vale NSW. Fast dispatch Australia-wide.",
+      "Quality used engines, gearboxes, body panels and more, all with warranty. Trusted car wreckers in Berkeley Vale NSW. Fast dispatch Australia-wide.",
     images: [site.logo],
   },
   icons: {

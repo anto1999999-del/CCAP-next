@@ -40,13 +40,20 @@ function mapping(posts, taxonomies) {
         /* keep the slug-derived path */
       }
     }
-    rows.push({ from: oldPath, to: `/blog/${post.slug}`, kind: "post" });
+    // Vehicles were posts in a "Gallery" category on WordPress. On the new
+    // site they are a gallery of their own, so they redirect there instead.
+    const isVehicle = post.categorySlug === "gallery";
+    rows.push({
+      from: oldPath,
+      to: isVehicle ? `/gallery/${post.slug}` : `/blog/${post.slug}`,
+      kind: isVehicle ? "vehicle" : "post",
+    });
   }
 
   for (const category of taxonomies.categories) {
     rows.push({
       from: `/category/${category.slug}/`,
-      to: `/blog`,
+      to: category.slug === "gallery" ? `/gallery` : `/blog`,
       kind: "category",
     });
   }

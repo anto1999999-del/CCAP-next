@@ -75,7 +75,7 @@ export type ContactState = {
  *
  * Behind LiteSpeed the socket address is the proxy, so the forwarded header is
  * what identifies the visitor. It is spoofable, which is why this is a
- * throttle rather than a security control — reCAPTCHA does that job.
+ * throttle rather than a security control, reCAPTCHA does that job.
  */
 async function clientKey(): Promise<string> {
   const headerList = await headers();
@@ -156,7 +156,7 @@ export async function submitContactForm(
   if (!toSales.ok) {
     return {
       status: "error",
-      message: `Sorry — we could not send your message just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
+      message: `Sorry, we could not send your message just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
     };
   }
 
@@ -191,6 +191,6 @@ export async function submitContactForm(
 
   return {
     status: "success",
-    message: "Thanks — your message has been sent. We will be in touch shortly.",
+    message: "Thanks, your message has been sent. We will be in touch shortly.",
   };
 }

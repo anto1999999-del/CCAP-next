@@ -12,7 +12,7 @@ import {
   listPostSlugs,
 } from "@/lib/blog/repository";
 import { cleanPostHtml, readingTimeMinutes } from "@/lib/blog/html";
-import { site } from "@/lib/site";
+import { absoluteUrl, site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,8 +27,8 @@ export function generateStaticParams() {
 /**
  * Metadata carried across from Yoast verbatim.
  *
- * These articles already rank — one sits around position 11 and is the third
- * most-visited page on the site — so the title and description Google has
+ * These articles already rank, one sits around position 11 and is the third
+ * most-visited page on the site, so the title and description Google has
  * indexed are reproduced exactly rather than rewritten.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -95,7 +95,9 @@ export default async function BlogPostPage({ params }: Props) {
           description: post.seo.metaDescription ?? post.excerpt,
           datePublished: post.publishedAt,
           dateModified: post.updatedAt ?? post.publishedAt,
-          image: post.featuredImage?.url,
+          image: post.featuredImage
+            ? absoluteUrl(post.featuredImage.url)
+            : undefined,
           mainEntityOfPage: `${site.url}/blog/${post.slug}`,
           author: { "@id": `${site.url}/#organization` },
           publisher: { "@id": `${site.url}/#organization` },

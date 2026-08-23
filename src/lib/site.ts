@@ -8,10 +8,10 @@
  */
 export const site = {
   name: "Central Coast Auto Parts",
-  /** No trailing slash — everything else appends its own. */
+  /** No trailing slash, everything else appends its own. */
   url: "https://centralcoastautoparts.com.au",
   description:
-    "Quality used car parts in Berkeley Vale, NSW. Engines, gearboxes, body panels and more — all with warranty. Nationwide delivery. Call 02 4388 1818.",
+    "Quality used car parts in Berkeley Vale, NSW. Engines, gearboxes, body panels and more, all with warranty. Nationwide delivery. Call 02 4388 1818.",
   logo: "/aa.png",
 
   contact: {
@@ -53,7 +53,7 @@ export const site = {
    * Confirmed with the owner 2026-08-19, resolving a disagreement between what
    * the footer linked to and what the structured data claimed:
    *
-   * - Both Facebook URLs are real and both belong to the business — one is the
+   * - Both Facebook URLs are real and both belong to the business, one is the
    *   Page, the other the Marketplace profile. `sameAs` takes a list, so both
    *   are listed rather than one being dropped.
    * - eBay: /usr/central_coast_auto_parts permanently redirects to the /str/

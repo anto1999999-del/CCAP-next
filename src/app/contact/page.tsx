@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title:
     "Contact Us | Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
   description:
-    "Get in touch with Central Coast Auto Parts in Berkeley Vale NSW. Call 02 4388 1818, request a part quote, or visit us Mon–Fri 8am–5pm, Sat 9am–2pm.",
+    "Get in touch with Central Coast Auto Parts in Berkeley Vale NSW. Call 02 4388 1818, request a part quote, or visit us Mon, Fri 8am, 5pm, Sat 9am, 2pm.",
   alternates: { canonical: "/contact" },
 };
 
@@ -35,8 +35,8 @@ function SectionLabel({ lead, tail }: { lead: string; tail: string }) {
 /**
  * One row of the store details card.
  *
- * The original repeated this block three times in full — same wrapper, same
- * red tile, same label markup — with only the icon path and the value changing.
+ * The original repeated this block three times in full, same wrapper, same
+ * red tile, same label markup, with only the icon path and the value changing.
  */
 function StoreDetail({
   label,

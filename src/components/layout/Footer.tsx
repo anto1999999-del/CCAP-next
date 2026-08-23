@@ -14,7 +14,7 @@ import Container from "./Container";
  *
  * The profile links below and the `sameAs` entries in the Organization schema
  * used to point at different Facebook, eBay and Gumtree accounts. Confirmed
- * with the owner and reconciled 2026-08-19 — see the note in lib/site.ts. The
+ * with the owner and reconciled 2026-08-19, see the note in lib/site.ts. The
  * footer links to the Marketplace profile because that is where customers buy;
  * the schema lists both Facebook addresses.
  */
@@ -215,7 +215,7 @@ export default function Footer() {
       {/*
         Google requires this notice whenever the reCAPTCHA badge is hidden by
         CSS, which it is in globals.css. Removing one without the other breaches
-        their terms — keep the two together.
+        their terms, keep the two together.
       */}
       <div className="border-t border-gray-800 bg-[#141414] px-4 py-3 text-center text-[10px] text-gray-400">
         This site is protected by reCAPTCHA and the Google{" "}

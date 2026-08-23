@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title:
     "About Us | Car Wreckers Berkeley Vale NSW | Central Coast Auto Parts",
   description:
-    "Central Coast Auto Parts is a trusted car wrecker and used parts supplier in Berkeley Vale NSW. Engines, gearboxes, body panels and more — all tested and sold with warranty.",
+    "Central Coast Auto Parts is a trusted car wrecker and used parts supplier in Berkeley Vale NSW. Engines, gearboxes, body panels and more, all tested and sold with warranty.",
   alternates: { canonical: "/about" },
 };
 
@@ -69,7 +69,7 @@ export default function AboutPage() {
             <div className="order-1 lg:order-2">
               <h2 className="mb-6 text-3xl leading-tight font-bold text-white md:text-4xl lg:text-2xl">
                 Central Coast&apos;s Trusted Car Wreckers &amp; Used Auto Parts
-                Supplier — Berkeley Vale NSW
+                Supplier, Berkeley Vale NSW
               </h2>
 
               <div className="space-y-5 text-base leading-relaxed text-gray-300 md:text-lg">
@@ -91,7 +91,7 @@ export default function AboutPage() {
                       {index < PART_LINKS.length - 1 ? ", " : ""}
                     </span>
                   ))}{" "}
-                  and more — for cars, 4WDs, vans and light commercials across
+                  and more, for cars, 4WDs, vans and light commercials across
                   all major Japanese, Korean, European and Australian makes and
                   models.
                 </p>
@@ -105,8 +105,8 @@ export default function AboutPage() {
                 </p>
                 <p>
                   We supply smash repairers, mechanics, insurance companies and
-                  everyday customers across the Central Coast — Gosford, Wyong,
-                  Tuggerah and beyond — as well as Newcastle, Sydney and
+                  everyday customers across the Central Coast (Gosford, Wyong,
+                  Tuggerah and beyond) as well as Newcastle, Sydney and
                   Australia-wide with fast freight and same-day dispatch where
                   possible. Can&apos;t find what you need? Call us on{" "}
                   <a
@@ -168,7 +168,7 @@ export default function AboutPage() {
         closing={
           <>
             Whether you need a used engine, a replacement panel or want to sell
-            your car fast —{" "}
+            your car fast,{" "}
             <span className="text-brand-text font-semibold">
               Central Coast Auto Parts has you covered.
             </span>

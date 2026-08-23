@@ -14,7 +14,7 @@ import { site } from "@/lib/site";
  * sales and confirm to the customer.
  *
  * The fields were named `input1` through `input10` plus `yesNo`, in an order
- * that did not match the form — `input8` is the odometer but sits after
+ * that did not match the form, `input8` is the odometer but sits after
  * `input9`, the mechanical condition. Every read of that data had to be checked
  * against the markup to know what it held, which is exactly how the contact
  * form ended up mailing the subject line in place of the phone number. They
@@ -147,7 +147,7 @@ export async function submitSaleOffer(
   if (!toSales.ok) {
     return {
       status: "error",
-      message: `Sorry — we could not send your offer just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
+      message: `Sorry, we could not send your offer just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
     };
   }
 
@@ -181,6 +181,6 @@ export async function submitSaleOffer(
   return {
     status: "success",
     message:
-      "Thanks — your offer has been sent. Our team will be in touch shortly.",
+      "Thanks, your offer has been sent. Our team will be in touch shortly.",
   };
 }

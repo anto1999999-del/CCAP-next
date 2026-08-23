@@ -4,7 +4,7 @@
  * Two jobs: strip the markup that only meant something inside WordPress, and
  * refuse anything that could execute.
  *
- * The sanitising is not theatre. The exported content is clean today — it was
+ * The sanitising is not theatre. The exported content is clean today, but it
  * checked, and the cloaking attack of 10 August lived in a must-use plugin at
  * the serving layer rather than in the posts themselves. But this same function
  * will render whatever an admin user pastes into the editor later, and the
@@ -80,6 +80,29 @@ export function rewriteImageUrl(src: string): string {
  * server at build time, where there is no DOM, and the input is a known shape
  * rather than arbitrary web content.
  */
+/**
+ * Take the em and en dashes out of imported copy.
+ *
+ * The owner does not want them anywhere on the site, and 197 of them came
+ * across in the WordPress posts. Applied when content is loaded rather than
+ * edited into the export, so re-running the exporter cannot bring them back.
+ *
+ * A dash between two numbers is a range, so that becomes a hyphen. Everywhere
+ * else the dash is doing the job of a comma, so it becomes one.
+ */
+export function withoutDashes(text: string): string {
+  return (
+    text
+      .replace(/(?<=\d)\s*[\u2013\u2014]\s*(?=\d)/g, "-")
+      .replace(/\s*[\u2013\u2014]\s*/g, ", ")
+      // A dash that ended a sentence leaves a comma stranded before the stop.
+      .replace(/,\s*([.!?,;:])/g, "$1")
+      // ...or stranded against the tag that followed it.
+      .replace(/,\s*(<\/?(?:p|h[1-6]|li|td|th|div|figure|blockquote)\b)/gi, "$1")
+      .replace(/([,;:])\s*,\s*/g, "$1 ")
+  );
+}
+
 export function cleanPostHtml(html: string): string {
   let out = html;
 

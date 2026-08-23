@@ -10,7 +10,7 @@ import "server-only";
  * Scope, stated plainly: this counts requests inside one Node process. That is
  * the right fit today, because the app runs as a single PM2 process on one
  * droplet. If it is ever run as more than one instance, or moved somewhere
- * serverless, this needs to move to Redis or the database — a limiter that
+ * serverless, this needs to move to Redis or the database, a limiter that
  * resets whenever a process restarts is close to no limiter at all.
  */
 

@@ -7,7 +7,7 @@ export type Faq = {
  * Home page FAQs.
  *
  * These are published as FAQPage structured data as well as rendered, so the
- * wording is a live SEO asset — Google may show these answers directly in
+ * wording is a live SEO asset, Google may show these answers directly in
  * search results. Edit with that in mind, and keep the rendered text and the
  * structured data identical, which is why both read from this one list.
  */
@@ -21,7 +21,7 @@ export const HOMEPAGE_FAQS: readonly Faq[] = [
   {
     question: "Where is Central Coast Auto Parts located?",
     answer:
-      "Central Coast Auto Parts is located at 23 Hereford Street, Berkeley Vale NSW 2261, Australia. We are open Monday to Friday 8:00 AM – 5:00 PM and Saturday 9:00 AM – 2:00 PM.",
+      "Central Coast Auto Parts is located at 23 Hereford Street, Berkeley Vale NSW 2261, Australia. We are open Monday to Friday 8:00 AM to 5:00 PM and Saturday 9:00 AM to 2:00 PM.",
   },
   {
     question: "Do you deliver car parts Australia-wide?",
@@ -46,7 +46,7 @@ export const HOMEPAGE_FAQS: readonly Faq[] = [
   {
     question: "Are used car parts cheaper than new OEM parts?",
     answer:
-      "Yes, quality used car parts are typically 50–70% cheaper than brand new OEM parts, while still offering genuine manufacturer quality. At Central Coast Auto Parts, all our used parts are inspected and come with a warranty, giving you great value without compromising on quality.",
+      "Yes, quality used car parts are typically 50-70% cheaper than brand new OEM parts, while still offering genuine manufacturer quality. At Central Coast Auto Parts, all our used parts are inspected and come with a warranty, giving you great value without compromising on quality.",
   },
   {
     question: "Do you stock Toyota, Kia and Hyundai parts?",
@@ -56,7 +56,7 @@ export const HOMEPAGE_FAQS: readonly Faq[] = [
 ] as const;
 
 /**
- * Contact page FAQs — a different, shorter set aimed at someone about to get in
+ * Contact page FAQs, a different, shorter set aimed at someone about to get in
  * touch, rather than the broader questions on the home page.
  */
 export const CONTACT_FAQS: readonly Faq[] = [
@@ -83,7 +83,7 @@ export const CONTACT_FAQS: readonly Faq[] = [
   {
     question: "Do your parts come with a warranty?",
     answer:
-      "Yes, many parts come with a limited warranty. Details depend on the item – please ask our team before purchase.",
+      "Yes, many parts come with a limited warranty. Details depend on the item, please ask our team before purchase.",
   },
   {
     question: "How do I request a part?",

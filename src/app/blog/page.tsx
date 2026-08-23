@@ -5,7 +5,7 @@ import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
 import PageHero from "@/components/layout/PageHero";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
-import { listPosts } from "@/lib/blog/repository";
+import { listArticles } from "@/lib/blog/repository";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ function formatDate(iso: string | null): string {
 }
 
 export default function BlogIndexPage() {
-  const posts = listPosts();
+  const posts = listArticles();
   const [latest, ...rest] = posts;
 
   return (
@@ -59,23 +59,19 @@ export default function BlogIndexPage() {
         }}
       />
 
-      <PageHero title="BLOG" image="/images/cars-hero.webp" />
+      {/*
+        Gradient rather than a photograph: the available hero image has
+        "EXPLORE OUR SALVAGE VEHICLES" burnt into it, so a heading placed over
+        it read as two competing titles.
+      */}
+      <PageHero
+        eyebrow="Guides & advice"
+        title="BLOG"
+        subtitle="Common faults by make and model, what to check before buying a used part, and how to get more life out of the car you have. Written by the workshop team."
+      />
 
       <div className="bg-admin py-14 text-white md:py-20">
         <Container>
-          <div className="mx-auto mb-12 max-w-3xl text-center">
-            <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs">
-              GUIDES &amp; ADVICE
-            </p>
-            <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
-              From the workshop
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm text-white/70 md:text-base">
-              Common faults by make and model, what to check before buying a used
-              part, and how to get more life out of the car you have.
-            </p>
-            <div className="bg-brand mx-auto mt-4 h-[3px] w-14 rounded-full" />
-          </div>
 
           {latest && (
             <Link

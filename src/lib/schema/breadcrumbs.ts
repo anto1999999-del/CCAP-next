@@ -9,7 +9,7 @@ export type Crumb = {
 /**
  * BreadcrumbList structured data.
  *
- * Renders no visible UI — this only tells search engines where a page sits in
+ * Renders no visible UI, this only tells search engines where a page sits in
  * the site, which is what produces the trail shown under a result instead of a
  * bare URL.
  */

@@ -19,7 +19,7 @@ import Container from "./Container";
  * A client component in full: the cart badge, both dropdowns and the mobile
  * menu all share open/closed state, and the mobile toggle sits in a different
  * branch of the tree from the menu it controls. Splitting it into islands would
- * mean lifting that state into a provider for no real benefit — the component
+ * mean lifting that state into a provider for no real benefit, the component
  * is small and ships very little JavaScript.
  *
  * The red used here is Tailwind's red-500/red-600, not the brand red. That is
