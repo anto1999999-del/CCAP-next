@@ -32,11 +32,11 @@ export function matchesQuery(part: CatalogPart, query: string): boolean {
 
   const text = haystack(part);
 
-  return terms.every((term) => {
-    const partType = searchTermMeansPartType(term);
-    if (partType) return matchesPartType(part, partType);
-    return text.includes(term);
-  });
+  return terms.every((term) =>
+    searchTermMeansPartType(term)
+      ? matchesPartType(part, term)
+      : text.includes(term),
+  );
 }
 
 /**

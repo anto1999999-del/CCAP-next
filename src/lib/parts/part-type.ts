@@ -9,18 +9,24 @@
 import type { CatalogPart } from "./types";
 
 /**
- * Words customers type, mapped to the code the supplier uses. Kept small on
- * purpose: each alias here is one that a real search needed.
+ * Words customers type, mapped to the codes the supplier uses.
+ *
+ * A word can mean more than one code, and gearboxes are why. The current site
+ * maps "gearbox" to GEARBOX, and the catalogue has no such code: it files all
+ * 234 of them under TRANS_GEARBOX. So searching the live site for a gearbox
+ * finds nothing at all, and has done for as long as the alias table has existed.
+ * Both codes are listed here so that stays fixed if the supplier ever changes
+ * its mind.
  */
-const ALIASES: Record<string, string> = {
-  engine: "ENGINE",
-  engines: "ENGINE",
-  motor: "ENGINE",
-  motors: "ENGINE",
-  gearbox: "GEARBOX",
-  gearboxes: "GEARBOX",
-  transmission: "GEARBOX",
-  transmissions: "GEARBOX",
+const ALIASES: Record<string, string[]> = {
+  engine: ["ENGINE"],
+  engines: ["ENGINE"],
+  motor: ["ENGINE"],
+  motors: ["ENGINE"],
+  gearbox: ["GEARBOX", "TRANS_GEARBOX"],
+  gearboxes: ["GEARBOX", "TRANS_GEARBOX"],
+  transmission: ["GEARBOX", "TRANS_GEARBOX"],
+  transmissions: ["GEARBOX", "TRANS_GEARBOX"],
 };
 
 /** "engine cover", "Engine Cover" and "ENGINE_COVER" are one code. */
@@ -31,28 +37,33 @@ export function normalisePartTypeCode(value: unknown): string {
     .replace(/\s+/g, "_");
 }
 
-/** Turn whatever the customer typed into a code from the catalogue. */
-export function resolvePartTypeFilter(filter: string): string {
+/**
+ * The codes a filter means.
+ *
+ * An empty list means "no filter". Anything that is not a known word is taken
+ * as a code in its own right, which is what the dropdown sends.
+ */
+export function resolvePartTypeFilter(filter: string): string[] {
   const raw = filter.trim();
-  if (!raw) return "";
+  if (!raw) return [];
 
   const alias = ALIASES[raw.toLowerCase().replace(/\s+/g, "_")];
-  return alias ?? normalisePartTypeCode(raw);
+  return alias ?? [normalisePartTypeCode(raw)];
 }
 
 export function matchesPartType(part: CatalogPart, filter: string): boolean {
   const wanted = resolvePartTypeFilter(filter);
-  if (!wanted) return true;
-  return normalisePartTypeCode(part.itemTypeCode) === wanted;
+  if (wanted.length === 0) return true;
+  return wanted.includes(normalisePartTypeCode(part.itemTypeCode));
 }
 
 /**
  * Whether a free-text search word names a whole assembly.
  *
- * Someone searching "engine" wants engines, so the word is treated as a part
- * type rather than as text to look for in the description, where it would also
- * match every engine cover and engine mount.
+ * Someone searching "engine" wants engines, so the word is matched as a part
+ * type rather than as text, where it would also hit every engine cover and
+ * engine mount.
  */
-export function searchTermMeansPartType(term: string): string | null {
-  return ALIASES[term.trim().toLowerCase().replace(/\s+/g, "_")] ?? null;
+export function searchTermMeansPartType(term: string): boolean {
+  return Boolean(ALIASES[term.trim().toLowerCase().replace(/\s+/g, "_")]);
 }

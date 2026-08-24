@@ -243,3 +243,36 @@ copies are separate files that fail independently.
 Genuinely missing photographs do exist, but they are rarer and they come in
 pairs: across 402 parts checked, every part whose large copy returned 404 was
 missing its small copy too. 38 distinct small copies are gone for good.
+
+## 21. The category landing pages are carried across, and now link to stock
+
+`/parts` and its seven category pages (`/parts/engines`, `/parts/gearboxes` and
+so on) were missing from the rebuild until now. They are the pages that rank for
+"used engines for sale NSW" and similar, so their titles, descriptions, headings
+and body copy are carried across word for word: 94 of the 96 copy strings match
+the live page exactly, and the other two differ only by the site-wide dash rule.
+
+Two deliberate changes:
+
+The questions already on those pages now carry FAQPage structured data. Same
+wording; it was previously invisible to search engines.
+
+Each page links into the catalogue filtered to its own part type where the
+supplier codes one cleanly (engines, gearboxes). The live pages send everybody
+to the unfiltered catalogue, so a reader who has just read about engines has to
+find the engines again. The other five categories span many codes, so they link
+to the whole catalogue rather than to a fraction of their stock presented as all
+of it.
+
+An unknown slug is a 404 rather than a redirect to /parts. The live behaviour
+answers 200 at any invented address under /parts/, which is a soft 404.
+
+## 22. A gearbox search on the live site returns nothing
+
+The alias table maps "gearbox" and "transmission" to the code GEARBOX. The
+catalogue has no such code: all 234 gearboxes are filed under TRANS_GEARBOX. So
+every gearbox search and every gearbox filter on the live site comes back empty,
+and has for as long as that table has existed.
+
+Both codes are now accepted, and a test pins it, because this is exactly the
+kind of thing that gets silently reverted by someone tidying the alias list.

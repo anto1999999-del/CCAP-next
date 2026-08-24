@@ -22,6 +22,24 @@ import Container from "./Container";
 
 type HeroAction = { href: string; label: string };
 
+/**
+ * The brand wash used behind headings across the site.
+ *
+ * Exported because three pages need it at three different heading sizes: the
+ * home page, the interior heroes here, and the part-category landing pages,
+ * whose headings are full sentences and cannot take the size this component
+ * uses. Copying the gradient into each of them is how the old codebase ended up
+ * with the same red written out 212 times.
+ */
+export const BRAND_GRADIENT = {
+  backgroundColor: "#050505",
+  backgroundImage: `
+    radial-gradient(ellipse 120% 80% at 0% 50%, rgba(233, 22, 47, 0.45), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgba(233, 22, 47, 0.12), transparent 45%),
+    linear-gradient(100deg, #2a0c10 0%, #12080a 28%, #080808 55%, #050505 100%)
+  `,
+} as const;
+
 export default function PageHero({
   title,
   eyebrow,
@@ -42,18 +60,7 @@ export default function PageHero({
   return (
     <div
       className="relative flex h-[330px] items-center sm:h-[380px] lg:h-[455px]"
-      style={
-        image
-          ? undefined
-          : {
-              backgroundColor: "#050505",
-              backgroundImage: `
-                radial-gradient(ellipse 120% 80% at 0% 50%, rgba(233, 22, 47, 0.45), transparent 55%),
-                radial-gradient(ellipse 70% 50% at 100% 0%, rgba(233, 22, 47, 0.12), transparent 45%),
-                linear-gradient(100deg, #2a0c10 0%, #12080a 28%, #080808 55%, #050505 100%)
-              `,
-            }
-      }
+      style={image ? undefined : BRAND_GRADIENT}
     >
       {image && (
         <>

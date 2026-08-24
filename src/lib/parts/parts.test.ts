@@ -45,8 +45,20 @@ test("a part type filter matches the whole code, not a substring", () => {
 });
 
 test("part type aliases map to the supplier's codes", () => {
-  expect(matchesPartType(part({ itemTypeCode: "GEARBOX" }), "transmission")).toEqual(true);
   expect(matchesPartType(part({ itemTypeCode: "ENGINE" }), "motor")).toEqual(true);
+  expect(matchesPartType(part({ itemTypeCode: "GEARBOX" }), "transmission")).toEqual(true);
+});
+
+test("a gearbox search finds the code the catalogue actually uses", () => {
+  // All 234 gearboxes are filed under TRANS_GEARBOX. The live site maps the
+  // word to GEARBOX alone, so searching it there returns nothing.
+  const gearbox = part({ itemTypeCode: "TRANS_GEARBOX", itemName: "Trans/Gearbox" });
+  expect(matchesPartType(gearbox, "gearbox")).toEqual(true);
+  expect(matchesPartType(gearbox, "transmission")).toEqual(true);
+  expect(matchesQuery(gearbox, "gearbox")).toEqual(true);
+
+  // Still not a transfer case or a diff, which are their own parts.
+  expect(matchesPartType(part({ itemTypeCode: "TRANSFER_CASE" }), "gearbox")).toEqual(false);
 });
 
 test("a year filter also matches the years a part interchanges into", () => {
