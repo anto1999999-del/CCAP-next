@@ -276,3 +276,36 @@ and has for as long as that table has existed.
 
 Both codes are now accepted, and a test pins it, because this is exactly the
 kind of thing that gets silently reverted by someone tidying the alias list.
+
+## 23. Anyone can choose what they pay on the current site
+
+The checkout works the total out in the browser and posts it:
+
+    const { amount, customerId, userEmail } = req.body;
+    ...
+    paymentIntents.create({ amount })
+
+Nothing between that request and Stripe re-checks the price against the
+catalogue. Editing one number in the request buys a $3,300 engine for the
+fifty-cent minimum, and the order arrives looking ordinary.
+
+`src/lib/orders/pricing.ts` takes only which parts and how many. Every price is
+read from the catalogue on the server, quantities are clamped, parts that have
+sold or have no price are reported rather than guessed at, and freight is added
+as a separate figure. The tests exist mainly to hold that line: one of them
+sends a price in the request and asserts it is ignored.
+
+**This is worth fixing on the live site before the rebuild ships**, since it is
+live now. The change is to re-price the order server-side in
+`create-payment-intent` rather than trusting `req.body.amount`.
+
+## 24. The live site quotes freight from the carrier's test system
+
+`shippingController.js` hardcodes `api-uat.teamglobalexp.com`, which is Team
+Global Express's user acceptance testing environment. Every freight price quoted
+to a customer comes from there. Whether those prices match production is a
+question for the carrier.
+
+The endpoint is `TGE_RATE_URL` in the rebuild, defaulting to the same UAT host so
+nothing changes by accident. The carrier credentials moved out of the source
+file to the environment, as with the parts API.

@@ -1,0 +1,1544 @@
+{
+  "2ND SEAT REAR SEAT RH REAR": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 80
+  },
+  "3RD SEAT": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "A C COMPRESSOR": {
+    "weightKg": 8,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "A C CONDENSER": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "A C HOSES": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "ABS PUMP MODULATOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ABS SENSOR LH REAR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ADBLUE PUMP": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ADBLUE TANK": {
+    "weightKg": 5,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "AIR CLEANER BOX": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "AIR CLEANER DUCT HOS": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "AIR FLOW METER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "AIR RIDE COMPRESSOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "AIRBAG ASSEMBL Y": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CLOCKSPRING": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ALTERNATOR": {
+    "weightKg": 6,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ANTENNA": {
+    "weightKg": 6,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "AUTO INHIBITOR SWTCH": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "AXLE": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "BADGE": {
+    "weightKg": 2,
+    "lengthCm": 14.7,
+    "widthCm": 5,
+    "heightCm": 15.6
+  },
+  "BATTERY TERMINAL": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BATTERY TRAY": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BEARING HUB": {
+    "weightKg": 15,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BELT TENSIONER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BODY DOOR MOULD": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BONNET": {
+    "weightKg": 40,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 145
+  },
+  "BONNET HINGE STRUT HINGES PAIR": {
+    "weightKg": 6,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BONNET LOCK SUPPORT": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BONNET SCOOP": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "BOOTLID TAILGATE": {
+    "weightKg": 75,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 180
+  },
+  "BOOTLID TGATE HINGE": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "BRAKE BOOSTER": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "BRAKE COMP VALVE": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "CABLE": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "CALIPER RH REAR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CAMSHAFT": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "CARGO BARRIER": {
+    "weightKg": 15,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "CATALYTIC CONVERTER": {
+    "weightKg": 20,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "CHASSIS": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CLOCK": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "CLUTCH MASTER CYLIND": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "COIL COIL PACK": {
+    "weightKg": 2,
+    "lengthCm": 25,
+    "widthCm": 25,
+    "heightCm": 7.13
+  },
+  "COMBINATION SWITCH": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "COMPLETE INTERIOR": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "COMPLETE REAR SUSPEN": {
+    "weightKg": 80,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "CONSOLE": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "CONV LIFT MOTOR": {
+    "weightKg": 6,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "COOLER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "COURTESY LIGHT": {
+    "weightKg": 1,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CRANKSHAFT": {
+    "weightKg": 15,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "CRANKSHAFT PULLEY": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CRUISE CONTROL UNIT": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "CYLINDER HEAD": {
+    "weightKg": 15,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "DASH ASSEMBL Y": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "DIFFERENTIAL CENTRE": {
+    "weightKg": 40,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "DISTRIBUTOR": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "DOOR BOOT GATE LOCK": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "DOOR HANDLE": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "DOOR TRIM": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "DOOR HINGE RUNNER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "DRAG LINK": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "DRIVING LIGHT": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "DUMP PIPE": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "ECU": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "EGR VALVE": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ENGINE": {
+    "weightKg": 160,
+    "lengthCm": 80,
+    "widthCm": 70,
+    "heightCm": 90
+  },
+  "ENGINE COVER": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "EXHAUST SYSTEM": {
+    "weightKg": 40,
+    "lengthCm": 120,
+    "widthCm": 80,
+    "heightCm": 50
+  },
+  "F BAR REINFORC BRACK": {
+    "weightKg": 15,
+    "lengthCm": 120,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "FAN": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "FAN SPEED RESISTOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FLOOR MATS": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "FRONT BUMPER": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 80
+  },
+  "FRONT DIFF ASSEMBL Y": {
+    "weightKg": 40,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "FRONT PANHARD ROD": {
+    "weightKg": 15,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "FRONT PROP SHAFT": {
+    "weightKg": 25,
+    "lengthCm": 110,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "FRONT SEAT RH": {
+    "weightKg": 50,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 150
+  },
+  "FRONT COIL SPRING": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "FRT XMEMBER CRADLE": {
+    "weightKg": 50,
+    "lengthCm": 120,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "FUEL DOOR FILLER": {
+    "weightKg": 5,
+    "lengthCm": 70.5,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUEL FILTER HOUSING": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUEL INJECTOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUEL PUMP": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUEL SENDING UNIT": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUEL TANK": {
+    "weightKg": 35,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 50
+  },
+  "FUEL PRESSURE REGULATOR": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "FUSE BOX": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "GASKET": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "GEAR STICK SHIFTER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "GEARBOX": {
+    "weightKg": 125,
+    "lengthCm": 80,
+    "widthCm": 60,
+    "heightCm": 40
+  },
+  "GLOVE BOX": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "GLOW PLUG": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "GRILLE": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "HANDBRAKE ACTUATOR": {
+    "weightKg": 5,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "HANDBRAKE LEVER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HATCH STRUT": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "HEADLAMP BALLAST": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HEADREST RH REAR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HEATER AC CONTROLS": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HEATER CORE BOX": {
+    "weightKg": 15,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "HEATER FAN MOTOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HIGH LEVEL STOPLIGHT": {
+    "weightKg": 1,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "HIGH VOLTAGE BATTERY": {
+    "weightKg": 100,
+    "lengthCm": 80,
+    "widthCm": 70,
+    "heightCm": 70
+  },
+  "HOODLINING": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "IGNITION SWITCH": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "IGNITION W KEY": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "INJECTION RAIL": {
+    "weightKg": 4,
+    "lengthCm": 50,
+    "widthCm": 19,
+    "heightCm": 19
+  },
+  "INJECTOR PUMP": {
+    "weightKg": 15,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "NSTRUMENTCLUSTER": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "INTERCOOLER": {
+    "weightKg": 20,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "INTERIOR MIRROR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "INVERTER": {
+    "weightKg": 45,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "JACK": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "JACK TOOL KIT": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "KEY FOB": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "LEFT AIRBAG SIDE CURTAIN": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "LEFT DOOR MIRROR": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "LEFT DRIVESHAFT": {
+    "weightKg": 25,
+    "lengthCm": 70,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT FRONT 1Q DOOR GLASS": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT FRONT DOOR": {
+    "weightKg": 40,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 120
+  },
+  "LEFT FRONT DOOR WINDOW": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "LEFT FRONT HUB ASSEMBL Y": {
+    "weightKg": 55,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "LEFT FRONT LOWER CONTROL ARM REAR": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT FRONT STRUT": {
+    "weightKg": 18,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "LEFT FRONT UPPER CONTROL ARM": {
+    "weightKg": 5,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "LEFT FRONT WINDOW REG MOTOR": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT GUARD": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "LEFT GUARD LINER": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT HEADLAMP": {
+    "weightKg": 5,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "BUMPER FOGLAMP": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "LEFT REAR DOOR SLIDING": {
+    "weightKg": 60,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 140
+  },
+  "LEFT REAR SIDE GLASS": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "LEFT REAR STRUT": {
+    "weightKg": 18,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "LEFT REAR TRAILING ARM": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "LEFT TAILLIGHT": {
+    "weightKg": 15,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "LIFT KIT": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "LOWER ENGINE SPLASH TRAY": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "MANIFOLD": {
+    "weightKg": 25,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "MAP SENSOR": {
+    "weightKg": 2.5,
+    "lengthCm": 20,
+    "widthCm": 19,
+    "heightCm": 6
+  },
+  "MASTER CYLINDER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "MISC": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "MISC BRACKET": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "MISC SWITCH RELAY": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "MOUNT": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "MUFFLER": {
+    "weightKg": 19,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "OIL": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "OIL PAN SUMP": {
+    "weightKg": 20,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "OIL FILTER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "OIL PUMP": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "OVERFLOW BOTTLE": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "OWNERS HANDBOOK": {
+    "weightKg": 2,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "OXYGEN SENSOR": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "P S RESERVOIR": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "PARCEL SHELF CARGO BLIND": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "PARCEL SHELF": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "PARTICULATE FILTER DPF": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "PEDAL ASSEMBLY": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "PISTON": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "PLENUM CHAMBER": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "POWER WINCH": {
+    "weightKg": 45,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "PWR DR WIND SWITCH LH FRONT": {
+    "weightKg": 1,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "R BAR BRACKET REINFO": {
+    "weightKg": 15,
+    "lengthCm": 120,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "R BEAM CRADLE XMEMBR": {
+    "weightKg": 55,
+    "lengthCm": 23,
+    "widthCm": 80,
+    "heightCm": 60
+  },
+  "RADIATOR": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "RADIATOR SUPPORT": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "RADIO CD DVD SAT TV": {
+    "weightKg": 10,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "REAR AXLE BEAM FWD": {
+    "weightKg": 55,
+    "lengthCm": 23,
+    "widthCm": 80,
+    "heightCm": 60
+  },
+  "REAR BRAKE DISC DRUM": {
+    "weightKg": 15,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "REAR BUMPER": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 80
+  },
+  "REAR COIL SPRING": {
+    "weightKg": 15,
+    "lengthCm": 36,
+    "widthCm": 24,
+    "heightCm": 23
+  },
+  "REAR DIFF ASSEMBL Y": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 80
+  },
+  "REAR GARNISH": {
+    "weightKg": 15,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "REAR LEAF SPRING": {
+    "weightKg": 55,
+    "lengthCm": 120,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "REAR PROP SHAFT": {
+    "weightKg": 28,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "REAR SPOILER": {
+    "weightKg": 28,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "REAR TAILGATE GLASS": {
+    "weightKg": 15,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "REAR LOWER APRON": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "REAR PANHARD ROD": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "REAR SWAY BAR": {
+    "weightKg": 15,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "REVERSE CAMERA": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "RIGHT AIRBAG": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "RIGHT DOOR MIRROR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "RIGHT DRIVESHAFT": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "RIGHT FRONT DOOR": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 140
+  },
+  "RIGHT FRONT DOOR WINDOW": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "RIGHT FRONT HUB ASSEMBL Y": {
+    "weightKg": 55,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "RIGHT FRONT LOWER CONTROL ARM": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT FRONT STRUT": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT FRONT UPPER CONTROL ARM": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT FRONT WINDOW REG MOTOR": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT GUARD": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "RIGHT GUARD LINER": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT HEADLAMP": {
+    "weightKg": 5,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "RIGHT INDICATOR FOG SIDE": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "RIGHT REAR 1Q DOOR GLASS": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT REAR DOOR SLIDING WK": {
+    "weightKg": 60,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 140
+  },
+  "RIGHT REAR DOOR WINDOW": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT REAR HUB ASSEMBL Y": {
+    "weightKg": 55,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "RIGHT REAR SIDE GLASS": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT REAR STRUT": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "RIGHT REAR TRAILING ARM": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT REAR WND REG MOTOR": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "RIGHT TAILLIGHT": {
+    "weightKg": 15,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "RIGHT FRONT 1Q DOOR GLASS": {
+    "weightKg": 4,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "RIGHT HEADLIGHT SURROUND": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "ROCKER ASSY COVER": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "ROOF": {
+    "weightKg": 45,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 80
+  },
+  "ROOF GLASS SUNROOF": {
+    "weightKg": 40,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 120
+  },
+  "ROOF RACK BARS": {
+    "weightKg": 8,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "SEAT BELT STALK": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 5
+  },
+  "SHOCK ABSORBER": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "SIDE STEP SKIRT": {
+    "weightKg": 25,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "SNORKEL": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "SOLENOID": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 23,
+    "heightCm": 19
+  },
+  "SPARE WHEEL CARRIER": {
+    "weightKg": 28,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "SPARE WHEEL WINCH": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "SPEAKER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "SPORTS BAR D40": {
+    "weightKg": 15,
+    "lengthCm": 80,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "STABILIZER BAR": {
+    "weightKg": 15,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "STARTER": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "STEERING BOX RACK": {
+    "weightKg": 28,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "STEERING COLUMN": {
+    "weightKg": 28,
+    "lengthCm": 180,
+    "widthCm": 50,
+    "heightCm": 45
+  },
+  "STEERING PUMP": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "STEERING WHEEL": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "STEERING INTERMEDIATE SHAFT": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "STRUT SET": {
+    "weightKg": 15,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "SUMP GUARD": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "SUNROOF MOTOR": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "SUNVISOR": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "TAILGATE HANDLE": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "TAILGATE REGULATOR": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "THERMOSTAT HOUSING": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "THROTTLE BODY": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "TIMING BELT": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "TIMING CASE COVER": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "TONNEAU COVER": {
+    "weightKg": 15,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "TOWBAR": {
+    "weightKg": 50,
+    "lengthCm": 120,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "TRANS GEARBOX": {
+    "weightKg": 50,
+    "lengthCm": 60,
+    "widthCm": 80,
+    "heightCm": 50
+  },
+  "TRANSFER CASE": {
+    "weightKg": 50,
+    "lengthCm": 70,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "TRIM PANEL": {
+    "weightKg": 8,
+    "lengthCm": 30,
+    "widthCm": 30,
+    "heightCm": 25
+  },
+  "TURBOCHARGER": {
+    "weightKg": 15,
+    "lengthCm": 46,
+    "widthCm": 46,
+    "heightCm": 32
+  },
+  "UTE BACK": {
+    "weightKg": 100,
+    "lengthCm": 180,
+    "widthCm": 180,
+    "heightCm": 120
+  },
+  "UTE TRAY LINER": {
+    "weightKg": 50,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "VACUUM AIR PUMP": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WASHER BOTTLE": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WASHER JET": {
+    "weightKg": 2.5,
+    "lengthCm": 20,
+    "widthCm": 10,
+    "heightCm": 10
+  },
+  "WASTEGATE": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WATER PIPES OUTLETS": {
+    "weightKg": 1,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WATER PUMP": {
+    "weightKg": 4,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WHEEL ARCH FLARE": {
+    "weightKg": 8,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "WHEEL COVER HUB CAP": {
+    "weightKg": 10,
+    "lengthCm": 50,
+    "widthCm": 30,
+    "heightCm": 40
+  },
+  "WHEEL MAG": {
+    "weightKg": 20,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "WHEEL STANDARD STEEL": {
+    "weightKg": 18,
+    "lengthCm": 80,
+    "widthCm": 50,
+    "heightCm": 25
+  },
+  "WINDSCREEN": {
+    "weightKg": 150,
+    "lengthCm": 180,
+    "widthCm": 80,
+    "heightCm": 40
+  },
+  "WIPER ARM": {
+    "weightKg": 5,
+    "lengthCm": 80,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WIPER MOTOR": {
+    "weightKg": 5,
+    "lengthCm": 80,
+    "widthCm": 24,
+    "heightCm": 19
+  },
+  "WIRE HARNESS": {
+    "weightKg": 5,
+    "lengthCm": 23,
+    "widthCm": 24,
+    "heightCm": 19
+  }
+}

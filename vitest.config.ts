@@ -8,7 +8,11 @@ import path from "node:path";
  */
 export default defineConfig({
   resolve: {
-    alias: { "@": path.resolve(__dirname, "src") },
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+      // See the note in src/test/server-only.ts.
+      "server-only": path.resolve(__dirname, "src/test/server-only.ts"),
+    },
   },
   test: {
     include: ["src/**/*.test.ts"],
