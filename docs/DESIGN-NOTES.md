@@ -309,3 +309,27 @@ question for the carrier.
 The endpoint is `TGE_RATE_URL` in the rebuild, defaulting to the same UAT host so
 nothing changes by accident. The carrier credentials moved out of the source
 file to the environment, as with the parts API.
+
+## 25. The sitemap and robots.txt are generated, not maintained by hand
+
+The live sitemap lists twelve URLs and has fallen behind: no parts hub, no terms
+page, and nothing that used to live on the blog subdomain. Both files are now
+generated from the same data the pages are built from, so they cannot drift.
+
+What is listed: the 9 site pages, the 7 category pages, 87 articles, 26 gallery
+vehicles, and 24,115 priced parts. That is 24,244 URLs, split across four files
+because one file of that size is unwieldy.
+
+Unpriced parts are left out. Their page says "contact for price" and little
+else, so there is nothing for it to rank on, and a crawler's time is better
+spent on the 24,115 that can sell something.
+
+Two traps worth recording. A chunked sitemap is served at /sitemap/0.xml and so
+on with **no index at /sitemap.xml**, so robots.txt names every file rather than
+pointing at an address that would 404. And the `id` handed to the sitemap
+function is a promise in this version of Next: comparing it without awaiting is
+silently false, which serves the same file for every chunk and looks like it
+worked.
+
+Static robots.txt and sitemap.xml files had been left in public/ from the old
+site. They shadow the generated routes, so they are gone.
