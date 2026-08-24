@@ -78,14 +78,32 @@ async function main() {
   const worker = async () => {
     while (cursor < paths.length) {
       const target = paths[cursor++];
-      try {
-        const response = await fetch(`${BASE}${target}`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        if (response.headers.get("x-image-cache") === "HIT") hits += 1;
-        // The body has to be read for the connection to be reused.
-        await response.arrayBuffer();
-      } catch {
-        failed += 1;
+
+      /*
+        Retried once, after a pause. Under a full run the supplier drops about
+        one request in twenty, and those are not missing images: a sample of
+        the ones that failed a first pass all answered when asked again. Without
+        this the warm-up leaves a thousand photographs cold and reports them as
+        failures.
+      */
+      let stored = false;
+      for (let attempt = 1; attempt <= 2 && !stored; attempt += 1) {
+        try {
+          const response = await fetch(`${BASE}${target}`);
+          if (response.status === 404) {
+            // Genuinely not there. Asking again will not change that.
+            await response.arrayBuffer();
+            break;
+          }
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          if (response.headers.get("x-image-cache") === "HIT") hits += 1;
+          // The body has to be read for the connection to be reused.
+          await response.arrayBuffer();
+          stored = true;
+        } catch {
+          if (attempt === 2) failed += 1;
+          else await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
       }
 
       done += 1;

@@ -223,3 +223,23 @@ by hand.
 
 Measured on a production build: a filtered page falls from 388ms to 29ms when it
 is asked for a second time, and paging inside those filters is 19ms.
+
+## 20. The supplier's image host drops about one request in twenty
+
+Warming 21,968 images end to end, 1,410 failed. That number looked like missing
+photographs, and it is not: a random sample of 25 of them all answered when
+asked again. The supplier drops requests under sustained load.
+
+Two consequences, both handled:
+
+The warm-up retries once after a pause, and treats a 404 as final rather than
+retrying it. Without that it left about 1,400 photographs cold and reported them
+as missing.
+
+A photograph that fails in the browser falls back to the part's other copy of
+the same image before it falls back to the words "No photo". The large and small
+copies are separate files that fail independently.
+
+Genuinely missing photographs do exist, but they are rarer and they come in
+pairs: across 402 parts checked, every part whose large copy returned 404 was
+missing its small copy too. 38 distinct small copies are gone for good.

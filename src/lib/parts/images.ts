@@ -54,6 +54,17 @@ export function thumbUrl(image: PartImage): string {
   return proxied(image.thumb ?? image.img) ?? PART_IMAGE_PLACEHOLDER;
 }
 
+/**
+ * The large copy of a part's leading photograph.
+ *
+ * Used as the fallback behind the thumbnail: a handful of parts have the large
+ * copy and not the small one, which is the same problem the other way around.
+ */
+export function fullPhotoUrl(part: CatalogPart): string {
+  const image = coverImage(part);
+  return proxied(image?.img ?? image?.thumb ?? null) ?? PART_IMAGE_PLACEHOLDER;
+}
+
 export function hasPhoto(part: CatalogPart): boolean {
   return (part.images ?? []).some((image) => Boolean(image.thumb || image.img));
 }

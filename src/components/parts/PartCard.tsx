@@ -3,7 +3,7 @@ import AddToCartButton from "./AddToCartButton";
 import PartThumbnail from "./PartThumbnail";
 import { hasPrice } from "@/lib/parts/arrange";
 import { partPath } from "@/lib/parts/identity";
-import { thumbnailUrl } from "@/lib/parts/images";
+import { fullPhotoUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
 import type { CatalogPart } from "@/lib/parts/types";
 
@@ -24,6 +24,7 @@ export default function PartCard({ part }: { part: CatalogPart }) {
       <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
         <PartThumbnail
           src={thumbnailUrl(part)}
+          fallbackSrc={fullPhotoUrl(part)}
           alt={name}
           className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />

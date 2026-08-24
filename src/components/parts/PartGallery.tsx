@@ -38,6 +38,7 @@ export default function PartGallery({
         <PartThumbnail
           key={fullImageUrl(current)}
           src={fullImageUrl(current)}
+          fallbackSrc={thumbUrl(current)}
           alt={name}
           className="aspect-[4/3] w-full object-contain"
         />
