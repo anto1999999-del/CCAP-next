@@ -333,3 +333,19 @@ worked.
 
 Static robots.txt and sitemap.xml files had been left in public/ from the old
 site. They shadow the generated routes, so they are gone.
+
+## 26. The catalogue had no working search, so one was added
+
+The old codebase has a SearchBar component, and it never appears: it only
+renders when the path contains "collection", and no such path exists on this
+site. So 32,698 parts have only ever been reachable by paging through them or
+narrowing the four dropdowns.
+
+There is now a search box on /products. Like the filters it is a plain GET form,
+so it works without JavaScript and every search has a shareable URL, and it
+carries the current filters with it: searching inside a chosen make narrows that
+make rather than throwing the choice away.
+
+**This is an addition to the design rather than a port**, so it is recorded here
+for the owner to accept or reject. Measured: "alternator" finds 280 parts,
+"hilux" 5, "kia cerato gearbox" 6.

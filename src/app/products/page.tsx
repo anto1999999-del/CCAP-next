@@ -4,6 +4,7 @@ import FaqSection from "@/components/FaqSection";
 import PartCard from "@/components/parts/PartCard";
 import PartsFilters from "@/components/parts/PartsFilters";
 import PartsPagination from "@/components/parts/PartsPagination";
+import PartsSearch from "@/components/parts/PartsSearch";
 import { getCatalogPage } from "@/lib/parts/repository";
 import { partKey } from "@/lib/parts/identity";
 import { productsListSchema } from "@/lib/schema/products";
@@ -80,20 +81,28 @@ export default async function ProductsPage({
       />
 
       <div className="border-b border-gray-800 bg-[#141414]/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-[1920px] px-4 py-6 md:px-8">
-          <h1 className="text-2xl font-bold text-white md:text-3xl">
-            Explore Our <span className="text-brand-text">Parts</span>
-          </h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Filter by year, make, model and part type
-            {syncedAt
-              ? `. Stock as at ${new Date(syncedAt).toLocaleDateString("en-AU", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}.`
-              : "."}
-          </p>
+        <div className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-6 md:px-8 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white md:text-3xl">
+              Explore Our <span className="text-brand-text">Parts</span>
+            </h1>
+            <p className="mt-1 text-sm text-gray-400">
+              Filter by year, make, model and part type
+              {syncedAt
+                ? `. Stock as at ${new Date(syncedAt).toLocaleDateString("en-AU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}.`
+                : "."}
+            </p>
+          </div>
+
+          <PartsSearch
+            query={query}
+            filters={filters}
+            resultCount={available ? page.totalResults : null}
+          />
         </div>
       </div>
 
