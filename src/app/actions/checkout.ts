@@ -5,7 +5,7 @@ import { loadCatalog } from "@/lib/parts/catalog";
 import { formatCents } from "@/lib/parts/price";
 import { orderTotal, priceOrder } from "@/lib/orders/pricing";
 import { quoteFreight } from "@/lib/shipping/carrier";
-import { lookupShippingProfile, volumeM3 } from "@/lib/shipping/dimensions";
+import { shippingProfileFor, volumeM3 } from "@/lib/shipping/dimensions";
 import { rateLimit } from "@/lib/rate-limit";
 import type { LineProblem } from "@/lib/orders/pricing";
 
@@ -47,6 +47,8 @@ export type CheckoutQuote =
       problems: LineProblem[];
       /** True when freight was asked for but the carrier could not answer. */
       freightUnavailable: boolean;
+      /** True when a part in the order has never been weighed and measured. */
+      freightEstimated: boolean;
     }
   | { ok: false; message: string };
 
@@ -87,22 +89,28 @@ export async function quoteCheckout(
   let freightCents = 0;
   let freightUnavailable = false;
 
+  /*
+    About one part in seven has never been measured. Its freight is quoted from
+    a deliberately generous assumption, and the customer is told so rather than
+    being given a firm number the yard may have to correct.
+  */
+  const freightEstimated = order.lines.some(
+    (line) => !shippingProfileFor(line.part).measured,
+  );
+
   if (!pickup && suburb && postcode) {
     try {
       const quote = await quoteFreight({
         destination: { suburb, postcode },
         items: order.lines.map((line) => {
-          const profile = lookupShippingProfile(line.part);
+          const { profile } = shippingProfileFor(line.part);
           return {
             quantity: line.quantity,
-            // A part the yard has not measured still has to ship. These floors
-            // are the carrier's minimum, so it quotes rather than refusing, and
-            // the yard confirms the real freight before dispatch.
-            weightKg: profile?.weightKg ?? 1,
-            lengthCm: profile?.lengthCm ?? 10,
-            widthCm: profile?.widthCm ?? 10,
-            heightCm: profile?.heightCm ?? 10,
-            volumeM3: profile ? volumeM3(profile) : 0.001,
+            weightKg: profile.weightKg,
+            lengthCm: profile.lengthCm,
+            widthCm: profile.widthCm,
+            heightCm: profile.heightCm,
+            volumeM3: volumeM3(profile),
           };
         }),
       });
@@ -132,5 +140,6 @@ export async function quoteCheckout(
     totalCents: totals.totalCents,
     problems: order.problems,
     freightUnavailable: !pickup && freightUnavailable,
+    freightEstimated: !pickup && freightEstimated,
   };
 }

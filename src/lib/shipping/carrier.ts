@@ -25,7 +25,39 @@ const RATE_URL =
   process.env.TGE_RATE_URL ??
   "https://api-uat.teamglobalexp.com:6930/gateway/TollMessageRateEnquiryRestService/1.0/tom/rateEnquiry";
 
-const TIMEOUT_MS = 20_000;
+/*
+  The carrier answers in about two seconds when it is well, and occasionally
+  hangs. Waiting twenty seconds to find that out means a customer watches
+  "Calculating" for twenty seconds and is then told we could not price it. A
+  shorter wait with one retry gets an answer sooner in both cases: a hung
+  request is abandoned at eight seconds and the second attempt usually answers
+  straight away.
+*/
+const TIMEOUT_MS = 8_000;
+const ATTEMPTS = 2;
+
+/**
+ * Limits the current site learned from the carrier the hard way, and they are
+ * not in any documentation we hold.
+ *
+ * The carrier gives up on its own side at about 29 seconds, and a long list of
+ * item rows is what pushes it there: sending each unit as its own row returned
+ * HTTP 408. So a line carries up to 99 of the same part, and a shipment carries
+ * at most 75 lines, with anything beyond that rolled into one approximate line.
+ */
+const MAX_QUANTITY_PER_LINE = 99;
+const MAX_LINES = 75;
+
+/**
+ * Quotes are remembered for two minutes, as they are on the current site.
+ *
+ * The same cart to the same address is the same price, and this runs while
+ * somebody edits a form: without it, correcting a typo in a suburb costs
+ * another two-second wait and another call to a paid service.
+ */
+const CACHE_TTL_MS = 120_000;
+
+const cache = new Map<string, { quote: FreightQuote; expires: number }>();
 
 /** The yard, as the carrier knows it. */
 const CONSIGNOR = {
@@ -116,6 +148,46 @@ export function readCharges(response: RateResponse): FreightQuote {
   };
 }
 
+/** Split a line of more than 99 into several, and cap the total line count. */
+function ratingLines(items: readonly ShipmentItem[]): ShipmentItem[] {
+  const lines: ShipmentItem[] = [];
+
+  for (const item of items) {
+    let remaining = Math.max(1, item.quantity);
+    while (remaining > 0) {
+      const quantity = Math.min(remaining, MAX_QUANTITY_PER_LINE);
+      lines.push({ ...item, quantity });
+      remaining -= quantity;
+    }
+  }
+
+  if (lines.length <= MAX_LINES) return lines;
+
+  /*
+    Everything past the cap becomes one line: the summed weight and volume, and
+    the largest of each dimension. Approximate on purpose. The alternative is a
+    request the carrier refuses to answer at all.
+  */
+  const kept = lines.slice(0, MAX_LINES - 1);
+  const rest = lines.slice(MAX_LINES - 1);
+
+  kept.push(
+    rest.reduce<ShipmentItem>(
+      (merged, line) => ({
+        quantity: 1,
+        weightKg: merged.weightKg + line.weightKg * line.quantity,
+        volumeM3: merged.volumeM3 + line.volumeM3 * line.quantity,
+        lengthCm: Math.max(merged.lengthCm, line.lengthCm),
+        widthCm: Math.max(merged.widthCm, line.widthCm),
+        heightCm: Math.max(merged.heightCm, line.heightCm),
+      }),
+      { quantity: 1, weightKg: 0, volumeM3: 0, lengthCm: 1, widthCm: 1, heightCm: 1 },
+    ),
+  );
+
+  return kept;
+}
+
 function itemNodes(items: readonly ShipmentItem[]) {
   return items.map((item) => ({
     Commodity: { CommodityCode: "Z", CommodityDescription: "ALL FREIGHT" },
@@ -140,6 +212,20 @@ export async function quoteFreight({
   destination: Destination;
   items: readonly ShipmentItem[];
 }): Promise<FreightQuote> {
+  const lines = ratingLines(items);
+
+  const key = [
+    destination.suburb.trim().toLowerCase(),
+    destination.postcode.trim(),
+    ...lines.map(
+      (line) =>
+        `${line.quantity}:${line.weightKg}:${line.lengthCm}x${line.widthCm}x${line.heightCm}`,
+    ),
+  ].join("|");
+
+  const hit = cache.get(key);
+  if (hit && hit.expires > Date.now()) return hit.quote;
+
   const payload = {
     TollMessage: {
       Header: {
@@ -175,30 +261,52 @@ export async function quoteFreight({
               CountryCode: "AU",
             },
           },
-          ShipmentItems: { ShipmentItem: itemNodes(items) },
+          ShipmentItems: { ShipmentItem: itemNodes(lines) },
         },
       },
     },
   };
 
-  const response = await fetch(RATE_URL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Basic ${credentials()}`,
-    },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-    cache: "no-store",
-  });
+  const authorization = `Basic ${credentials()}`;
+  let lastError: unknown;
 
-  if (!response.ok) {
-    throw new Error(`Freight quote failed: HTTP ${response.status}`);
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(RATE_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Freight quote failed: HTTP ${response.status}`);
+      }
+
+      const body = (await response.json()) as {
+        TollMessage?: { RateEnquiry?: { Response?: RateResponse } };
+      };
+
+      /*
+        Sometimes an array of quotes rather than one. The old backend handled
+        this and it is not documented anywhere else, so it is handled here too.
+      */
+      const answer = body.TollMessage?.RateEnquiry?.Response;
+      const quote = readCharges((Array.isArray(answer) ? answer[0] : answer) ?? {});
+
+      // Only a real price is worth remembering; a zero is worth retrying.
+      if (quote.totalCents > 0) {
+        cache.set(key, { quote, expires: Date.now() + CACHE_TTL_MS });
+      }
+
+      return quote;
+    } catch (error) {
+      lastError = error;
+    }
   }
 
-  const body = (await response.json()) as {
-    TollMessage?: { RateEnquiry?: { Response?: RateResponse } };
-  };
-
-  return readCharges(body.TollMessage?.RateEnquiry?.Response ?? {});
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Freight quote failed.");
 }

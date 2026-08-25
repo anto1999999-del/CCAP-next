@@ -1,6 +1,12 @@
 import { expect, test } from "vitest";
 import { readCharges } from "./carrier";
-import { lookupShippingProfile, profileCount, volumeM3 } from "./dimensions";
+import {
+  ASSUMED_PROFILE,
+  lookupShippingProfile,
+  profileCount,
+  shippingProfileFor,
+  volumeM3,
+} from "./dimensions";
 import { nextPickupTime } from "./pickup";
 import { stateFromPostcode } from "./postcode";
 
@@ -128,4 +134,37 @@ test("an empty answer is zero, not a guess", () => {
     taxCents: 0,
     totalCents: 0,
   });
+});
+
+test("a part measured by position is found from its plain name", () => {
+  /*
+    The yard measured "HEADREST RH REAR" and "CALIPER RH REAR"; the catalogue
+    calls them HEADREST and CALIPER. Matching only one way missed 4,542 parts,
+    which were then quoted as though they weighed a kilogram.
+  */
+  for (const code of ["HEADREST", "CALIPER", "ABS_SENSOR", "FRONT_SEAT"]) {
+    const profile = lookupShippingProfile({
+      itemTypeCode: code,
+      icDesc: null,
+      itemName: code,
+    });
+
+    expect(profile, `${code} should find a measured profile`).not.toEqual(null);
+    expect(profile!.weightKg).toBeGreaterThan(0);
+  }
+});
+
+test("an unmeasured part is assumed heavy, not light", () => {
+  const unknown = {
+    itemTypeCode: "ZZZ_NOT_A_PART",
+    icDesc: null,
+    itemName: "Qq",
+  };
+
+  const { profile, measured } = shippingProfileFor(unknown);
+
+  expect(measured).toEqual(false);
+  expect(profile).toEqual(ASSUMED_PROFILE);
+  // The error has to fall on the yard's side of the ledger, not the customer's.
+  expect(profile.weightKg).toBeGreaterThanOrEqual(15);
 });

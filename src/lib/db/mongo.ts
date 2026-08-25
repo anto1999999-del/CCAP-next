@@ -67,6 +67,9 @@ export type OrderDocument = {
    */
   hidden?: boolean;
   hiddenAt?: Date;
+  /** Stripe's id for the payment, so a webhook can find the order it belongs to. */
+  paymentIntentId?: string;
+  paidAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 };

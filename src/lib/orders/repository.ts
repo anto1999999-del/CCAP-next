@@ -1,6 +1,6 @@
 import "server-only";
 import { ObjectId } from "mongodb";
-import { orders, type OrderDocument } from "../db/mongo";
+import { orders, type OrderDocument, type OrderItemDocument } from "../db/mongo";
 import type { Order, OrderStatus } from "./types";
 
 export { ORDER_STATUSES } from "./types";
@@ -127,4 +127,75 @@ export async function summarise(): Promise<{
   }
 
   return { count: documents.length, revenueCents, byStatus };
+}
+
+/**
+ * Record an order before it is paid for.
+ *
+ * Written first, marked paid later by the webhook. The current site does the
+ * opposite: the browser confirms the payment itself and then posts the order,
+ * which means an order can be recorded that was never paid for, and a payment
+ * can succeed while the order that explains it is never written at all.
+ *
+ * The amount is in cents here and stored in dollars, because that is what the
+ * existing documents hold and the admin pages read.
+ */
+export async function createPending(order: {
+  userId: string | null;
+  items: OrderItemDocument[];
+  amountCents: number;
+  customer: Order["customer"];
+  pickup: boolean;
+  paymentIntentId: string;
+}): Promise<string> {
+  const id = new ObjectId();
+
+  await (await orders()).insertOne({
+    _id: id,
+    user: order.userId ? new ObjectId(order.userId) : new ObjectId(),
+    items: order.items,
+    amount: order.amountCents / 100,
+    address: order.customer.address,
+    city: order.customer.city,
+    zipcode: order.customer.zipcode,
+    phone: order.customer.phone,
+    email: order.customer.email,
+    name: order.customer.name,
+    paymentMethod: "Stripe",
+    pickup: order.pickup,
+    status: "Awaiting payment",
+    paymentIntentId: order.paymentIntentId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } as OrderDocument & { paymentIntentId: string });
+
+  return id.toString();
+}
+
+/**
+ * Mark an order paid.
+ *
+ * Keyed on the payment rather than the order id, because the webhook is told
+ * about a payment and has to find the order it belongs to. Idempotent: Stripe
+ * retries a webhook it did not get a clean answer to, and the same payment
+ * arriving twice must not produce two paid orders.
+ */
+export async function markPaid(paymentIntentId: string): Promise<boolean> {
+  const result = await (await orders()).updateOne(
+    { paymentIntentId, status: "Awaiting payment" } as Record<string, unknown>,
+    { $set: { status: "Pending", paidAt: new Date(), updatedAt: new Date() } },
+  );
+
+  return result.modifiedCount === 1;
+}
+
+/** Find an order by its payment, for the page a customer lands on afterwards. */
+export async function findByPayment(
+  paymentIntentId: string,
+): Promise<Order | null> {
+  const document = await (await orders()).findOne({
+    paymentIntentId,
+  } as Record<string, unknown>);
+
+  return document ? toOrder(document) : null;
 }

@@ -81,6 +81,28 @@ export function lookupShippingProfile(
     if (match) return TABLE[match];
   }
 
+  /*
+    And the other way around, which is where most of the misses were.
+
+    The yard measured parts by position: the table holds "HEADREST RH REAR",
+    "CALIPER RH REAR", "ABS SENSOR LH REAR". The catalogue codes them without
+    the position: HEADREST, CALIPER, ABS_SENSOR. Neither this matcher nor the
+    one on the current site looked for a table entry that *starts with* the
+    part's name, so 4,542 parts fell through to a default and were quoted as
+    though they weighed a kilogram. A front seat is not a kilogram.
+
+    The shortest match wins, as the least specific and so the most likely to be
+    the plain version of the part. Positional variants of the same part have
+    near enough the same dimensions anyway.
+  */
+  for (const option of options) {
+    if (option.length < 5) continue;
+    const match = [...KEYS_BY_LENGTH]
+      .reverse()
+      .find((key) => key.startsWith(`${option} `));
+    if (match) return TABLE[match];
+  }
+
   return null;
 }
 
@@ -93,4 +115,30 @@ export function volumeM3(profile: ShippingProfile): number {
 
 export function profileCount(): number {
   return KEYS_BY_LENGTH.length;
+}
+
+/**
+ * What to assume for a part nobody measured.
+ *
+ * Deliberately not a small box. An unmeasured part quoted at a kilogram means
+ * the customer is charged for a parcel and the yard pays for a pallet, and the
+ * difference comes out of the sale. This is the 75th percentile of everything
+ * in the table: larger than most parts, so the error falls on the safe side,
+ * and the yard confirms the real freight before it ships.
+ */
+export const ASSUMED_PROFILE: ShippingProfile = {
+  weightKg: 15,
+  lengthCm: 60,
+  widthCm: 45,
+  heightCm: 40,
+};
+
+/** The profile to quote with, and whether it is a real measurement. */
+export function shippingProfileFor(
+  part: Pick<CatalogPart, "itemTypeCode" | "icDesc" | "itemName">,
+): { profile: ShippingProfile; measured: boolean } {
+  const profile = lookupShippingProfile(part);
+  return profile
+    ? { profile, measured: true }
+    : { profile: ASSUMED_PROFILE, measured: false };
 }

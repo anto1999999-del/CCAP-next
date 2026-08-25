@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { quoteCheckout, type CheckoutQuote } from "@/app/actions/checkout";
+import { startPayment } from "@/app/actions/payment";
+import PaymentPanel from "./PaymentPanel";
 import { useCart } from "@/lib/cart/CartProvider";
 import { formatCents } from "@/lib/parts/price";
 import { site } from "@/lib/site";
@@ -56,9 +58,58 @@ export default function Checkout() {
   */
   const [answered, setAnswered] = useState<{ key: string; quote: CheckoutQuote } | null>(null);
   const [pending, startQuoting] = useTransition();
+  /*
+    Set once the server has created the payment. Its presence is what swaps the
+    summary for the card form, so the customer cannot be paying while the
+    address behind them is still being edited.
+  */
+  const [payment, setPayment] = useState<{ clientSecret: string } | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [starting, startingPayment] = useTransition();
 
+  const complete =
+    details.name.trim().length > 1 &&
+    details.email.includes("@") &&
+    details.phone.trim().length > 5 &&
+    (pickup ||
+      (details.address.trim().length > 3 &&
+        details.suburb.trim().length > 1 &&
+        /^\d{3,4}$/.test(details.postcode.trim())));
+
+  function beginPayment() {
+    setPaymentError(null);
+    startingPayment(async () => {
+      const result = await startPayment({
+        lines: lines.map((line) => ({
+          urgId: line.urgId,
+          invNumber: line.invNumber,
+          quantity: line.quantity,
+        })),
+        pickup,
+        name: details.name.trim(),
+        email: details.email.trim(),
+        phone: details.phone.trim(),
+        // The yard's own address when collecting, so the order still records
+        // somewhere, and the customer is not asked for one they do not need.
+        address: pickup ? site.address.displayLine : details.address.trim(),
+        suburb: pickup ? "Berkeley Vale" : details.suburb.trim(),
+        postcode: pickup ? "2261" : details.postcode.trim(),
+      });
+
+      if (result.ok) setPayment({ clientSecret: result.clientSecret });
+      else setPaymentError(result.message);
+    });
+  }
+
+  /*
+    A full four-digit postcode, not three. Quoting on a partial one sends the
+    carrier a suburb and postcode that do not belong together, which it answers
+    with a 500: typing "Melbourne" while the postcode still says 2259 produced
+    exactly that.
+  */
   const deliverable =
-    pickup || (details.suburb.trim() !== "" && details.postcode.trim().length >= 3);
+    pickup ||
+    (details.suburb.trim().length > 1 && /^\d{4}$/.test(details.postcode.trim()));
 
   const requestKey = [
     pickup ? "pickup" : "deliver",
@@ -84,8 +135,12 @@ export default function Checkout() {
     }));
     const key = requestKey;
 
-    // Debounced, because this runs as somebody types a postcode, and every run
-    // is a request to the carrier.
+    /*
+      Debounced by nearly a second. This runs as somebody types, each run is a
+      request to a paid service, and a suburb and postcode are usually typed one
+      after the other: waiting means one quote for the pair rather than one for
+      every intermediate state.
+    */
     const timer = setTimeout(() => {
       startQuoting(async () => {
         const quote = await quoteCheckout({
@@ -96,7 +151,7 @@ export default function Checkout() {
         });
         setAnswered({ key, quote });
       });
-    }, 500);
+    }, 900);
 
     return () => clearTimeout(timer);
   }, [lines, pickup, details.suburb, details.postcode, deliverable, requestKey]);
@@ -220,6 +275,14 @@ export default function Checkout() {
             </ul>
           )}
 
+          {quote?.ok && quote.freightEstimated && !quote.freightUnavailable && (
+            <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+              One of these parts has not been weighed yet, so the delivery price
+              above is an estimate. We will confirm it before it ships and let
+              you know if it changes.
+            </p>
+          )}
+
           {quote?.ok && quote.freightUnavailable && (
             <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
               We could not price the freight automatically for that address.
@@ -240,7 +303,19 @@ export default function Checkout() {
             </p>
           )}
 
-          <PaymentStep ready={Boolean(quote?.ok)} />
+          {payment ? (
+            <PaymentPanel
+              clientSecret={payment.clientSecret}
+              onCancel={() => setPayment(null)}
+            />
+          ) : (
+            <PaymentStep
+              ready={Boolean(quote?.ok) && complete}
+              starting={starting}
+              error={paymentError}
+              onPay={beginPayment}
+            />
+          )}
         </section>
       </div>
     </div>
@@ -272,7 +347,17 @@ function Line({
  * Taking the money needs Stripe keys, which are not configured yet, so rather
  * than pretend, the page says so and offers the phone.
  */
-function PaymentStep({ ready }: { ready: boolean }) {
+function PaymentStep({
+  ready,
+  starting,
+  error,
+  onPay,
+}: {
+  ready: boolean;
+  starting: boolean;
+  error: string | null;
+  onPay: () => void;
+}) {
   const configured = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
   if (!configured) {
@@ -296,12 +381,30 @@ function PaymentStep({ ready }: { ready: boolean }) {
   }
 
   return (
-    <button
-      type="button"
-      disabled={!ready}
-      className="bg-brand hover:bg-brand-hover mt-auto w-full rounded-full px-4 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors disabled:opacity-50"
-    >
-      Pay now
-    </button>
+    <div className="mt-auto">
+      {error && (
+        <p
+          role="alert"
+          className="mb-3 rounded-lg border border-gray-700 bg-[#0d0d0d] p-3 text-sm text-gray-200"
+        >
+          {error}
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={onPay}
+        disabled={!ready || starting}
+        className="bg-brand hover:bg-brand-hover w-full rounded-full px-4 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors disabled:opacity-50"
+      >
+        {starting ? "Preparing..." : "Continue to payment"}
+      </button>
+
+      {!ready && (
+        <p className="mt-2 text-center text-xs text-gray-500">
+          Fill in your details above to continue.
+        </p>
+      )}
+    </div>
   );
 }
