@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import Container from "./Container";
+import HelpBand from "./HelpBand";
 
 /**
  * Site footer.
@@ -137,45 +138,7 @@ function ContactDetails() {
 export default function Footer() {
   return (
     <div className="bg-surface text-white">
-      {/*
-        The band above the footer proper. It was a photograph with a heading,
-        a line of text and a button stacked down the left of it, which read as
-        three unrelated things. It is one offer now: a question, and the two
-        ways of answering it.
-      */}
-      <div
-        className="relative bg-cover bg-center py-10 text-white md:py-12"
-        style={{ backgroundImage: "url(/images/section.webp)" }}
-      >
-        <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
-
-        <Container className="relative flex flex-col items-center gap-6 text-center md:flex-row md:justify-between md:text-left">
-          <div>
-            <h3 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-              Can&rsquo;t find the part you need?
-            </h3>
-            <p className="mt-2 max-w-xl text-sm text-white/85 md:text-base">
-              We hold thousands more than are listed, and we can source what we
-              do not have. Tell us the car and the part.
-            </p>
-          </div>
-
-          <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row">
-            <a
-              href={`tel:${site.contact.phoneE164}`}
-              className="rounded-full bg-white px-7 py-3 text-sm font-bold tracking-wide text-black uppercase transition-transform hover:scale-[1.02]"
-            >
-              Call {site.contact.phone}
-            </a>
-            <Link
-              href="/contact"
-              className="rounded-full border border-white/70 px-7 py-3 text-sm font-bold tracking-wide text-white uppercase transition-colors hover:bg-white/10"
-            >
-              Send an enquiry
-            </Link>
-          </div>
-        </Container>
-      </div>
+      <HelpBand />
 
       <Container className="py-8 text-sm">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

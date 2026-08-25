@@ -11,6 +11,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/lib/cart/CartProvider";
+import { signOut } from "@/app/actions/auth";
 import Container from "./Container";
 
 /**
@@ -49,6 +50,37 @@ const RESOURCE_LINKS = [
 
 export default function Header() {
   const { count } = useCart();
+
+  /*
+    Asked for after the page loads rather than read in the layout. Reading the
+    session server-side in the root layout would make every page on the site
+    dynamic, so the blog, gallery and part pages would stop being static for the
+    sake of one menu.
+  */
+  const [session, setSession] = useState<{
+    signedIn: boolean;
+    name?: string;
+    isAdmin?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    let current = true;
+    fetch("/api/session")
+      .then((response) => response.json())
+      .then((data) => {
+        if (current) setSession(data);
+      })
+      .catch(() => {
+        // A header that cannot tell is a header that offers signing in.
+        if (current) setSession({ signedIn: false });
+      });
+
+    return () => {
+      current = false;
+    };
+  }, []);
+
+  const closeAccount = () => setAccountOpen(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -177,23 +209,67 @@ export default function Header() {
                 type="button"
                 aria-expanded={accountOpen}
                 aria-haspopup="true"
-                aria-label="Account menu"
+                aria-label={session?.signedIn ? `Account, ${session.name}` : "Account menu"}
                 onClick={() => setAccountOpen((open) => !open)}
+                className="hover:text-brand-text relative flex h-8 w-8 items-center justify-center rounded-md text-white transition-colors"
               >
-                <UserIcon
-                  className="h-5 w-5 cursor-pointer text-white hover:text-brand-text"
-                  aria-hidden="true"
-                />
+                <UserIcon className="h-5 w-5" aria-hidden="true" />
+                {/*
+                  A dot rather than a name in the bar: the header has no room
+                  for one, and without any mark at all the icon looked the same
+                  signed in as signed out, which is what made the menu read as
+                  "Login" forever.
+                */}
+                {session?.signedIn && (
+                  <span
+                    aria-hidden="true"
+                    className="bg-brand ring-canvas absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full ring-2"
+                  />
+                )}
               </button>
+
               {accountOpen && (
-                <div className="bg-card border-line absolute right-0 z-10 mt-3 max-w-[300px] overflow-hidden rounded-xl border shadow-2xl">
-                  <Link
-                    href="/login"
-                    onClick={() => setAccountOpen(false)}
-                    className="hover:bg-brand block px-4 py-2.5 text-sm whitespace-nowrap text-white"
-                  >
-                    Login
-                  </Link>
+                <div className="bg-card border-line absolute right-0 z-10 mt-3 w-56 overflow-hidden rounded-xl border shadow-2xl">
+                  {session?.signedIn ? (
+                    <>
+                      <p className="border-line truncate border-b px-4 py-3 text-xs text-gray-400">
+                        Signed in as{" "}
+                        <span className="font-semibold text-white">
+                          {session.name}
+                        </span>
+                      </p>
+
+                      {session.isAdmin && (
+                        <AccountLink href="/dashboard" onNavigate={closeAccount}>
+                          Dashboard
+                        </AccountLink>
+                      )}
+                      <AccountLink href="/my-account" onNavigate={closeAccount}>
+                        My profile
+                      </AccountLink>
+                      <AccountLink href="/orders" onNavigate={closeAccount}>
+                        My orders
+                      </AccountLink>
+
+                      <form action={signOut} className="border-line border-t">
+                        <button
+                          type="submit"
+                          className="hover:bg-brand block w-full px-4 py-2.5 text-left text-sm text-white transition-colors"
+                        >
+                          Sign out
+                        </button>
+                      </form>
+                    </>
+                  ) : (
+                    <>
+                      <AccountLink href="/login" onNavigate={closeAccount}>
+                        Sign in
+                      </AccountLink>
+                      <AccountLink href="/login" onNavigate={closeAccount}>
+                        Create an account
+                      </AccountLink>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -281,5 +357,26 @@ export default function Header() {
       {/* Spacer for the fixed header, matching its measured height of 73px. */}
       <div className="h-[4.5625rem]" aria-hidden="true" />
     </>
+  );
+}
+
+/** One row in the account menu. */
+function AccountLink({
+  href,
+  onNavigate,
+  children,
+}: {
+  href: string;
+  onNavigate: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className="hover:bg-brand block px-4 py-2.5 text-sm whitespace-nowrap text-white transition-colors"
+    >
+      {children}
+    </Link>
   );
 }
