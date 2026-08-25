@@ -9,6 +9,18 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/*
+  Rendered per request, not at build time.
+
+  Whether accounts work depends on an environment variable, and the page reads
+  it. Prerendered, that check runs during the build: a build without the
+  variable bakes "accounts are not available" into static HTML, and setting the
+  variable afterwards changes nothing until somebody rebuilds. It was doing
+  exactly that. The early return also skips reading the session, which would
+  otherwise have made the page dynamic on its own.
+*/
+export const dynamic = "force-dynamic";
+
 export default async function LoginPage({
   searchParams,
 }: {

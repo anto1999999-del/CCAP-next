@@ -301,14 +301,37 @@ live now. The change is to re-price the order server-side in
 
 ## 24. The live site quotes freight from the carrier's test system
 
-`shippingController.js` hardcodes `api-uat.teamglobalexp.com`, which is Team
-Global Express's user acceptance testing environment. Every freight price quoted
-to a customer comes from there. Whether those prices match production is a
-question for the carrier.
+`shippingController.js` hardcodes `api-uat.teamglobalexp.com`, Team Global
+Express's user acceptance testing environment, along with a username and
+password. Every freight price ever quoted to a customer comes from there.
 
-The endpoint is `TGE_RATE_URL` in the rebuild, defaulting to the same UAT host so
-nothing changes by accident. The carrier credentials moved out of the source
-file to the environment, as with the parts API.
+Confirmed on the server itself, in the code that is actually running
+(`/root/ccautoparts/ccautoparts-api`, not the `boya1/backend` copy in the repo):
+
+    const TGE_RATE_URL = "https://api-uat.teamglobalexp.com:6930/...";
+    const TGE_USERNAME = "sales@centralcoastautoparts.com.au";
+    const TGE_PASSWORD = "...";
+    Environment: "MYTGE_PS",
+
+**Somebody set production up and it was never wired in.** That server's `.env`
+carries a full production configuration, and the code reads none of it:
+
+    TGE_BASE_URL=https://api.teamglobalexp.com:6930
+    TGE_RATE_URL=https://api.teamglobalexp.com:6930/...
+    TGE_TOKEN_URL=https://api.teamglobalexp.com:6930/oauth/token
+    TGE_CLIENT_ID / TGE_CLIENT_SECRET
+    TGE_ENVIRONMENT=MYT_PS
+
+Note the shape: production authenticates with OAuth against a token endpoint,
+where UAT takes a username and password. So moving to production is not a change
+of URL. It needs the OAuth flow those credentials imply, which neither codebase
+has ever contained.
+
+The rebuild quotes from the same UAT endpoint the live site does, so nothing
+changes by accident, and `TGE_RATE_URL` is the switch when the owner decides.
+Whether UAT prices match production is a question for the carrier and worth
+asking before that switch: the yard has been charging customers on those numbers
+for as long as the site has been up.
 
 ## 25. The sitemap and robots.txt are generated, not maintained by hand
 
