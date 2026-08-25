@@ -349,3 +349,42 @@ make rather than throwing the choice away.
 **This is an addition to the design rather than a port**, so it is recorded here
 for the owner to accept or reject. Measured: "alternator" finds 280 parts,
 "hilux" 5, "kia cerato gearbox" 6.
+
+## 27. Sessions are a cookie the browser will not show to JavaScript
+
+The current site signs a JWT and keeps it in localStorage, where any script on
+the page can read it. One injected script and an attacker holds that customer's
+session for the seven days the token lasts.
+
+The rebuild puts the same signed token in an httpOnly, sameSite cookie. It
+cannot be read by script, it is attached automatically, and it expires the same
+way. The token says who you are and nothing else: whether an account is an admin
+is read from the database on each request, so removing someone's admin access
+takes effect immediately rather than whenever their week-old token expires.
+
+Two other things carried deliberately. Sign-in failures never say which half was
+wrong, because "no account with that email" is a way to enumerate customers. And
+accounts created through Google have no password at all, so a missing hash must
+fail rather than compare equal to an empty string.
+
+## 28. Admin pages check on the server, every request
+
+`adminOnly()` runs on each admin page, and each admin action re-checks before it
+writes. Hiding a button is not access control: a form can be submitted by anyone
+who knows the address.
+
+Two guards on admin access itself: an admin cannot remove their own, and the
+last admin cannot be removed at all. Without those, one careless click leaves a
+back office nobody can open.
+
+Hiding an order is offered; deleting one is not. A record of money taken should
+not be destroyable from a web page. Hidden orders stay in the database and drop
+out of the list and the totals, which is what the existing `hidden` flag was
+built for.
+
+**Not yet verified against the database.** Everything here is written against
+the live collections and their existing document shapes, and it builds, types
+and lints clean, but nothing has run against real data because MONGO_URI is not
+available here. Without it the account pages say accounts are unavailable and
+the rest of the site is unaffected, which is also what a deployment missing that
+variable would look like.
