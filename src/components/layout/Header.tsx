@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   Bars3Icon,
   ChevronDownIcon,
@@ -50,6 +51,7 @@ const RESOURCE_LINKS = [
 
 export default function Header() {
   const { count } = useCart();
+  const pathname = usePathname();
 
   /*
     Asked for after the page loads rather than read in the layout. Reading the
@@ -63,6 +65,12 @@ export default function Header() {
     isAdmin?: boolean;
   } | null>(null);
 
+  /*
+    Re-read on every navigation, not once on mount. Signing in is a client-side
+    navigation: the header does not remount, so a header that asked once keeps
+    saying "Sign in" to somebody who is now signed in. Signing out has the same
+    problem in reverse.
+  */
   useEffect(() => {
     let current = true;
     fetch("/api/session")
@@ -78,7 +86,7 @@ export default function Header() {
     return () => {
       current = false;
     };
-  }, []);
+  }, [pathname]);
 
   const closeAccount = () => setAccountOpen(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -265,7 +273,10 @@ export default function Header() {
                       <AccountLink href="/login" onNavigate={closeAccount}>
                         Sign in
                       </AccountLink>
-                      <AccountLink href="/login" onNavigate={closeAccount}>
+                      <AccountLink
+                        href="/login?mode=register"
+                        onNavigate={closeAccount}
+                      >
                         Create an account
                       </AccountLink>
                     </>

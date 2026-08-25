@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; mode?: string }>;
 }) {
   /*
     Accounts need the database. Without it the page would fail on the first
@@ -36,8 +36,14 @@ export default async function LoginPage({
   // Somebody already signed in has no business on a sign-in page.
   if (await currentAccount()) redirect("/my-account");
 
-  const { next } = await searchParams;
-  return <AuthForms next={next ?? "/my-account"} />;
+  const { next, mode } = await searchParams;
+
+  return (
+    <AuthForms
+      next={next ?? "/my-account"}
+      initialMode={mode === "register" ? "register" : "signin"}
+    />
+  );
 }
 
 function AccountsUnavailable() {

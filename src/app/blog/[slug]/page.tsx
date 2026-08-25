@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: Props) {
       />
 
       <article className="bg-admin text-white">
-        <Container className="max-w-3xl py-12 md:py-16">
+        <Container width="prose" className="py-12 md:py-16">
           <nav className="mb-6 text-sm text-white/50">
             <Link href="/blog" className="hover:text-brand-text transition-colors">
               ← All articles

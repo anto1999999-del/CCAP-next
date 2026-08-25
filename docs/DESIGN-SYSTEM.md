@@ -61,10 +61,15 @@ columns do not jitter as they update.
 
 ## Width and rhythm
 
-- Public pages: `Container`, which is `max-w-7xl px-6 lg:px-8`. The header and
-  footer use it too, so everything lines up down the page.
-- Account and admin pages: `max-w-[1600px]` with a 288px sidebar, because tables
-  need the room. Content is capped, not stretched.
+- One width for the whole site: `Container`, which is `max-w-[1600px] px-6
+  lg:px-10`. The header, the footer, every page and the admin all use it, so
+  everything lines up down the page and a large screen has something to use
+  rather than a narrow column marooned in the middle.
+- Long-form reading is the exception: `<Container width="prose">` caps an
+  article at `max-w-3xl`, because a line past about eighty characters is harder
+  to follow. It is a prop rather than a class passed through `className`, which
+  collides with the width already on the element and wins or loses depending on
+  the order Tailwind emits them.
 - Ultrawide: nothing is full-bleed except backgrounds. On a 3440px screen the
   content stops and the background continues.
 - Vertical rhythm: `py-14 md:py-20` between page sections, `gap-4` between cards

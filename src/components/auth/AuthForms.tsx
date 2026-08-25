@@ -29,8 +29,20 @@ const REASONS = [
   "A record of every part you have bought from us",
 ];
 
-export default function AuthForms({ next }: { next: string }) {
-  const [mode, setMode] = useState<"signin" | "register">("signin");
+export default function AuthForms({
+  next,
+  initialMode = "signin",
+}: {
+  next: string;
+  /*
+    Which form to open on. It comes from the URL rather than living only in
+    this component, so "Create an account" in the header can land somebody on
+    the right form: two links to the same page cannot switch a piece of state
+    they have no way of reaching.
+  */
+  initialMode?: "signin" | "register";
+}) {
+  const [mode, setMode] = useState<"signin" | "register">(initialMode);
 
   return (
     <div className="bg-canvas px-4 py-12 text-white md:py-16">
