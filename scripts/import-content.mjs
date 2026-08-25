@@ -67,6 +67,58 @@ function imagesFrom(html) {
   return images;
 }
 
+/**
+ * Point every image in a body at our own copy.
+ *
+ * The export keeps the WordPress addresses, and the old site rewrote them as it
+ * rendered. That is fine while WordPress is up and a broken article the day it
+ * is switched off, so the rewrite happens here, once, into what is stored.
+ *
+ * `srcset` goes entirely: it lists WordPress's generated sizes of the same
+ * photograph, none of which were downloaded, and the browser prefers it over
+ * `src` when both are present.
+ */
+function rewriteBodyImages(html) {
+  return html
+    .replace(/\ssrcset="[^"]*"/gi, "")
+    .replace(/\ssizes="[^"]*"/gi, "")
+    .replace(/(\ssrc=")([^"]+)(")/gi, (_, before, url, after) =>
+      `${before}${rewriteImageUrl(url)}${after}`,
+    )
+    .replace(/(\shref=")(https?:\/\/blog\.centralcoastautoparts\.com\.au[^"]*)(")/gi,
+      (_, before, url, after) => `${before}${internalPath(url)}${after}`,
+    )
+    /*
+      And the addresses that are visible words rather than links. Several
+      articles print the old blog address as the text of their own link. The
+      link was fixed above; leaving the text would have the page reading out a
+      domain that is about to stop existing.
+    */
+    .replace(/https?:\/\/blog\.centralcoastautoparts\.com\.au[^\s<"']*/gi,
+      (url) => `centralcoastautoparts.com.au${internalPath(url)}`,
+    );
+}
+
+/**
+ * Where an old blog address lives now.
+ *
+ * The blog home became /blog, the gallery category became /gallery, and every
+ * article kept its slug under /blog. This is the same mapping the redirect file
+ * uses, so a link inside an article and a redirect from outside agree.
+ */
+function internalPath(url) {
+  try {
+    const { pathname } = new URL(url);
+    const clean = pathname.replace(/\/$/, "");
+    if (clean === "") return "/blog";
+    if (clean === "/gallery" || clean.startsWith("/category/gallery")) return "/gallery";
+    if (clean.startsWith("/category/") || clean.startsWith("/tag/")) return "/blog";
+    return `/blog${clean}`;
+  } catch {
+    return "/blog";
+  }
+}
+
 /** The figures are pulled out into the photo set, so the prose stands alone. */
 function bodyWithoutFigures(html) {
   return html
@@ -149,7 +201,7 @@ async function main() {
       slug: article.slug,
       title: withoutDashes(article.title),
       excerpt: withoutDashes(article.excerpt),
-      body: withoutDashes(article.contentHtml),
+      body: rewriteBodyImages(withoutDashes(article.contentHtml)),
       // Kept as HTML. Rewriting a WordPress article into markdown loses its
       // tables and its layout, and these are live pages with live rankings.
       bodyFormat: "html",
@@ -191,7 +243,7 @@ async function main() {
       slug: car.slug,
       title: withoutDashes(car.title),
       ...identity,
-      body: withoutDashes(bodyWithoutFigures(car.contentHtml)),
+      body: rewriteBodyImages(withoutDashes(bodyWithoutFigures(car.contentHtml))),
       bodyFormat: "html",
       photos,
       status: "published",
