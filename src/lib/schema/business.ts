@@ -15,7 +15,15 @@ export function homeBusinessSchema() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": ["AutoPartsStore", "AutoWrecked", "LocalBusiness"],
+        /*
+          Both are real schema.org types. "AutoWrecked" used to sit in this
+          list and is not a type at all: schema.org's automotive branch has
+          AutoBodyShop, AutoDealer, AutoPartsStore, AutoRental, AutoRepair,
+          AutoWash, GasStation and the two motorcycle ones, and nothing called
+          AutoWrecked. An unrecognised type in the array risks the whole block
+          being discarded.
+        */
+        "@type": ["AutoPartsStore", "LocalBusiness"],
         "@id": `${site.url}/#business`,
         name: site.name,
         alternateName: "CCAP",

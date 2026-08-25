@@ -39,6 +39,13 @@ export async function generateMetadata({
       description: category.description,
       type: "website",
       url: `${site.url}/parts/${category.slug}`,
+      /*
+        Repeated, not inherited. A page that sets `openGraph` replaces the
+        parent's whole object rather than merging into it, so leaving this out
+        meant these seven pages shared with no image at all while every other
+        page on the site had one.
+      */
+      images: [{ url: site.logo }],
     },
   };
 }

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { sitemapFileUrls } from "@/lib/seo/sitemap-files";
+import { site } from "@/lib/site";
 
 /**
  * What crawlers may look at.
@@ -28,15 +29,26 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         "/dashboard",
         "/manage-orders",
         "/manage-users",
+        // The two content admin screens. Added when the CMS was built; a
+        // missing line here is how an admin URL ends up in search results.
+        "/manage-blog",
+        "/manage-gallery",
+        // Carried from the live robots.txt. The page no longer exists, and the
+        // line stays because removing it invites a crawler to try the address.
         "/manage-slider-images",
       ],
       allow: "/",
     },
     /*
-      Every file by name. A chunked sitemap is served as /sitemap/0.xml and so
-      on with no index at /sitemap.xml, so naming that address here would send
-      every crawler to a 404.
+      The index first, then every file by name.
+
+      Next serves a chunked sitemap as /sitemap/0.xml and so on and builds no
+      index of its own, and it will not let a route handler answer at
+      /sitemap.xml either, so the index is at /sitemap_index.xml with a
+      redirect pointing at it. Listing both the index and the files means a
+      crawler that follows the index and a tool that only reads this file each
+      get the whole thing.
     */
-    sitemap: await sitemapFileUrls(),
+    sitemap: [`${site.url}/sitemap_index.xml`, ...(await sitemapFileUrls())],
   };
 }

@@ -20,7 +20,17 @@ const nextConfig: NextConfig = {
    * moves and the duplicate stops being served.
    */
   async redirects() {
-    return [{ source: "/ProductsPage", destination: "/products", permanent: true }];
+    return [
+      { source: "/ProductsPage", destination: "/products", permanent: true },
+      /*
+        /sitemap.xml is the address every crawler and every SEO tool tries
+        first, and the one the current live site answers. Next reserves it for
+        its own metadata route and then serves a 404 there, so this points it
+        at the index we build instead. Without it, replacing the live site
+        turns a working sitemap into a 404 on day one.
+      */
+      { source: "/sitemap.xml", destination: "/sitemap_index.xml", permanent: true },
+    ];
   },
 };
 

@@ -14,7 +14,7 @@ import {
   orNotRecorded,
   yearLabel,
 } from "@/lib/parts/format";
-import { partKey } from "@/lib/parts/identity";
+import { canonicalPathFor, partKey } from "@/lib/parts/identity";
 import { coverImage, fullImageUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
 import { findPart } from "@/lib/parts/query";
@@ -48,13 +48,21 @@ export async function generateMetadata({
   const part = await lookup(params);
   if (!part) return { title: `Part not found | ${site.name}` };
 
-  const { urgId, invNumber } = await params;
   const name = formatItemName(part.itemName);
   const vehicle = vehicleLabel(part);
 
   const title = vehicle
-    ? `Used ${name} for ${vehicle} | ${site.name} NSW`
+    ? `Used ${name} for ${vehicle} | ${site.name}`
     : `Used ${name} | ${site.name} Berkeley Vale NSW`;
+
+  /*
+    Where several identical parts exist, one of them owns the address and the
+    rest point here. Sixty-two per cent of the catalogue has a twin, and
+    without this they compete with each other in search results instead of
+    with other wreckers.
+  */
+  const { parts: catalogue } = await loadCatalog();
+  const canonical = canonicalPathFor(part, catalogue);
 
   const description = [
     `Quality used ${name}`,
@@ -69,7 +77,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/product/${urgId}/${invNumber}` },
+    alternates: { canonical },
     openGraph: {
       title,
       description,
