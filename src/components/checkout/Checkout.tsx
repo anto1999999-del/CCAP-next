@@ -234,9 +234,36 @@ export default function Checkout() {
         <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
           <h2 className="mb-5 text-xl font-bold md:text-2xl">Order summary</h2>
 
+          {quote?.ok && (
+            <ul className="border-line mb-5 space-y-3 border-b pb-5">
+              {quote.lines.map((line) => (
+                <li key={`${line.name}-${line.dimensions}`}>
+                  <div className="flex justify-between gap-4 text-sm">
+                    <span className="truncate text-gray-200">
+                      {line.quantity > 1 && `${line.quantity} x `}
+                      {line.name}
+                    </span>
+                    <span className="shrink-0 font-semibold">{line.parts}</span>
+                  </div>
+                  <div className="mt-0.5 flex justify-between gap-4 text-xs text-gray-500">
+                    <span>
+                      {line.weightKg} kg, {line.dimensions}
+                      {line.measured ? "" : " (estimated)"}
+                    </span>
+                    {line.freightAlone && (
+                      <span className="shrink-0">
+                        {line.freightAlone} to send on its own
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="mb-4 space-y-2">
             <Line
-              label="Subtotal"
+              label="Parts"
               value={
                 quote?.ok ? quote.subtotal : formatCents(indicativeSubtotal)
               }
@@ -264,6 +291,14 @@ export default function Checkout() {
               </span>
             </div>
           </div>
+
+          {quote?.ok && quote.lines.some((line) => line.freightAlone) && (
+            <p className="mb-4 text-xs leading-relaxed text-gray-500">
+              The per-part figures are what each would cost to send by itself.
+              They add up to more than the delivery charged above, because the
+              carrier prices the whole consignment as one shipment.
+            </p>
+          )}
 
           {quote?.ok && quote.problems.length > 0 && (
             <ul className="mb-4 space-y-2 rounded-lg border border-yellow-700/40 bg-yellow-900/10 p-4 text-sm text-yellow-200">
