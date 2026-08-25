@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { register, signIn, type AuthState } from "@/app/actions/auth";
+import GoogleSignIn from "./GoogleSignIn";
 import { BRAND_GRADIENT } from "@/components/layout/PageHero";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth/credentials";
 import { site } from "@/lib/site";
@@ -32,7 +33,7 @@ export default function AuthForms({ next }: { next: string }) {
   const [mode, setMode] = useState<"signin" | "register">("signin");
 
   return (
-    <div className="bg-canvas min-h-[calc(100vh-4rem)] px-4 py-12 text-white md:py-16">
+    <div className="bg-canvas px-4 py-12 text-white md:py-16">
       <div className="border-line bg-card mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border shadow-[0_24px_70px_rgba(0,0,0,0.55)] lg:grid-cols-[1.05fr_1fr]">
         <aside
           className="relative hidden flex-col justify-between p-10 lg:flex"
@@ -83,6 +84,21 @@ export default function AuthForms({ next }: { next: string }) {
               ? "Welcome back."
               : "It takes a moment, and your next order fills itself in."}
           </p>
+
+          {/*
+            Google first, deliberately. Most of the accounts on this site were
+            created with it and have no password, so for most people the form
+            below is not the way in.
+          */}
+          <GoogleSignIn next={next} />
+
+          <div className="my-6 flex items-center gap-4">
+            <span className="bg-line h-px flex-1" />
+            <span className="text-xs tracking-wider text-gray-500 uppercase">
+              or with your email
+            </span>
+            <span className="bg-line h-px flex-1" />
+          </div>
 
           {mode === "signin" ? <SignInForm next={next} /> : <RegisterForm />}
 

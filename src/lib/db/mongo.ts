@@ -23,6 +23,8 @@ export type UserDocument = {
   password?: string;
   isAdmin?: boolean;
   isGoogleLogin?: boolean;
+  /** Google's own id for the person, recorded when they first sign in with it. */
+  googleId?: string;
   phone?: string;
   address?: string;
   city?: string;

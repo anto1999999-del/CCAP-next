@@ -12,6 +12,11 @@ import {
   verifyCredentials,
 } from "@/lib/auth/accounts";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { accountForGoogle, identityFromToken } from "@/lib/auth/google";
+import { beginReset, completeReset } from "@/lib/auth/reset";
+import { passwordField } from "@/lib/auth/credentials";
+import { sendEmail } from "@/lib/email";
+import { site } from "@/lib/site";
 import { rateLimit } from "@/lib/rate-limit";
 
 /**
@@ -120,4 +125,116 @@ export async function register(
 export async function signOut(): Promise<void> {
   await destroySession();
   redirect("/");
+}
+
+/**
+ * Sign in with Google.
+ *
+ * Most customers here are Google customers: 35 of the 62 existing accounts have
+ * no password at all. The browser sends the ID token Google gave it, and it is
+ * verified against Google before anything in it is believed.
+ */
+export async function signInWithGoogle(idToken: string): Promise<AuthState> {
+  if (typeof idToken !== "string" || idToken.length < 20) {
+    return { message: "That Google sign-in could not be read." };
+  }
+
+  const identity = await identityFromToken(idToken);
+  if (!identity) {
+    return { message: "Google could not confirm that sign-in. Please try again." };
+  }
+
+  const account = await accountForGoogle(identity);
+  await createSession(account.id);
+  return {};
+}
+
+export type ResetState = {
+  errors?: Record<string, string>;
+  message?: string;
+  done?: boolean;
+};
+
+/**
+ * Ask for a reset link.
+ *
+ * Always answers the same way, whether or not the address has an account.
+ * Anything else turns this form into a way of finding out who has one.
+ */
+export async function requestPasswordReset(
+  _previous: ResetState,
+  form: FormData,
+): Promise<ResetState> {
+  const email = field(form, "email").trim();
+  const sameAnswer: ResetState = {
+    done: true,
+    message:
+      "If that address has an account, a reset link is on its way. It is good for one hour.",
+  };
+
+  if (!email.includes("@")) {
+    return { errors: { email: "Enter your email address." } };
+  }
+
+  const limit = rateLimit(`reset:${email.toLowerCase()}`, {
+    limit: 5,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!limit.allowed) return sameAnswer;
+
+  const token = await beginReset(email);
+  if (!token) return sameAnswer;
+
+  const origin = process.env.NEXT_PUBLIC_SITE_ORIGIN ?? site.url;
+  const link = `${origin}/reset-password/${token}`;
+
+  const sent = await sendEmail({
+    to: email,
+    subject: `Reset your ${site.name} password`,
+    text: [
+      "Somebody asked to reset the password on this account.",
+      "",
+      link,
+      "",
+      "The link works once and expires in an hour. If this was not you, ignore",
+      `this email, or call us on ${site.contact.phone}.`,
+    ].join("\n"),
+  });
+
+  if (!sent.ok) {
+    console.error("[auth] reset email failed:", sent.reason);
+    return {
+      message:
+        `We could not send that email just now. Please call us on ${site.contact.phone} and we will sort it out.`,
+    };
+  }
+
+  return sameAnswer;
+}
+
+/** Set a new password from a reset link. */
+export async function resetPassword(
+  _previous: ResetState,
+  form: FormData,
+): Promise<ResetState> {
+  const token = field(form, "token");
+  const parsed = passwordField.safeParse(field(form, "password"));
+
+  if (!parsed.success) {
+    return { errors: { password: parsed.error.issues[0]?.message ?? "" } };
+  }
+
+  if (field(form, "confirm") !== parsed.data) {
+    return { errors: { confirm: "Those two passwords are not the same." } };
+  }
+
+  const changed = await completeReset(token, parsed.data);
+  if (!changed) {
+    return {
+      message:
+        "That link has expired or has already been used. Ask for a new one.",
+    };
+  }
+
+  return { done: true, message: "Your password has been changed. You can sign in now." };
 }
