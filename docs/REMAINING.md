@@ -74,3 +74,39 @@ and their existing shapes, but nothing has run a query.
       `RESEND_API_KEY` and the Stripe keys at production values
 - [ ] Nightly on the droplet: sync the catalogue, then warm the images
 - [ ] Put the 132 blog redirects in front of the old blog subdomain
+
+## Deploying to the droplet: two things the current setup gets wrong
+
+Both were found while looking at the live server on 26 August 2026. Neither is
+worth fixing on the old API, which is being deleted; both must be right from the
+first day of the new one.
+
+**Run as an unprivileged user, from outside /root.**
+
+The current API runs as root from `/root/ccautoparts/ccautoparts-api`. A
+public-facing Node process running as root means any code-execution bug in it
+owns the whole box: the mail server, the database, the lot. It cannot simply be
+moved to another user either, because `/root` is mode 700 and nothing else can
+traverse it.
+
+The new deployment goes to `/srv/ccap-next`, owned by a `ccap` user with no
+login shell, and its service runs as that user. `MEDIA_DIR=/root/ccap-media`
+moves to `/srv/ccap-media` with the same owner, or uploaded images will fail to
+write with a permission error nobody sees until somebody tries to add a vehicle.
+
+**Bind to 127.0.0.1, not 0.0.0.0.**
+
+The old API binds every interface on port 4000 and is saved only by a ufw rule.
+That rule is correct today, and it is one careless `ufw allow` away from not
+being. A service that is only ever reached through the web server should not be
+listening anywhere else, so the firewall is the second line of defence rather
+than the only one.
+
+Next binds to whatever `HOSTNAME` says; set `HOSTNAME=127.0.0.1` and let the web
+server proxy to it.
+
+**Relative paths.** The old API writes `./utils/partsCache.json` and several
+caches through `path.dirname(filePath)`, all resolved against the working
+directory. Anything the new deployment writes uses an absolute path from an
+environment variable, so a service started from the wrong directory fails loudly
+instead of writing somewhere nobody looks.
