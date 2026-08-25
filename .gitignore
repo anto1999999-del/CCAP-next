@@ -57,3 +57,6 @@ sync.log
 # Local run logs.
 prod.log
 warm*.log
+
+# Images uploaded through the admin.
+content/media/
