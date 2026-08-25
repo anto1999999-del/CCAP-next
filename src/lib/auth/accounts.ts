@@ -118,6 +118,39 @@ export async function updateDetails(
   );
 }
 
+/**
+ * Fill in whatever the account has not got, from a delivery address.
+ *
+ * Somebody who checks out as a guest of their own account should not have to
+ * type their address into their profile a second time, so what they entered at
+ * checkout is kept.
+ *
+ * Only blank fields are written. Sending one part to a friend, or to work,
+ * must not quietly overwrite the address they had saved: the order carries its
+ * own delivery address either way, and that is the one the part ships to.
+ */
+export async function fillBlankDetails(
+  userId: string,
+  details: Partial<Pick<Account, "name" | "phone" | "address" | "city" | "zipcode">>,
+): Promise<void> {
+  const collection = await users();
+  const user = await collection.findOne({ _id: new ObjectId(userId) });
+  if (!user) return;
+
+  const blanks: Record<string, string> = {};
+  for (const [field, value] of Object.entries(details)) {
+    const trimmed = value?.trim();
+    if (!trimmed) continue;
+
+    const existing = (user as unknown as Record<string, string | undefined>)[field];
+    if (!existing?.trim()) blanks[field] = trimmed;
+  }
+
+  if (Object.keys(blanks).length === 0) return;
+
+  await collection.updateOne({ _id: user._id }, { $set: blanks });
+}
+
 export async function changePassword(
   userId: string,
   password: string,

@@ -3,7 +3,7 @@ import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
 import PartCard from "@/components/parts/PartCard";
 import PartsFilters from "@/components/parts/PartsFilters";
-import PartsPagination from "@/components/parts/PartsPagination";
+import Pagination from "@/components/layout/Pagination";
 import PartsSearch from "@/components/parts/PartsSearch";
 import Container from "@/components/layout/Container";
 import { getCatalogPage } from "@/lib/parts/repository";
@@ -136,7 +136,9 @@ export default async function ProductsPage({
                 ))}
               </div>
 
-              <PartsPagination
+              <Pagination
+                perPage={20}
+                noun="parts"
                 page={page.page}
                 pageCount={page.pageCount}
                 totalResults={page.totalResults}

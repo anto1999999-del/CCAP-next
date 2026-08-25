@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AccountShell, { StatCard } from "@/components/account/AccountShell";
 import ContentTable, { type ContentRow } from "@/components/admin/ContentTable";
+import Pagination from "@/components/layout/Pagination";
 import { adminOnly } from "@/lib/auth/guard";
 import { allVehicles } from "@/lib/content/store";
 
@@ -12,10 +13,12 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+const PER_PAGE = 20;
+
 export default async function ManageGalleryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const admin = await adminOnly("/manage-gallery");
   const params = await searchParams;
@@ -28,7 +31,7 @@ export default async function ManageGalleryPage({
 
   const vehicles = await allVehicles();
 
-  const rows: ContentRow[] = vehicles
+  const matches: ContentRow[] = vehicles
     .filter((vehicle) => status === "all" || vehicle.status === status)
     .filter(
       (vehicle) =>
@@ -59,6 +62,24 @@ export default async function ManageGalleryPage({
     (total, vehicle) => total + vehicle.photos.length,
     0,
   );
+
+  /*
+    Twenty a screen. The list was every row at once, which on the blog meant
+    eighty-seven of them and a page nobody scrolled to the end of.
+  */
+  const pageCount = Math.max(1, Math.ceil(matches.length / PER_PAGE));
+  const page = Math.min(Math.max(1, Number(params.page) || 1), pageCount);
+  const rows = matches.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  /** Keeps the search and the filter while moving between pages. */
+  const hrefForPage = (target: number) => {
+    const query = new URLSearchParams();
+    if (params.q) query.set("q", params.q);
+    if (status !== "all") query.set("status", status);
+    if (target > 1) query.set("page", String(target));
+    const suffix = query.toString();
+    return suffix ? `/manage-gallery?${suffix}` : "/manage-gallery";
+  };
 
   const tab = (value: string, label: string) => {
     const query = new URLSearchParams();
@@ -158,6 +179,17 @@ export default async function ManageGalleryPage({
               ? "No drafts. Every vehicle added is published."
               : "No vehicles yet. Add the first one."
         }
+      />
+
+      <Pagination
+        page={page}
+        pageCount={pageCount}
+        totalResults={matches.length}
+        shown={rows.length}
+        perPage={PER_PAGE}
+        noun="vehicles"
+        label="Vehicle pages"
+        hrefForPage={hrefForPage}
       />
     </AccountShell>
   );

@@ -4,6 +4,7 @@ import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
 import PageHero from "@/components/layout/PageHero";
+import Pagination from "@/components/layout/Pagination";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { listArticles } from "@/lib/blog/repository";
 import { site } from "@/lib/site";
@@ -25,9 +26,36 @@ function formatDate(iso: string | null): string {
   });
 }
 
-export default async function BlogIndexPage() {
+/**
+ * Twelve to a page.
+ *
+ * Eighty-seven articles in one column is a page nobody reaches the bottom of,
+ * and it made the browser lay out eighty-seven images at once. Page one leads
+ * with the newest article and shows eleven more; every page after that is a
+ * plain grid of twelve.
+ *
+ * The page number is in the URL rather than in state, so page four can be
+ * linked to, crawled and reached with the back button.
+ */
+const PER_PAGE = 12;
+
+export default async function BlogIndexPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const posts = await listArticles();
-  const [latest, ...rest] = posts;
+  const params = await searchParams;
+
+  const pageCount = Math.max(1, Math.ceil(posts.length / PER_PAGE));
+  const page = Math.min(Math.max(1, Number(params.page) || 1), pageCount);
+
+  const start = (page - 1) * PER_PAGE;
+  const onThisPage = posts.slice(start, start + PER_PAGE);
+
+  // The featured card is page one's alone; later pages are an even grid.
+  const latest = page === 1 ? onThisPage[0] : undefined;
+  const rest = page === 1 ? onThisPage.slice(1) : onThisPage;
 
   return (
     <>
@@ -49,7 +77,7 @@ export default async function BlogIndexPage() {
           name: "Central Coast Auto Parts Blog",
           url: `${site.url}/blog`,
           publisher: { "@id": `${site.url}/#organization` },
-          blogPost: posts.slice(0, 20).map((post) => ({
+          blogPost: onThisPage.map((post) => ({
             "@type": "BlogPosting",
             headline: post.title,
             url: `${site.url}/blog/${post.slug}`,
@@ -76,10 +104,18 @@ export default async function BlogIndexPage() {
           {latest && (
             <Link
               href={`/blog/${latest.slug}`}
-              className="group bg-card hover:border-brand/40 mb-10 grid grid-cols-1 overflow-hidden rounded-2xl border-line border transition-colors md:mb-14 md:grid-cols-2"
+              className="group bg-card hover:border-brand/40 border-line mb-10 grid grid-cols-1 items-center overflow-hidden rounded-2xl border transition-colors md:mb-14 md:grid-cols-2"
             >
               {latest.featuredImage && (
-                <div className="relative aspect-[16/10] md:aspect-auto md:h-full">
+                /*
+                  A fixed shape, not the height of the text beside it. With
+                  `md:h-full` the picture took whatever height the excerpt
+                  happened to give it, so a short excerpt squashed the frame to
+                  a letterbox and the crop took the roof and the wheels off the
+                  car. The photograph decides its own shape now and the text
+                  centres against it.
+                */
+                <div className="bg-tile-well relative aspect-[16/10]">
                   <Image
                     src={latest.featuredImage.url}
                     alt={latest.featuredImage.alt || latest.title}
@@ -115,7 +151,7 @@ export default async function BlogIndexPage() {
                 className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border-line border transition-colors"
               >
                 {post.featuredImage && (
-                  <div className="relative aspect-[16/10]">
+                  <div className="bg-tile-well relative aspect-[16/10]">
                     <Image
                       src={post.featuredImage.url}
                       alt={post.featuredImage.alt || post.title}
@@ -139,6 +175,19 @@ export default async function BlogIndexPage() {
               </Link>
             ))}
           </div>
+
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            totalResults={posts.length}
+            shown={onThisPage.length}
+            perPage={PER_PAGE}
+            noun="articles"
+            label="Article pages"
+            hrefForPage={(target) =>
+              target === 1 ? "/blog" : `/blog?page=${target}`
+            }
+          />
         </Container>
       </div>
     </>

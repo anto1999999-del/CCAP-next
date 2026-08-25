@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { currentAccount } from "@/lib/auth/accounts";
+import { currentAccount, fillBlankDetails } from "@/lib/auth/accounts";
 import { loadCatalog } from "@/lib/parts/catalog";
 import { thumbnailUrl } from "@/lib/parts/images";
 import { orderTotal, priceOrder } from "@/lib/orders/pricing";
@@ -182,6 +182,26 @@ export async function startPayment(
     pickup: details.pickup,
     paymentIntentId: intent.id,
   });
+
+  /*
+    Keep what they typed, so nobody fills the same form twice.
+
+    Blanks only, and after the order exists rather than before: a customer who
+    sends one part to a different address has not moved house, and the order
+    carries its own delivery address regardless. Failing to save is not a reason
+    to fail a payment that has already been set up.
+  */
+  if (account) {
+    await fillBlankDetails(account.id, {
+      name: details.name,
+      phone: details.phone,
+      address: details.address,
+      city: details.suburb,
+      zipcode: details.postcode,
+    }).catch((error) => {
+      console.error("[payment] could not save details to the account:", error);
+    });
+  }
 
   return {
     ok: true,

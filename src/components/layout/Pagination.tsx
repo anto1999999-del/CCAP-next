@@ -1,12 +1,16 @@
 import Link from "next/link";
 
 /**
- * Paging through results.
+ * Paging through a list, anywhere on the site.
  *
  * Real links, not buttons: each page has its own URL, so it can be shared,
- * crawled, opened in a new tab and reached with the back button. The old page
- * kept the page number in component state, which meant page seven of a filtered
- * catalogue could not be linked to at all.
+ * crawled, opened in a new tab and reached with the back button. The old
+ * catalogue kept the page number in component state, which meant page seven of
+ * a filtered catalogue could not be linked to at all.
+ *
+ * Written for the catalogue and now used by the blog, the gallery and the admin
+ * lists as well, because eighty-seven articles in one column is a page nobody
+ * reaches the bottom of.
  */
 
 /** Page numbers to show around the current one, with gaps marked null. */
@@ -32,11 +36,14 @@ function pageWindow(current: number, total: number): (number | null)[] {
   return withGaps;
 }
 
-export default function PartsPagination({
+export default function Pagination({
   page,
   pageCount,
   totalResults,
   shown,
+  perPage,
+  noun = "results",
+  label,
   hrefForPage,
 }: {
   page: number;
@@ -44,21 +51,27 @@ export default function PartsPagination({
   totalResults: number;
   /** How many results are on this page, for the count line. */
   shown: number;
+  /** Needed to work out which result this page starts at. */
+  perPage: number;
+  /** What is being counted, plural: "parts", "articles", "vehicles". */
+  noun?: string;
+  /** Names the nav for a screen reader, e.g. "Article pages". */
+  label?: string;
   hrefForPage: (page: number) => string;
 }) {
   if (totalResults === 0) return null;
 
-  const first = (page - 1) * 20 + 1;
+  const first = (page - 1) * perPage + 1;
 
   return (
     <nav
-      aria-label="Parts pages"
+      aria-label={label ?? `${noun} pages`}
       className="mt-10 flex flex-col items-center gap-4"
     >
       <p className="text-sm text-gray-400">
         Showing {first.toLocaleString()} to{" "}
         {(first + shown - 1).toLocaleString()} of{" "}
-        {totalResults.toLocaleString()} parts
+        {totalResults.toLocaleString()} {noun}
       </p>
 
       {pageCount > 1 && (

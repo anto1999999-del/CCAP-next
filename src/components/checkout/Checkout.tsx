@@ -71,9 +71,14 @@ const FIELDS: {
   },
 ];
 
-export default function Checkout() {
+export default function Checkout({
+  initialDetails,
+}: {
+  /** The signed-in customer's saved details, or null for a guest. */
+  initialDetails?: Details | null;
+}) {
   const { lines } = useCart();
-  const [details, setDetails] = useState<Details>(EMPTY);
+  const [details, setDetails] = useState<Details>(initialDetails ?? EMPTY);
   const [pickup, setPickup] = useState(false);
   /*
     The quote is stored with the request it answers. Anything that changes the
