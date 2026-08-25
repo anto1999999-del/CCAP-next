@@ -75,7 +75,7 @@ export default function AccountShell({
 
   return (
     <div className="bg-admin min-h-screen text-white">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col lg:flex-row">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col lg:flex-row">
         <aside className="border-line w-full flex-shrink-0 border-b p-6 lg:w-72 lg:border-r lg:border-b-0 lg:p-8">
           <div className="lg:sticky lg:top-24">
             <p className="mb-1 text-xs font-semibold tracking-[0.22em] text-gray-500 uppercase">
@@ -120,7 +120,7 @@ export default function AccountShell({
             <form action={signOut} className="border-line mt-6 border-t pt-6">
               <button
                 type="submit"
-                className="w-full rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-white/25 hover:text-white"
+                className="w-full rounded-xl border-line border px-4 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-white/25 hover:text-white"
               >
                 Sign out
               </button>

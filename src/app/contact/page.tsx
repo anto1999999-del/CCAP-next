@@ -18,21 +18,6 @@ export const metadata: Metadata = {
 };
 
 /**
- * Small caps label above the section heading. The original had this as a
- * separate `Title` component used only here.
- */
-function SectionLabel({ lead, tail }: { lead: string; tail: string }) {
-  return (
-    <div className="mb-3 inline-flex items-center gap-2">
-      <p className="text-brand-text">
-        {lead} <span className="font-medium text-gray-300">{tail}</span>
-      </p>
-      <span className="h-[1px] w-8 bg-gray-700 sm:h-[2px] sm:w-12" />
-    </div>
-  );
-}
-
-/**
  * One row of the store details card.
  *
  * The original repeated this block three times in full, same wrapper, same
@@ -49,9 +34,9 @@ function StoreDetail({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="bg-brand flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg">
+      <div className="bg-brand flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
         <svg
-          className="h-7 w-7 text-white"
+          className="h-6 w-6 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -62,7 +47,7 @@ function StoreDetail({
         </svg>
       </div>
       <div className="flex flex-col">
-        <p className="text-brand-text mb-1 text-base font-black tracking-wider whitespace-nowrap uppercase">
+        <p className="mb-1 text-[11px] font-semibold tracking-wider whitespace-nowrap text-gray-400 uppercase">
           {label}
         </p>
         {children}
@@ -72,11 +57,11 @@ function StoreDetail({
 }
 
 /** Shared type styling for each detail's value. */
-const VALUE_CLASS = "text-lg font-bold text-white italic md:text-xl";
+const VALUE_CLASS = "text-base font-bold text-white md:text-lg";
 
 export default function ContactPage() {
   return (
-    <div className="bg-surface">
+    <div className="bg-admin">
       <JsonLd data={faqSchema(CONTACT_FAQS)} />
       <JsonLd
         data={breadcrumbSchema([
@@ -85,35 +70,38 @@ export default function ContactPage() {
         ])}
       />
 
-      <div className="bg-surface py-12 md:py-16">
-        <div className="mb-12 text-center">
-          {/*
-            The visible heading is the styled "CONTACT US" label, which is not a
-            heading element. A screen-reader-only h1 gives the page the single
-            top-level heading it needs without altering the design.
-          */}
-          <h1 className="sr-only">Contact Central Coast Auto Parts</h1>
-          <SectionLabel lead="CONTACT" tail="US" />
-        </div>
-
+      <div className="bg-admin py-14 md:py-20">
         <Container>
+          <div className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
+            <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase">
+              Berkeley Vale NSW
+            </p>
+            <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-balance text-white md:text-4xl">
+              Contact Central Coast Auto Parts
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-gray-400 md:text-base">
+              Call the yard, send an email, or come and see us. We answer the
+              phone during trading hours and reply to email the same day.
+            </p>
+          </div>
+
           <div className="flex flex-col items-center gap-8 lg:flex-row lg:gap-12">
             <div className="w-full lg:w-1/2">
-              <div className="relative overflow-hidden rounded-xl shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
+              <div className="border-line relative overflow-hidden rounded-2xl border">
                 <Image
                   src="/images/contact image.png"
                   alt="The Central Coast Auto Parts yard at Berkeley Vale"
                   width={1200}
                   height={800}
-                  className="h-auto w-full rounded-xl"
+                  className="h-auto w-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
             </div>
 
             <div className="w-full lg:w-1/2">
-              <div className="rounded-xl border border-gray-700 bg-[#2a2a2a] p-8 shadow-xl md:p-10">
-                <h2 className="mb-8 text-2xl font-black text-white md:text-3xl">
+              <div className="border-line bg-card rounded-2xl border p-8 md:p-10">
+                <h2 className="mb-8 text-xl font-extrabold tracking-tight text-white md:text-2xl">
                   Our Store
                 </h2>
 
@@ -187,7 +175,6 @@ export default function ContactPage() {
       <FaqSection
         faqs={CONTACT_FAQS}
         intro="Everything you need to know about our services"
-        fromClass="from-[#1c1c1c]"
       />
     </div>
   );

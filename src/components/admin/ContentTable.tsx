@@ -98,7 +98,7 @@ export default function ContentTable({
             key={row.id}
             className="grid grid-cols-[56px_minmax(0,1fr)] items-center gap-4 px-4 py-4 transition-colors hover:bg-white/[0.02] md:grid-cols-[64px_minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] md:px-5"
           >
-            <div className="border-line h-14 w-14 overflow-hidden rounded-lg border bg-[#0b0b0d] md:h-16 md:w-16">
+            <div className="border-line h-14 w-14 overflow-hidden rounded-lg border bg-field md:h-16 md:w-16">
               {row.thumbnail ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img

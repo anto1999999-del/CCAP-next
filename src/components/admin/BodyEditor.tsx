@@ -175,7 +175,7 @@ export default function BodyEditor({
 
       {preview ? (
         <div
-          className="blog-body border-line min-h-[420px] rounded-xl border bg-[#0b0b0d] p-5"
+          className="blog-body border-line min-h-[420px] rounded-xl border bg-field p-5"
           dangerouslySetInnerHTML={{ __html: renderBody(value, format) }}
         />
       ) : (
@@ -184,7 +184,7 @@ export default function BodyEditor({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           spellCheck
-          className="focus:border-brand border-line min-h-[420px] w-full rounded-xl border bg-[#0b0b0d] p-4 font-mono text-sm leading-relaxed text-white focus:outline-none"
+          className="focus:border-brand border-line min-h-[420px] w-full rounded-xl border bg-field p-4 font-mono text-sm leading-relaxed text-white focus:outline-none"
           placeholder={
             isHtml
               ? "<p>Write the article here.</p>"

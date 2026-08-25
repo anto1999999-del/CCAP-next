@@ -97,7 +97,7 @@ export default function UserRow({
           </button>
 
           {open && (
-            <div className="border-line bg-card absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border shadow-2xl">
+            <div className="border-line bg-card absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border">
               <form action={changeAdmin}>
                 <input type="hidden" name="userId" value={account.id} />
                 <input

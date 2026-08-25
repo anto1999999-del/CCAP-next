@@ -29,7 +29,7 @@ export default function CartContents() {
 
   if (lines.length === 0) {
     return (
-      <div className="bg-surface flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
+      <div className="bg-admin flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
         <h1 className="mb-3 text-3xl font-bold">Your cart is empty</h1>
         <p className="mb-8 max-w-md text-sm text-gray-400">
           Nothing put aside yet. We hold about 32,000 parts, so there is a fair
@@ -46,15 +46,16 @@ export default function CartContents() {
   }
 
   return (
-    <div className="bg-admin min-h-screen py-10 text-white">
+    <div className="bg-admin py-10 pb-16 text-white md:pb-24">
       <Container>
         <header className="mb-8">
-          <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl lg:text-5xl">
-            Your <span className="text-brand-text">Shopping Cart</span>
+          {/* One colour, like every other heading on the site. */}
+          <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
+            Your cart
           </h1>
-          <p className="mt-2 text-sm text-gray-400 md:text-base">
-            Review your items, adjust quantities, and proceed to secure
-            checkout.
+          <p className="mt-2 text-sm text-gray-400">
+            {count} {count === 1 ? "item" : "items"}. Delivery is priced at
+            checkout, once we know where it is going.
           </p>
         </header>
 
@@ -63,7 +64,7 @@ export default function CartContents() {
             {lines.map((line) => (
               <li
                 key={`${line.urgId}-${line.invNumber}`}
-                className="flex flex-col items-start gap-4 rounded-xl border border-gray-800 bg-[#151518] p-5 shadow-lg md:flex-row md:items-center md:gap-6"
+                className="border-line bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:gap-5"
               >
                 <Link
                   href={`/product/${line.urgId}/${line.invNumber}`}
@@ -73,12 +74,12 @@ export default function CartContents() {
                   <PartThumbnail
                     src={line.thumbnail ?? PART_IMAGE_PLACEHOLDER}
                     alt={line.itemName}
-                    className="h-28 w-28 rounded-lg bg-[#0d0d0d] object-cover transition hover:opacity-90"
+                    className="bg-field border-line h-24 w-24 rounded-xl border object-cover transition hover:opacity-90"
                   />
                 </Link>
 
-                <div className="flex-1">
-                  <h2 className="mb-1 text-lg font-semibold md:text-xl">
+                <div className="min-w-0 flex-1">
+                  <h2 className="mb-1 text-base font-semibold md:text-lg">
                     <Link
                       href={`/product/${line.urgId}/${line.invNumber}`}
                       className="hover:text-brand-text transition-colors"
@@ -88,17 +89,31 @@ export default function CartContents() {
                   </h2>
                   <Detail label="Manufacturer" value={line.manufacturer} />
                   <Detail label="Model" value={line.model} />
-                  <p className="text-brand-text mt-2 text-lg font-bold md:text-xl">
+                  <p className="mt-2 text-base font-bold tabular-nums text-white md:text-lg">
                     {formatCents(Math.round(line.price * 100))}
+                    {line.quantity > 1 && (
+                      <span className="ml-2 text-xs font-medium text-gray-500">
+                        each
+                      </span>
+                    )}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4 self-stretch md:ml-auto md:self-auto">
-                  <Quantity line={line} onChange={setQuantity} />
+                <div className="flex items-center gap-4 self-stretch sm:ml-auto sm:self-auto">
+                  <div className="text-right">
+                    <Quantity line={line} onChange={setQuantity} />
+                    {line.quantity > 1 && (
+                      <p className="mt-2 text-sm font-bold tabular-nums">
+                        {formatCents(
+                          Math.round(line.price * 100) * line.quantity,
+                        )}
+                      </p>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => remove(line)}
-                    className="bg-brand hover:bg-brand-hover rounded-full px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase transition-colors md:text-sm"
+                    className="hover:text-brand-text rounded-lg px-2 py-2 text-xs font-semibold text-gray-500 transition-colors hover:bg-white/5"
                   >
                     Remove
                   </button>
@@ -107,45 +122,57 @@ export default function CartContents() {
             ))}
           </ul>
 
-          <aside className="w-full lg:w-80">
-            <div className="space-y-4 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
-              <h2 className="mb-2 text-xl font-bold md:text-2xl">
-                Cart Summary
+          <aside className="w-full lg:w-96 lg:shrink-0">
+            <div className="border-line bg-card rounded-2xl border p-6 lg:sticky lg:top-24">
+              <h2 className="mb-5 text-sm font-bold tracking-wide text-white uppercase">
+                Summary
               </h2>
 
-              <Row label="Total Items" value={String(count)} />
-              <Row
-                label="Total Price"
-                value={formatCents(Math.round(subtotal * 100))}
-              />
-              <Row
-                label="Shipping"
-                value="At checkout"
-                hint="Calculated from your address and the size of the parts"
-              />
+              <div className="space-y-3">
+                <Row
+                  label={count === 1 ? "1 item" : `${count} items`}
+                  value={formatCents(Math.round(subtotal * 100))}
+                />
+                <Row
+                  label="Delivery"
+                  value="Priced at checkout"
+                  hint="Worked out from your address and the size of the parts"
+                />
+              </div>
 
-              <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-2">
-                <p className="text-sm text-gray-300 md:text-base">Subtotal</p>
-                <p className="text-xl font-bold text-white">
+              {/*
+                One figure, once. This panel used to print the same subtotal
+                twice under two different labels, which reads as though one of
+                them ought to be a different number.
+              */}
+              <div className="border-line mt-4 flex items-center justify-between border-t pt-4">
+                <p className="text-base font-semibold">Total so far</p>
+                <p className="text-xl font-extrabold tabular-nums text-white">
                   {formatCents(Math.round(subtotal * 100))}
                 </p>
               </div>
 
-              <div className="space-y-3 pt-4">
-                <button
-                  type="button"
-                  onClick={clear}
-                  className="w-full rounded-full border border-gray-700 px-4 py-3 text-sm font-semibold tracking-wide text-gray-200 uppercase transition-colors hover:bg-gray-800 md:text-base"
-                >
-                  Clear Cart
-                </button>
-                <Link
-                  href="/place-order"
-                  className="bg-brand hover:bg-brand-hover shadow-brand/40 block w-full rounded-full px-4 py-3 text-center text-sm font-semibold tracking-wide text-white uppercase shadow-lg transition-colors md:text-base"
-                >
-                  Proceed to Checkout
-                </Link>
-              </div>
+              <Link
+                href="/place-order"
+                className="bg-brand hover:bg-brand-hover mt-5 block w-full rounded-xl px-4 py-3.5 text-center text-sm font-semibold tracking-wide text-white uppercase transition-colors"
+              >
+                Proceed to Checkout
+              </Link>
+
+              {/*
+                Quiet, and it asks first. Emptying the cart had the same weight
+                as the button people are meant to press, and did it on one
+                click.
+              */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("Empty your cart? This cannot be undone.")) clear();
+                }}
+                className="mt-3 w-full rounded-lg px-4 py-2 text-xs font-semibold text-gray-500 transition-colors hover:bg-white/5 hover:text-gray-300"
+              >
+                Empty cart
+              </button>
             </div>
           </aside>
         </div>
@@ -173,9 +200,12 @@ function Row({
   hint?: string;
 }) {
   return (
-    <div className="flex justify-between text-sm md:text-base">
+    <div className="flex justify-between gap-4 text-sm">
       <p className="text-gray-400">{label}</p>
-      <p className="max-w-[60%] text-right font-semibold" title={hint}>
+      <p
+        className="max-w-[60%] text-right font-semibold tabular-nums"
+        title={hint}
+      >
         {value}
       </p>
     </div>
@@ -190,7 +220,7 @@ function Quantity({
   onChange: (line: CartLine, quantity: number) => void;
 }) {
   return (
-    <div className="flex items-center overflow-hidden rounded-full border border-gray-700 bg-[#101015]">
+    <div className="flex items-center overflow-hidden rounded-full border-line border bg-field">
       <Step
         label={`Fewer ${line.itemName}`}
         disabled={line.quantity <= 1}

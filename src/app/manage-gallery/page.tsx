@@ -137,7 +137,7 @@ export default async function ManageGalleryPage({
             type="search"
             defaultValue={params.q ?? ""}
             placeholder="Search by make, model or title"
-            className="focus:border-brand border-line min-w-0 flex-1 rounded-xl border bg-[#0b0b0d] px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none lg:max-w-sm"
+            className="focus:border-brand border-line min-w-0 flex-1 rounded-xl border bg-field px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none lg:max-w-sm"
           />
           <button
             type="submit"

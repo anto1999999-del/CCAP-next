@@ -4,6 +4,7 @@ import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
 import PageHero from "@/components/layout/PageHero";
+import SectionHeading from "@/components/layout/SectionHeading";
 import ContactFormSection from "@/components/ContactFormSection";
 import {
   WhatWeSupply,
@@ -50,24 +51,24 @@ export default function AboutPage() {
         ]}
       />
 
-      <div className="bg-surface py-16 md:py-20">
+      <div className="bg-admin py-16 md:py-20">
         <Container>
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div className="order-2 lg:order-1">
-              <div className="relative overflow-hidden rounded-xl shadow-2xl transition-transform duration-300 hover:scale-[1.02]">
+              <div className="border-line relative overflow-hidden rounded-2xl border">
                 <Image
                   src="/images/about us image.png"
                   alt="The Central Coast Auto Parts yard at Berkeley Vale"
                   width={1200}
                   height={800}
-                  className="h-auto w-full rounded-xl"
+                  className="h-auto w-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               </div>
             </div>
 
             <div className="order-1 lg:order-2">
-              <h2 className="mb-6 text-3xl leading-tight font-bold text-white md:text-4xl lg:text-2xl">
+              <h2 className="mb-6 text-2xl leading-tight font-extrabold tracking-tight text-balance text-white md:text-3xl">
                 Central Coast&apos;s Trusted Car Wreckers &amp; Used Auto Parts
                 Supplier, Berkeley Vale NSW
               </h2>
@@ -121,7 +122,7 @@ export default function AboutPage() {
 
               <Link
                 href="/contact"
-                className="bg-brand hover:bg-brand-hover mt-8 inline-block rounded-lg px-8 py-3 font-semibold tracking-wide text-white uppercase shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                className="bg-brand hover:bg-brand-hover mt-8 inline-block rounded-xl px-8 py-3 font-semibold tracking-wide text-white uppercase transition-colors"
               >
                 Contact Us
               </Link>
@@ -133,30 +134,23 @@ export default function AboutPage() {
       {/* About lists the same categories as Home but without linking them. */}
       <WhatWeSupply cards={ABOUT_SUPPLY_CARDS} linked={false} />
 
-      <section className="border-t border-white/5 bg-[#0a0a0a] py-16 text-white md:py-20">
+      <section className="border-line bg-admin border-t py-16 text-white md:py-20">
         <Container>
-          <div className="mb-10 text-center">
-            <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs">
-              LOCAL &amp; NATIONWIDE
-            </p>
-            <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
-              Areas We Serve
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm text-white/60 md:text-base">
-              Based in Berkeley Vale, we supply used car parts locally and ship
-              Australia-wide every business day.
-            </p>
-            <div className="bg-brand mx-auto mt-4 h-[3px] w-14 rounded-full" />
-          </div>
+          <SectionHeading
+            className="mb-10"
+            eyebrow="Local and nationwide"
+            title="Areas We Serve"
+            intro="Based in Berkeley Vale, we supply used car parts locally and ship Australia-wide every business day."
+          />
 
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {SERVICE_AREAS.map((location) => (
               <div
                 key={location.area}
-                className="bg-card rounded-2xl border border-white/10 px-4 py-4 text-center"
+                className="border-line bg-card rounded-2xl border px-4 py-4 text-center"
               >
                 <p className="text-sm font-bold text-white">{location.area}</p>
-                <p className="mt-0.5 text-xs text-white/40">{location.note}</p>
+                <p className="mt-0.5 text-xs text-gray-500">{location.note}</p>
               </div>
             ))}
           </div>

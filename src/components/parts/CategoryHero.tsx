@@ -27,19 +27,19 @@ export default function CategoryHero({
         <h1 className="mb-6 text-3xl leading-tight font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
           {heading}
         </h1>
-        <p className="mx-auto mb-10 max-w-3xl text-sm leading-relaxed text-white/80 md:text-base">
+        <p className="mx-auto mb-10 max-w-3xl text-sm leading-relaxed text-gray-400 md:text-base">
           {intro}
         </p>
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             href="/products"
-            className="bg-brand hover:bg-brand-hover inline-flex min-w-[220px] items-center justify-center rounded-full px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase shadow-[0_0_28px_rgba(233,22,47,0.45)] transition-colors sm:text-sm"
+            className="bg-brand hover:bg-brand-hover inline-flex min-w-[220px] items-center justify-center rounded-full px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors sm:text-sm"
           >
             Browse all parts
           </Link>
           <Link
             href="/contact"
-            className="inline-flex min-w-[220px] items-center justify-center rounded-full border border-white/90 bg-transparent px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-white/10 sm:text-sm"
+            className="inline-flex min-w-[220px] items-center justify-center rounded-full border-line border bg-transparent px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-white/10 sm:text-sm"
           >
             Request a part
           </Link>

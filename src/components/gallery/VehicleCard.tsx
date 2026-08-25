@@ -12,7 +12,7 @@ export default function VehicleCard({ vehicle }: { vehicle: GalleryVehicle }) {
   return (
     <Link
       href={`/gallery/${vehicle.slug}`}
-      className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border border-white/10 transition-colors"
+      className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border-line border transition-colors"
     >
       {vehicle.image ? (
         <div className="relative aspect-[4/3] overflow-hidden">
@@ -25,7 +25,7 @@ export default function VehicleCard({ vehicle }: { vehicle: GalleryVehicle }) {
           />
         </div>
       ) : (
-        <div className="bg-tile-well flex aspect-[4/3] items-center justify-center text-sm text-white/40">
+        <div className="bg-tile-well flex aspect-[4/3] items-center justify-center text-sm text-gray-500">
           No photo
         </div>
       )}

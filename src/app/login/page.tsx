@@ -48,7 +48,7 @@ export default async function LoginPage({
 
 function AccountsUnavailable() {
   return (
-    <div className="bg-surface flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
+    <div className="bg-admin flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
       <h1 className="mb-3 text-2xl font-bold">Accounts are not available</h1>
       <p className="max-w-md text-sm text-gray-400">
         This site is not connected to its database, so signing in is switched

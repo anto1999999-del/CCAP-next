@@ -19,10 +19,11 @@ import { useRecaptcha } from "@/lib/useRecaptcha";
  * request is in flight, with abuse handled server-side.
  */
 
-const LABEL = "mb-2 block text-sm font-bold text-white uppercase";
+const LABEL =
+  "mb-2 block text-[11px] font-semibold tracking-wider text-gray-400 uppercase md:text-xs";
 
 const FIELD =
-  "w-full rounded border border-gray-600 bg-surface px-4 py-3 text-white placeholder-gray-500 transition-all focus:border-brand focus:ring-1 focus:ring-brand focus:outline-none";
+  "w-full rounded-xl border-line border bg-field px-4 py-3 text-white placeholder-gray-600 transition-colors focus:border-brand focus:outline-none";
 
 const INITIAL_STATE: SaleOfferState = { status: "idle" };
 
@@ -69,7 +70,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="bg-brand hover:bg-brand-hover focus:ring-brand w-full rounded px-8 py-4 text-lg font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#2a2a2a] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      className="bg-brand hover:bg-brand-hover focus:ring-brand w-full rounded-xl px-8 py-4 text-lg font-bold text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-offset-card focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <span className="flex items-center justify-center gap-2">
@@ -116,13 +117,13 @@ export default function SellYourCarForm() {
 
   return (
     <form action={handleAction} noValidate>
-      <div className="rounded-lg border border-gray-700 bg-[#2a2a2a] shadow-2xl">
+      <div className="border-line bg-card rounded-2xl border">
         <div className="p-6 md:p-8 lg:p-10">
           {state.status !== "idle" && state.message && (
             <div
               role="status"
               aria-live="polite"
-              className={`mb-6 rounded-lg border px-4 py-3 text-sm font-semibold ${
+              className={`mb-6 rounded-xl border px-4 py-3 text-sm font-semibold ${
                 state.status === "success"
                   ? "border-green-500/40 bg-green-500/10 text-green-200"
                   : "border-brand/40 bg-[#1a0d10] text-gray-100"

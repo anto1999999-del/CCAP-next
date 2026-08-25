@@ -91,7 +91,7 @@ export default function PartsPagination({
                   className={
                     entry === page
                       ? "bg-brand block min-w-10 rounded-lg px-3 py-2 text-center text-sm font-semibold text-white"
-                      : "block min-w-10 rounded-lg border border-gray-700 px-3 py-2 text-center text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 hover:text-white"
+                      : "block min-w-10 rounded-xl border-line border px-3 py-2 text-center text-sm font-semibold text-gray-300 transition-colors hover:border-white/25 hover:text-white"
                   }
                 >
                   {entry}
@@ -133,7 +133,7 @@ function Step({
     return (
       <span
         aria-disabled="true"
-        className={`${className} cursor-not-allowed border-gray-800 text-gray-600`}
+        className={`${className} cursor-not-allowed border-line text-gray-600`}
       >
         {children}
       </span>
@@ -144,7 +144,7 @@ function Step({
     <Link
       href={href}
       aria-label={label}
-      className={`${className} border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white`}
+      className={`${className} border-line text-gray-300 hover:border-white/25 hover:text-white`}
     >
       {children}
     </Link>

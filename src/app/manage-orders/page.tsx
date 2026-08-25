@@ -110,7 +110,7 @@ export default async function ManageOrdersPage({
             type="search"
             defaultValue={current.q}
             placeholder="Search part, customer, phone, address or order id"
-            className="focus:border-brand border-line min-w-0 flex-1 rounded-xl border bg-[#0b0b0d] px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none"
+            className="focus:border-brand border-line min-w-0 flex-1 rounded-xl border bg-field px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none"
           />
 
           <label htmlFor="order-sort" className="sr-only">
@@ -120,7 +120,7 @@ export default async function ManageOrdersPage({
             id="order-sort"
             name="sort"
             defaultValue={current.sort}
-            className="focus:border-brand border-line rounded-xl border bg-[#0b0b0d] px-4 py-2.5 text-sm text-white focus:outline-none"
+            className="focus:border-brand border-line rounded-xl border bg-field px-4 py-2.5 text-sm text-white focus:outline-none"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>

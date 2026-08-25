@@ -42,7 +42,7 @@ export default function PartThumbnail({
   if (failed || current === PART_IMAGE_PLACEHOLDER) {
     return (
       <div
-        className={`bg-tile-well flex items-center justify-center text-xs tracking-wider text-white/35 uppercase ${className}`}
+        className={`bg-tile-well flex items-center justify-center text-xs tracking-wider text-gray-500 uppercase ${className}`}
       >
         No photo
       </div>

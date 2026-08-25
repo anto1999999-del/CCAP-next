@@ -46,7 +46,7 @@ export default function AccountDetailsForm({ account }: { account: Account }) {
       {state.message && (
         <p
           role="status"
-          className="rounded-lg border border-gray-700 bg-[#0d0d0d] p-3 text-sm text-gray-200"
+          className="rounded-xl border-line border bg-field p-3 text-sm text-gray-200"
         >
           {state.message}
         </p>
@@ -84,7 +84,7 @@ function Field({
         defaultValue={defaultValue}
         autoComplete={autoComplete}
         aria-invalid={error ? true : undefined}
-        className="focus:border-brand w-full rounded-lg border border-gray-800 bg-[#0d0d0d] p-3 text-base text-white transition-colors focus:outline-none"
+        className="focus:border-brand w-full rounded-xl border-line border bg-field p-3 text-base text-white transition-colors focus:outline-none"
       />
       {error && <p className="text-brand-text mt-1.5 text-sm">{error}</p>}
     </div>

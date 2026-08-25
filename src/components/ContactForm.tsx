@@ -19,10 +19,10 @@ import { useRecaptcha } from "@/lib/useRecaptcha";
  */
 
 const LABEL_CLASS =
-  "block text-[11px] md:text-xs font-bold text-gray-700 uppercase tracking-wider mb-2";
+  "block text-[11px] md:text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-400 transition focus:outline-none focus:ring-2 focus:ring-brand/35 focus:border-brand";
+  "w-full px-4 py-3 rounded-xl bg-field border border-line text-white placeholder-gray-600 transition-colors focus:outline-none focus:border-brand";
 
 const INITIAL_STATE: ContactState = { status: "idle" };
 
@@ -41,7 +41,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="bg-brand hover:bg-brand-alt focus:ring-brand inline-flex min-w-[200px] items-center justify-center gap-2 rounded-lg px-10 py-3.5 font-bold text-white transition focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+      className="bg-brand hover:bg-brand-alt focus:ring-brand inline-flex min-w-[200px] items-center justify-center gap-2 rounded-xl px-10 py-3.5 font-bold text-white transition focus:ring-2 focus:ring-offset-2 focus:ring-offset-card focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -98,7 +98,7 @@ export default function ContactForm() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-xl">
+      <div className="border-line bg-card overflow-hidden rounded-2xl border">
         <div className="p-6 sm:p-8 md:p-10">
           {state.status !== "idle" && state.message && (
             <div

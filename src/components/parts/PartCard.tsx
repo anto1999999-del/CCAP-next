@@ -20,7 +20,7 @@ export default function PartCard({ part }: { part: CatalogPart }) {
   const name = part.itemName ?? "Used part";
 
   return (
-    <article className="group bg-tile hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border border-white/10 shadow-lg transition-colors">
+    <article className="group bg-tile hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border-line border transition-colors">
       <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
         <PartThumbnail
           src={thumbnailUrl(part)}

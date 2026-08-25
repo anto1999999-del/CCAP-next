@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import VehicleCard from "./VehicleCard";
+import SectionHeading from "@/components/layout/SectionHeading";
 import { site } from "@/lib/site";
 import type { GalleryMake, GalleryVehicle } from "@/lib/blog/gallery";
 
@@ -37,16 +38,11 @@ export default function GalleryGrid({
 
   return (
     <>
-      <div className="mb-10 text-center">
-        <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
-          Cars we have parted out
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-sm text-white/70 md:text-base">
-          Pick a make to narrow it down. This is a sample of our work, not the
-          full list of what we can supply.
-        </p>
-        <div className="bg-brand mx-auto mt-4 h-[3px] w-14 rounded-full" />
-      </div>
+      <SectionHeading
+        className="mb-10"
+        title="Cars we have parted out"
+        intro="Pick a make to narrow it down. This is a sample of our work, not the full list of what we can supply."
+      />
 
       <div
         role="group"
@@ -81,7 +77,7 @@ export default function GalleryGrid({
       </div>
 
       {shown.length === 0 && (
-        <p className="py-12 text-center text-white/60">
+        <p className="py-12 text-center text-gray-400">
           No photos of that make here yet. We part out far more than we
           photograph, so call us on{" "}
           <span className="text-brand-text font-semibold">
@@ -113,11 +109,11 @@ function FilterChip({
       className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
         active
           ? "border-brand bg-brand text-white"
-          : "border-white/15 bg-white/5 text-white/70 hover:border-white/30 hover:text-white"
+          : "border-white/15 bg-white/5 text-gray-400 hover:border-white/30 hover:text-white"
       }`}
     >
       {label}
-      <span className={active ? "ml-1.5 opacity-80" : "ml-1.5 text-white/40"}>
+      <span className={active ? "ml-1.5 opacity-80" : "ml-1.5 text-gray-500"}>
         {count}
       </span>
     </button>

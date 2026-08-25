@@ -54,7 +54,7 @@ export default function HomePage() {
           <h1 className="mb-6 text-3xl leading-[1.15] font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
             Used Car Parts Central Coast NSW: Engines, Gearboxes, Panels & More
           </h1>
-          <p className="mx-auto mb-10 max-w-3xl text-sm leading-relaxed text-white/90 md:text-base lg:text-lg">
+          <p className="mx-auto mb-10 max-w-3xl text-sm leading-relaxed text-gray-300 md:text-base lg:text-lg">
             Central Coast Auto Parts is a trusted used auto parts supplier and
             car wrecker based in Berkeley Vale, NSW. We stock quality second-hand
             engines, gearboxes, body panels, electrical components and mechanical
@@ -64,7 +64,7 @@ export default function HomePage() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
             <Link
               href="/products"
-              className="bg-brand hover:bg-brand-alt inline-flex min-w-[220px] items-center justify-center rounded-full px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase shadow-[0_0_28px_rgba(233,22,47,0.45)] transition-colors hover:shadow-[0_0_36px_rgba(233,22,47,0.55)] sm:text-sm"
+              className="bg-brand hover:bg-brand-alt inline-flex min-w-[220px] items-center justify-center rounded-full px-8 py-3.5 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors sm:text-sm"
             >
               Browse used parts
             </Link>

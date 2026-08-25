@@ -132,7 +132,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-900 bg-black text-white shadow-md">
+      <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-900 bg-black text-white">
         <Container className="flex min-h-16 items-center justify-between py-2">
           <div className="flex flex-shrink-0 items-center">
             <Link
@@ -174,7 +174,7 @@ export default function Header() {
                 <ChevronDownIcon className="ml-1 h-4 w-4" aria-hidden="true" />
               </button>
               {resourcesOpen && (
-                <div className="bg-card border-line absolute z-10 mt-3 min-w-[170px] overflow-hidden rounded-xl border whitespace-nowrap shadow-2xl">
+                <div className="bg-card border-line absolute z-10 mt-3 min-w-[170px] overflow-hidden rounded-xl border whitespace-nowrap">
                   {RESOURCE_LINKS.map(({ href, label }) => (
                     <Link
                       key={href}
@@ -237,7 +237,7 @@ export default function Header() {
               </button>
 
               {accountOpen && (
-                <div className="bg-card border-line absolute right-0 z-10 mt-3 w-56 overflow-hidden rounded-xl border shadow-2xl">
+                <div className="bg-card border-line absolute right-0 z-10 mt-3 w-56 overflow-hidden rounded-xl border">
                   {session?.signedIn ? (
                     <>
                       <p className="border-line truncate border-b px-4 py-3 text-xs text-gray-400">
@@ -309,7 +309,7 @@ export default function Header() {
         </Container>
 
         {mobileOpen && (
-          <Container className="bg-surface flex flex-col space-y-2 py-4 text-center md:hidden">
+          <Container className="bg-card flex flex-col space-y-2 py-4 text-center md:hidden">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
@@ -339,7 +339,7 @@ export default function Header() {
                 <ChevronDownIcon className="ml-1 h-4 w-4" aria-hidden="true" />
               </button>
               {resourcesOpen && (
-                <div className="bg-surface mt-2 rounded-lg shadow-lg">
+                <div className="bg-card border-line mt-2 rounded-xl border">
                   {RESOURCE_LINKS.map(({ href, label }) => (
                     <Link
                       key={href}

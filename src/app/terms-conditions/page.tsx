@@ -29,7 +29,7 @@ const BODY = "text-[15px] leading-relaxed text-gray-400 sm:text-base";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#0d0d0d]">
+    <div className="bg-admin min-h-screen">
       <JsonLd
         data={breadcrumbSchema([
           { name: "Home", path: "/" },
@@ -94,7 +94,7 @@ export default function TermsPage() {
           ))}
         </div>
 
-        <footer className="mt-16 border-t border-gray-800 pt-8 text-center">
+        <footer className="mt-16 border-line border-t pt-8 text-center">
           <p className="text-sm text-gray-400">
             Last updated · Central Coast Auto Parts
           </p>

@@ -135,7 +135,7 @@ export default async function ProductPage({ params }: { params: Params }) {
     .slice(0, 4);
 
   return (
-    <div className="bg-surface min-h-screen text-white">
+    <div className="bg-admin min-h-screen text-white">
       <JsonLd
         data={breadcrumbSchema([
           { name: "Home", path: "/" },
@@ -170,12 +170,12 @@ export default async function ProductPage({ params }: { params: Params }) {
           <PartGallery images={images} name={name} />
         </div>
 
-        <div className="bg-surface-raised flex-1 rounded-lg p-6 shadow-lg">
+        <div className="bg-card border-line flex-1 rounded-2xl border p-6">
           <h1 className="mb-4 text-xl font-bold break-words sm:text-2xl md:text-3xl lg:text-4xl">
             {name}
           </h1>
 
-          <dl className="mb-6 space-y-2.5 rounded-lg border border-gray-600/60 bg-[#252525] p-4 text-sm sm:text-base">
+          <dl className="mb-6 space-y-2.5 rounded-xl border-line border bg-tile p-4 text-sm sm:text-base">
             <Row label="Make" value={orNotRecorded(part.manufacturer)} />
             <Row label="Model" value={orNotRecorded(part.model)} />
             <Row label="Year" value={yearLabel(part)} />
@@ -192,7 +192,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                 {formatPrice(part.price)}
               </p>
               <AddToCartButton
-                className="bg-brand hover:bg-brand-hover w-full rounded px-6 py-3 text-base font-semibold text-white shadow-lg transition-colors sm:text-lg"
+                className="bg-brand hover:bg-brand-hover w-full rounded px-6 py-3 text-base font-semibold text-white transition-colors sm:text-lg"
                 line={{
                   urgId: String(part.urgId),
                   invNumber: String(part.invNumber),
@@ -216,7 +216,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               </p>
               <a
                 href={`tel:${site.contact.phoneE164}`}
-                className="bg-brand hover:bg-brand-hover block rounded px-6 py-3 text-center text-base font-semibold text-white shadow-lg transition-colors sm:text-lg"
+                className="bg-brand hover:bg-brand-hover block rounded px-6 py-3 text-center text-base font-semibold text-white transition-colors sm:text-lg"
               >
                 Call {site.contact.phone}
               </a>
@@ -237,7 +237,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                 }`}
             </p>
             {part.comments && part.comments !== description && (
-              <p className="mt-4 border-t border-gray-600 pt-4 text-sm text-gray-400">
+              <p className="mt-4 border-line border-t pt-4 text-sm text-gray-400">
                 <span className="font-semibold text-gray-300">Comments: </span>
                 {part.comments}
               </p>
@@ -291,7 +291,7 @@ function Row({
     <div
       className={
         muted
-          ? "flex flex-col border-t border-gray-600/50 pt-2 sm:flex-row sm:gap-3"
+          ? "flex flex-col border-line border-t pt-2 sm:flex-row sm:gap-3"
           : "flex flex-col sm:flex-row sm:gap-3"
       }
     >
@@ -315,7 +315,7 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-surface-raised rounded-lg p-6 text-sm shadow-lg sm:text-base">
+    <section className="bg-card border-line rounded-2xl border p-6 text-sm sm:text-base">
       <h2 className="text-brand-text mb-3 text-lg font-bold">{title}</h2>
       {children}
     </section>

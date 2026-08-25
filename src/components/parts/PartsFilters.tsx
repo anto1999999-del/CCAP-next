@@ -105,7 +105,7 @@ export default function PartsFilters({
         </button>
         <Link
           href="/products"
-          className="focus:ring-offset-admin block w-full rounded-xl border border-gray-700 bg-[#1a1a1a] py-3 text-center font-semibold text-gray-300 transition-colors hover:border-gray-600 hover:text-white focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:outline-none"
+          className="focus:ring-offset-admin block w-full rounded-xl border-line border bg-tile py-3 text-center font-semibold text-gray-300 transition-colors hover:border-white/25 hover:text-white focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:outline-none"
         >
           Reset Filters
         </Link>
@@ -147,7 +147,7 @@ function Select({
         defaultValue={value}
         disabled={empty}
         onChange={onChange}
-        className="focus:border-brand focus:ring-brand w-full cursor-pointer appearance-none rounded-xl border border-gray-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        className="focus:border-brand focus:ring-brand w-full cursor-pointer appearance-none rounded-xl border-line border bg-tile px-4 py-3 text-sm text-white transition-colors focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (

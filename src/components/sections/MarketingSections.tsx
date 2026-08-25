@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "@/components/layout/Container";
+import SectionHeading from "@/components/layout/SectionHeading";
 import {
   REASONS_TO_CHOOSE,
   SUPPLY_CARDS,
@@ -15,51 +16,25 @@ import {
  * verbatim between the two pages.
  */
 
-/** Shared shell so the two card grids stay visually identical. */
-const CARD =
-  "rounded-3xl border border-white/10 bg-card shadow-[0_16px_45px_rgba(0,0,0,0.55)]";
-
-function SectionHeading({
-  eyebrow,
-  title,
-  intro,
-  rule = true,
-}: {
-  eyebrow?: string;
-  title: React.ReactNode;
-  intro?: string;
-  rule?: boolean;
-}) {
-  return (
-    <div className="mb-10 text-center md:mb-12">
-      {eyebrow && (
-        <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase sm:text-xs sm:tracking-[0.35em]">
-          {eyebrow}
-        </p>
-      )}
-      <h2 className="text-3xl font-extrabold tracking-tight md:text-5xl">
-        {title}
-      </h2>
-      {intro && (
-        <p className="mx-auto mt-3 max-w-3xl text-sm text-white/70 md:text-base">
-          {intro}
-        </p>
-      )}
-      {rule && <div className="bg-brand mx-auto mt-4 h-[3px] w-14 rounded-full" />}
-    </div>
-  );
-}
+/**
+ * Shared shell so the two card grids stay visually identical.
+ *
+ * Flat and bordered, like every other card on the site. The drop shadow this
+ * used to carry did nothing on a near-black background except soften the edge
+ * the border was drawing.
+ */
+const CARD = "rounded-2xl border border-line bg-card";
 
 function SupplyCardBody({ card, linked }: { card: SupplyCard; linked: boolean }) {
   return (
     <>
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-xl md:h-14 md:w-14 md:text-2xl">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-line border bg-white/5 text-xl md:h-14 md:w-14 md:text-2xl">
         <span aria-hidden="true">{card.icon}</span>
       </div>
       <h3 className="mb-2 text-base leading-snug font-bold md:text-lg">
         {card.title}
       </h3>
-      <p className="text-sm leading-relaxed text-white/70 md:text-[0.95rem]">
+      <p className="text-sm leading-relaxed text-gray-400 md:text-[0.95rem]">
         {card.desc}
       </p>
       {linked && card.slug && (
@@ -87,7 +62,11 @@ export function WhatWeSupply({
   return (
     <section className={`bg-admin py-16 text-white md:py-24 ${className}`}>
       <Container>
-        <SectionHeading eyebrow="USED AUTO PARTS NSW" title="What We Supply" />
+        <SectionHeading
+          className="mb-10 md:mb-12"
+          eyebrow="USED AUTO PARTS NSW"
+          title="What We Supply"
+        />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
           {cards.map((card) =>
             linked && card.slug ? (
@@ -118,9 +97,9 @@ export function WhyUsedParts({ className = "" }: { className?: string }) {
     <section className={`bg-admin pb-16 text-white md:pb-24 ${className}`}>
       <Container>
         <SectionHeading
+          className="mb-10 md:mb-12"
           title="Why Choose a Used Auto Part?"
           intro="Quality second-hand parts save money, reduce waste and get your vehicle back on the road faster."
-          rule={false}
         />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
           {USED_PART_BENEFITS.map((card) => (
@@ -128,13 +107,13 @@ export function WhyUsedParts({ className = "" }: { className?: string }) {
               key={card.title}
               className={`${CARD} min-h-[190px] p-7 md:min-h-[210px] md:p-8`}
             >
-              <div className="mb-4 text-2xl leading-none text-white/90">
+              <div className="mb-4 text-2xl leading-none">
                 {card.icon}
               </div>
               <h3 className="mb-2 text-base leading-snug font-bold md:text-lg">
                 {card.title}
               </h3>
-              <p className="text-sm leading-relaxed text-white/70 md:text-[0.95rem]">
+              <p className="text-sm leading-relaxed text-gray-400 md:text-[0.95rem]">
                 {card.desc}
               </p>
             </div>
@@ -160,20 +139,20 @@ export function WhyChooseUs({
     <section className={`bg-admin pb-16 text-white md:pb-28 ${className}`}>
       <Container>
         <SectionHeading
+          className="mb-10 md:mb-12"
           title={
             <>
               Why Customers Choose Central Coast
               <br className="hidden sm:block" /> Auto Parts
             </>
           }
-          rule={false}
         />
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           {REASONS_TO_CHOOSE.map((card) => (
             <div
               key={card.title}
-              className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#121214] p-6 shadow-[0_18px_50px_rgba(0,0,0,0.6)] md:p-7"
+              className="relative overflow-hidden border-line bg-card rounded-2xl border p-6 md:p-7"
             >
               <div className="bg-brand/80 absolute top-0 bottom-0 left-0 w-[3px]" />
               <div className="flex items-start gap-4">
@@ -182,7 +161,7 @@ export function WhyChooseUs({
                   <h3 className="mb-1 text-base font-bold md:text-lg">
                     {card.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-white/70 md:text-[0.95rem]">
+                  <p className="text-sm leading-relaxed text-gray-400 md:text-[0.95rem]">
                     {card.desc}
                   </p>
                 </div>
@@ -191,7 +170,7 @@ export function WhyChooseUs({
           ))}
         </div>
 
-        <p className="mx-auto mt-10 max-w-4xl text-center text-sm leading-relaxed text-white/75 md:mt-12 md:text-base">
+        <p className="mx-auto mt-10 max-w-4xl text-center text-sm leading-relaxed text-gray-400 md:mt-12 md:text-base">
           Serving customers across the{" "}
           <span className="text-brand-text font-semibold">
             Central Coast, Sydney, Newcastle

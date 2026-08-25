@@ -43,7 +43,7 @@ export default function HelpBand() {
           <h3 className="text-2xl font-extrabold tracking-tight md:text-3xl">
             Can&rsquo;t find the part you need?
           </h3>
-          <p className="mt-2 max-w-xl text-sm text-white/85 md:text-base">
+          <p className="mt-2 max-w-xl text-sm text-gray-300 md:text-base">
             We hold thousands more than are listed, and we can source what we do
             not have. Tell us the car and the part.
           </p>
@@ -52,7 +52,7 @@ export default function HelpBand() {
         <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row">
           <a
             href={`tel:${site.contact.phoneE164}`}
-            className="rounded-full bg-white px-7 py-3 text-sm font-bold tracking-wide text-black uppercase transition-transform hover:scale-[1.02]"
+            className="rounded-full bg-white px-7 py-3 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-gray-100"
           >
             Call {site.contact.phone}
           </a>

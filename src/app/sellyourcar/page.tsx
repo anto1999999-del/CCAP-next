@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
-import ContactFormSection from "@/components/ContactFormSection";
+import Container from "@/components/layout/Container";
 import PageHero from "@/components/layout/PageHero";
+import SectionHeading from "@/components/layout/SectionHeading";
 import SellYourCarForm from "@/components/SellYourCarForm";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { sellYourCarServiceSchema } from "@/lib/schema/sell-your-car";
@@ -35,24 +36,25 @@ export default function SellYourCarPage() {
         image="/images/HEROSell.webp"
       />
 
-      <div className="bg-surface text-white">
-        <div className="mx-auto max-w-5xl px-4 py-12 md:px-8 md:py-16 lg:px-16">
-          <div className="mb-10 text-center">
-            <h2 className="mb-3 text-3xl font-extrabold tracking-tight md:text-4xl">
-              Tell us about your car
-            </h2>
-            <p className="mx-auto max-w-2xl text-base text-gray-400">
-              The more you can tell us, the closer our first number will be. We
-              come back to you the same day wherever we can.
-            </p>
-            <div className="bg-brand mx-auto mt-4 h-[3px] w-14 rounded-full" />
+      {/*
+        One form on this page, which is the point of the page. The site-wide
+        contact block used to sit directly beneath it, so somebody who had come
+        to sell a car was shown two forms stacked one on the other and had to
+        work out which one was for them.
+      */}
+      <div className="bg-admin py-14 text-white md:py-20">
+        <Container>
+          <div className="mx-auto max-w-3xl">
+            <SectionHeading
+              className="mb-10"
+              title="Tell us about your car"
+              intro="The more you can tell us, the closer our first number will be. We come back to you the same day wherever we can."
+            />
+
+            <SellYourCarForm />
           </div>
-
-          <SellYourCarForm />
-        </div>
+        </Container>
       </div>
-
-      <ContactFormSection />
     </>
   );
 }

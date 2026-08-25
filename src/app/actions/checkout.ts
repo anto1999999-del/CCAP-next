@@ -163,6 +163,12 @@ export async function quoteCheckout(
     ),
   ]);
 
+  /*
+    A failed carrier call and a genuine zero are not the same thing, and the
+    difference matters: falling back to zero and then formatting it printed
+    "Delivery $0.00" and a confident total on an address nobody could price.
+  */
+  const freightUnpriced = quotable && whole === null;
   const freightCents = whole?.totalCents ?? 0;
   const totals = orderTotal(order, freightCents);
 
@@ -185,11 +191,19 @@ export async function quoteCheckout(
     ok: true,
     lines: quotedLines,
     subtotal: formatCents(totals.subtotalCents),
-    freight: pickup ? "Pickup" : formatCents(totals.freightCents),
-    total: formatCents(totals.totalCents),
+    freight: pickup
+      ? "Pickup"
+      : freightUnpriced
+        ? "Call us for a price"
+        : formatCents(totals.freightCents),
+    // Parts only while the freight is unknown, and the page says so rather
+    // than presenting it as the amount due.
+    total: freightUnpriced
+      ? formatCents(totals.subtotalCents)
+      : formatCents(totals.totalCents),
     totalCents: totals.totalCents,
     problems: order.problems,
-    freightUnavailable: quotable && freightCents === 0,
+    freightUnavailable: freightUnpriced,
     freightEstimated: !pickup && quotedLines.some((line) => !line.measured),
   };
 }

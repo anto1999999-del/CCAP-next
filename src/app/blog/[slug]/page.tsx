@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <article className="bg-admin text-white">
         <Container width="prose" className="py-12 md:py-16">
-          <nav className="mb-6 text-sm text-white/50">
+          <nav className="mb-6 text-sm text-gray-500">
             <Link href="/blog" className="hover:text-brand-text transition-colors">
               ← All articles
             </Link>
@@ -132,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
             <h1 className="mb-4 text-3xl leading-tight font-extrabold tracking-tight md:text-4xl lg:text-5xl">
               {post.title}
             </h1>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-gray-500">
               <time dateTime={post.publishedAt ?? undefined}>
                 {formatDate(post.publishedAt)}
               </time>
@@ -165,11 +165,11 @@ export default async function BlogPostPage({ params }: Props) {
           />
 
           {post.tags.length > 0 && (
-            <div className="mt-12 flex flex-wrap gap-2 border-t border-white/10 pt-8">
+            <div className="mt-12 flex flex-wrap gap-2 border-line border-t pt-8">
               {post.tags.map((tag) => (
                 <span
                   key={tag.slug}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60"
+                  className="rounded-full border-line border bg-white/5 px-3 py-1 text-xs text-gray-500"
                 >
                   {tag.name}
                 </span>
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: Props) {
         </Container>
 
         {related.length > 0 && (
-          <div className="border-t border-white/5 py-14 md:py-20">
+          <div className="border-line border-t py-14 md:py-20">
             <Container>
               <h2 className="mb-8 text-2xl font-extrabold tracking-tight md:text-3xl">
                 Keep reading
@@ -189,7 +189,7 @@ export default async function BlogPostPage({ params }: Props) {
                   <Link
                     key={other.slug}
                     href={`/blog/${other.slug}`}
-                    className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border border-white/10 transition-colors"
+                    className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border-line border transition-colors"
                   >
                     {other.featuredImage && (
                       <div className="relative aspect-[16/10]">
@@ -206,7 +206,7 @@ export default async function BlogPostPage({ params }: Props) {
                       <h3 className="group-hover:text-brand-text line-clamp-2 text-base leading-snug font-bold transition-colors">
                         {other.title}
                       </h3>
-                      <p className="mt-auto pt-4 text-xs text-white/50">
+                      <p className="mt-auto pt-4 text-xs text-gray-500">
                         {formatDate(other.publishedAt)}
                       </p>
                     </div>

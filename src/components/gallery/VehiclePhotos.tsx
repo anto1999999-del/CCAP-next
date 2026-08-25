@@ -28,7 +28,7 @@ export default function VehiclePhotos({
 
   return (
     <div>
-      <div className="bg-tile-well relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10">
+      <div className="bg-tile-well relative aspect-[4/3] overflow-hidden rounded-2xl border-line border">
         {photos.map((photo, index) => (
           <Image
             key={photo.url}
@@ -62,7 +62,7 @@ export default function VehiclePhotos({
               className={`relative aspect-[4/3] overflow-hidden rounded-lg border transition-colors ${
                 index === selected
                   ? "border-brand"
-                  : "border-white/10 hover:border-white/35"
+                  : "border-line hover:border-white/35"
               }`}
             >
               <Image

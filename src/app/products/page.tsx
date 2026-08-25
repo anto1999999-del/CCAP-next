@@ -72,7 +72,7 @@ export default async function ProductsPage({
   });
 
   return (
-    <div className="bg-tile-well min-h-screen text-white">
+    <div className="bg-admin min-h-screen text-white">
       <JsonLd data={productsListSchema} />
       <JsonLd
         data={breadcrumbSchema([
@@ -81,7 +81,7 @@ export default async function ProductsPage({
         ])}
       />
 
-      <div className="border-b border-gray-800 bg-[#141414]/80 backdrop-blur-sm">
+      <div className="border-line bg-card/80 border-b backdrop-blur-sm">
         <Container className="flex flex-col gap-4 py-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white md:text-3xl">
@@ -111,7 +111,7 @@ export default async function ProductsPage({
       </div>
 
       <Container className="flex flex-col gap-8 py-8 md:flex-row">
-        <aside className="border-line bg-card w-full flex-shrink-0 rounded-2xl border p-6 md:max-w-[300px]">
+        <aside className="border-line bg-card w-full flex-shrink-0 rounded-2xl border p-6 md:max-w-[260px]">
           <div className="md:sticky md:top-24">
             <PartsFilters filters={filters} options={options} query={query} />
           </div>
@@ -130,7 +130,7 @@ export default async function ProductsPage({
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {page.parts.map((part) => (
                   <PartCard key={partKey(part) ?? part.stockNo} part={part} />
                 ))}
@@ -148,7 +148,7 @@ export default async function ProductsPage({
         </main>
       </Container>
 
-      <FaqSection faqs={HOMEPAGE_FAQS} fromClass="from-[#0d0d0d]" />
+      <FaqSection faqs={HOMEPAGE_FAQS} />
     </div>
   );
 }

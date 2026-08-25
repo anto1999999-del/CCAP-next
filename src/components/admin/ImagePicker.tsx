@@ -103,7 +103,7 @@ export default function ImagePicker({
                   onChange({ ...image, alt: event.target.value })
                 }
                 placeholder="Used Toyota Hilux engine on a stand"
-                className="focus:border-brand border-line w-full rounded-lg border bg-[#0b0b0d] px-3 py-2 text-sm text-white focus:outline-none"
+                className="focus:border-brand border-line w-full rounded-lg border bg-field px-3 py-2 text-sm text-white focus:outline-none"
               />
             </label>
 
@@ -130,7 +130,7 @@ export default function ImagePicker({
           type="button"
           onClick={() => input.current?.click()}
           disabled={busy}
-          className="border-line hover:border-brand/60 flex h-44 w-full flex-col items-center justify-center rounded-xl border border-dashed bg-[#0b0b0d] text-sm text-gray-400 transition-colors disabled:opacity-60"
+          className="border-line hover:border-brand/60 flex h-44 w-full flex-col items-center justify-center rounded-xl border border-dashed bg-field text-sm text-gray-400 transition-colors disabled:opacity-60"
         >
           {busy ? "Uploading..." : "Choose an image"}
           <span className="mt-1 text-xs text-gray-600">

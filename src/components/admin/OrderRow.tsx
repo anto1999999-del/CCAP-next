@@ -208,7 +208,7 @@ function StatusSelect({ id, value }: { id: string; value: string }) {
       defaultValue={value}
       disabled={pending}
       onChange={(event) => event.currentTarget.form?.requestSubmit()}
-      className="focus:border-brand border-line rounded-lg border bg-[#0b0b0d] px-3 py-2 text-sm text-white transition-colors focus:outline-none disabled:opacity-60"
+      className="focus:border-brand border-line rounded-lg border bg-field px-3 py-2 text-sm text-white transition-colors focus:outline-none disabled:opacity-60"
     >
       {ORDER_STATUSES.map((status) => (
         <option key={status} value={status}>

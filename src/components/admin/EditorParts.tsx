@@ -37,7 +37,7 @@ export function Field({
 }
 
 export const inputClass =
-  "focus:border-brand border-line w-full rounded-xl border bg-[#0b0b0d] px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none";
+  "focus:border-brand border-line w-full rounded-xl border bg-field px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none";
 
 export function Panel({
   title,
@@ -94,7 +94,7 @@ export function SeoPanel({
       title="Search engines"
       description="How this looks in Google. Leave a field empty and the page's own title and summary are used."
     >
-      <div className="rounded-xl border border-white/5 bg-[#0b0b0d] p-4">
+      <div className="rounded-xl border-line border bg-field p-4">
         <p className="truncate text-xs text-gray-500">
           centralcoastautoparts.com.au{path}
         </p>

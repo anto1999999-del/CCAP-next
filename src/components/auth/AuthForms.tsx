@@ -46,7 +46,7 @@ export default function AuthForms({
 
   return (
     <div className="bg-canvas px-4 py-12 text-white md:py-16">
-      <div className="border-line bg-card mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border shadow-[0_24px_70px_rgba(0,0,0,0.55)] lg:grid-cols-[1.05fr_1fr]">
+      <div className="border-line bg-card mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border lg:grid-cols-[1.05fr_1fr]">
         <aside
           className="relative hidden flex-col justify-between p-10 lg:flex"
           style={BRAND_GRADIENT}
@@ -65,7 +65,7 @@ export default function AuthForms({
 
             <ul className="space-y-3">
               {REASONS.map((reason) => (
-                <li key={reason} className="flex gap-3 text-sm text-white/80">
+                <li key={reason} className="flex gap-3 text-sm text-gray-300">
                   <span
                     aria-hidden="true"
                     className="bg-brand mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full"
@@ -76,7 +76,7 @@ export default function AuthForms({
             </ul>
           </div>
 
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-gray-400">
             Prefer to talk to somebody?{" "}
             <a
               href={`tel:${site.contact.phoneE164}`}
@@ -237,8 +237,8 @@ function Field({
         required
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
-        className={`focus:ring-brand/30 w-full rounded-xl border bg-[#0b0b0d] px-4 py-3 text-base text-white transition-colors focus:ring-4 focus:outline-none ${
-          error ? "border-brand" : "focus:border-brand border-white/10"
+        className={`focus:ring-brand/30 w-full rounded-xl border bg-field px-4 py-3 text-base text-white transition-colors focus:ring-4 focus:outline-none ${
+          error ? "border-brand" : "focus:border-brand border-line"
         }`}
       />
       {hint && (

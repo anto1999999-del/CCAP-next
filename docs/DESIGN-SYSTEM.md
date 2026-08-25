@@ -16,10 +16,22 @@ Four surfaces, darkest at the back:
 | Token | Value | Used for |
 | --- | --- | --- |
 | `canvas` | `#000000` | the page behind everything, and the header |
-| `admin` | `#050505` | page backgrounds for content areas |
-| `card` | `#0f0f10` | cards, panels, table shells, menus |
-| `tile` / `surface-raised` | `#1a1a1a` / `#2b2b2b` | a card on a card, inputs on a panel |
+| `admin` | `#050505` | every page and section background |
+| `field` | `#0b0b0d` | inputs, the one surface darker than a card |
+| `card` | `#0f0f10` | cards, panels, table shells, menus, the footer |
+| `tile` | `#1a1a1a` | a card sitting on a card |
 | `line` | `#232327` | every border and divider |
+
+There is no sixth. This was twelve near-identical darks spread across nine
+pages, and `surface` `#1c1c1c` and `surface-raised` `#2b2b2b` have been
+deleted rather than kept "just in case". Nobody could name the difference
+between `#0a0a0a` and `#0d0d0d`, but the eye reads each page as a slightly
+different colour and stops believing it is one site.
+
+Secondary text comes off the grey ramp, never white at an opacity. There were
+six opacities in use (`text-white/40` through `/90`), and white at 70% looks
+like a different colour on every surface it lands on. Use `gray-300` for body,
+`gray-400` for secondary, `gray-500` for labels and hints.
 
 Text: white for headings and figures, `gray-300` for body, `gray-400` for
 secondary, `gray-500` for labels and hints. Nothing below `gray-500` on a dark
@@ -61,10 +73,11 @@ columns do not jitter as they update.
 
 ## Width and rhythm
 
-- One width for the whole site: `Container`, which is `max-w-[1600px] px-6
+- One width for the whole site: `Container`, which is `max-w-[1280px] px-6
   lg:px-10`. The header, the footer, every page and the admin all use it, so
-  everything lines up down the page and a large screen has something to use
-  rather than a narrow column marooned in the middle.
+  everything lines up down the page. 1280 is the `xl` breakpoint exactly, so a
+  grid that goes to its widest layout at `xl` has the full width to lay it out
+  in. Never set a width on a section; use `Container`.
 - Long-form reading is the exception: `<Container width="prose">` caps an
   article at `max-w-3xl`, because a line past about eighty characters is harder
   to follow. It is a prop rather than a class passed through `className`, which
@@ -108,3 +121,45 @@ Copy these rather than inventing a variant:
 4. Destructive actions confirm, and say what will and will not be destroyed.
 5. Logic and wording of existing buttons stay as they are. This is a re-skin,
    not a change of behaviour.
+
+
+## Shadows
+
+None, on anything that sits flat on the page. A drop shadow over a near-black
+background does nothing except soften the border already drawn around the card.
+There were eleven distinct shadows in use, including two red glows.
+
+Shadows are for things that genuinely float above the page: the header's
+dropdown menu and the row action menus. Nothing else.
+
+## Hover
+
+Colour and border only. No `hover:scale`, which makes a section behave like a
+button and shifts everything around it. The one exception is a photograph
+zooming inside a fixed frame on a card, where the card itself does not move.
+
+## What red means
+
+Red is "do this". One primary action per view gets it.
+
+This is why **Remove** and **Clear cart** are no longer red buttons: they were
+the loudest and most repeated thing on the cart page, competing with the
+checkout button in the same colour, for an action nobody wants to encourage.
+Destructive actions are quiet text buttons, and the bulk one confirms first.
+
+## Section headings
+
+`SectionHeading` in `src/components/layout/SectionHeading.tsx`, and nothing
+else. There were three treatments in use with no rule about which went where,
+including one heading in red on a site where every other heading is white.
+
+The eyebrow does the job the little red bar under each heading used to do, and
+does it with words. A three-pixel rule under a heading says "this is a
+heading", which the heading already said.
+
+## Money
+
+A price is a price or it is not shown. Never an ellipsis, and never `$0.00`
+standing in for "we could not work this out", which on the checkout page read
+as free delivery directly above a paragraph saying the freight could not be
+priced.

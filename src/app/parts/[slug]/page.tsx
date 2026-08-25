@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import CategoryHero from "@/components/parts/CategoryHero";
+import Container from "@/components/layout/Container";
 import {
   PART_CATEGORIES,
   findPartCategory,
@@ -114,18 +115,18 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
         intro={category.intro}
       />
 
-      <section className="bg-admin px-6 py-16 text-white md:py-24">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-admin py-14 text-white md:py-20">
+        <Container>
           <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
               <h2 className="mb-5 text-2xl font-extrabold tracking-tight md:text-3xl">
                 What We Stock
               </h2>
-              <p className="mb-6 text-sm leading-relaxed text-white/70 md:text-base">
+              <p className="mb-6 text-sm leading-relaxed text-gray-400 md:text-base">
                 {category.body}
               </p>
-              <p className="mb-6 text-xs text-white/60 md:text-sm">
-                <span className="font-semibold text-white/80">
+              <p className="mb-6 text-xs text-gray-500 md:text-sm">
+                <span className="font-semibold text-gray-300">
                   Common makes:
                 </span>{" "}
                 {category.makes}
@@ -135,7 +136,7 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
                 <StockLink category={category} />
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-white/10"
+                  className="inline-flex items-center justify-center border-line rounded-full border px-6 py-3 text-xs font-bold tracking-[0.12em] text-white uppercase transition-colors hover:bg-white/10"
                 >
                   Can&apos;t find it? Ask us
                 </Link>
@@ -146,24 +147,24 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
               {category.items.map((item) => (
                 <li
                   key={item}
-                  className="bg-card flex items-center gap-3 rounded-2xl border border-white/10 px-5 py-4"
+                  className="border-line bg-card flex items-center gap-3 rounded-2xl border px-5 py-4"
                 >
                   <span
                     aria-hidden="true"
                     className="bg-brand h-2 w-2 flex-shrink-0 rounded-full"
                   />
-                  <span className="text-sm font-medium text-white/85">
+                  <span className="text-sm font-medium text-gray-300">
                     {item}
                   </span>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-admin px-6 pb-16 text-white md:pb-24">
-        <div className="mx-auto max-w-5xl">
+      <section className="bg-admin pb-14 text-white md:pb-20">
+        <Container>
           <h2 className="mb-10 text-center text-2xl font-extrabold tracking-tight md:text-3xl">
             Why Buy From {site.name}?
           </h2>
@@ -171,7 +172,7 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
             {REASONS.map((reason) => (
               <div
                 key={reason.title}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#121214] p-6 md:p-7"
+                className="border-line bg-card relative overflow-hidden rounded-2xl border p-6 md:p-7"
               >
                 <div className="bg-brand/80 absolute top-0 bottom-0 left-0 w-[3px]" />
                 <div className="flex items-start gap-4">
@@ -180,7 +181,7 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
                   </div>
                   <div>
                     <h3 className="mb-1 text-base font-bold">{reason.title}</h3>
-                    <p className="text-sm leading-relaxed text-white/70">
+                    <p className="text-sm leading-relaxed text-gray-400">
                       {reason.description}
                     </p>
                   </div>
@@ -188,11 +189,11 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-admin px-6 pb-16 text-white md:pb-24">
-        <div className="mx-auto max-w-3xl">
+      <section className="bg-admin pb-14 text-white md:pb-20">
+        <Container width="prose">
           <h2 className="mb-10 text-center text-2xl font-extrabold tracking-tight md:text-3xl">
             Frequently Asked Questions
           </h2>
@@ -200,22 +201,22 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
             {category.faq.map((entry) => (
               <div
                 key={entry.question}
-                className="bg-card rounded-2xl border border-white/10 p-6"
+                className="border-line bg-card rounded-2xl border p-6"
               >
                 <h3 className="mb-2 text-base font-bold text-white">
                   {entry.question}
                 </h3>
-                <p className="text-sm leading-relaxed text-white/70">
+                <p className="text-sm leading-relaxed text-gray-400">
                   {entry.answer}
                 </p>
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="bg-admin px-6 pb-20 text-white">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-admin pb-16 text-white md:pb-20">
+        <Container>
           <h2 className="mb-8 text-center text-xl font-extrabold tracking-tight md:text-2xl">
             Browse Other Part Categories
           </h2>
@@ -224,14 +225,14 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
               <Link
                 key={other.slug}
                 href={`/parts/${other.slug}`}
-                className="hover:border-brand/60 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white/80 transition-colors hover:text-white"
+                className="hover:border-brand/60 inline-flex items-center gap-2 border-line rounded-full border px-5 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:text-white"
               >
                 <span aria-hidden="true">{other.icon}</span>
                 {other.label}
               </Link>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
     </>
   );

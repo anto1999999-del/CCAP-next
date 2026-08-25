@@ -76,7 +76,7 @@ export default async function BlogIndexPage() {
           {latest && (
             <Link
               href={`/blog/${latest.slug}`}
-              className="group bg-card hover:border-brand/40 mb-10 grid grid-cols-1 overflow-hidden rounded-3xl border border-white/10 transition-colors md:mb-14 md:grid-cols-2"
+              className="group bg-card hover:border-brand/40 mb-10 grid grid-cols-1 overflow-hidden rounded-2xl border-line border transition-colors md:mb-14 md:grid-cols-2"
             >
               {latest.featuredImage && (
                 <div className="relative aspect-[16/10] md:aspect-auto md:h-full">
@@ -97,10 +97,10 @@ export default async function BlogIndexPage() {
                 <h3 className="group-hover:text-brand-text mb-3 text-2xl leading-snug font-bold transition-colors md:text-3xl">
                   {latest.title}
                 </h3>
-                <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-white/70 md:text-base">
+                <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-400 md:text-base">
                   {latest.excerpt}
                 </p>
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-gray-500">
                   {formatDate(latest.publishedAt)}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default async function BlogIndexPage() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border border-white/10 transition-colors"
+                className="group bg-card hover:border-brand/40 flex flex-col overflow-hidden rounded-2xl border-line border transition-colors"
               >
                 {post.featuredImage && (
                   <div className="relative aspect-[16/10]">
@@ -129,10 +129,10 @@ export default async function BlogIndexPage() {
                   <h3 className="group-hover:text-brand-text mb-2 line-clamp-2 text-base leading-snug font-bold transition-colors md:text-lg">
                     {post.title}
                   </h3>
-                  <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-white/70">
+                  <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-400">
                     {post.excerpt}
                   </p>
-                  <p className="mt-auto text-xs text-white/50">
+                  <p className="mt-auto text-xs text-gray-500">
                     {formatDate(post.publishedAt)}
                   </p>
                 </div>

@@ -30,7 +30,7 @@ export default async function ResetPasswordPage({
   if (!usable) {
     return (
       <div className="bg-canvas px-4 py-14 text-white md:py-20">
-        <div className="border-line bg-card mx-auto w-full max-w-md rounded-3xl border p-8 text-center shadow-[0_24px_70px_rgba(0,0,0,0.55)] sm:p-10">
+        <div className="border-line bg-card mx-auto w-full max-w-md rounded-3xl border p-8 text-center sm:p-10">
           <h1 className="mb-3 text-2xl font-extrabold tracking-tight">
             That link has expired
           </h1>

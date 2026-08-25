@@ -18,11 +18,17 @@ import type { ReactNode } from "react";
  */
 
 /**
- * `site` matches the dashboard, which the owner chose as the site-wide width:
- * it gives large screens something to use instead of a narrow column marooned
- * in the middle. `prose` is for long-form reading, where a line of text past
- * about eighty characters is genuinely harder to follow, so an article must not
+ * `site` is 1280px, chosen by the owner and used by every page including the
+ * dashboard. It is the `xl` breakpoint exactly, so a grid that goes to its
+ * widest layout at `xl` gets the full width to lay it out in. `prose` is for long-form reading, where a line of text past about
+ * eighty characters is genuinely harder to follow, so an article must not
  * inherit the full width.
+ *
+ * It is deliberately narrower than the screen. Content that runs the whole
+ * width of a 2560px monitor is unreadable, and a grid that keeps adding columns
+ * to fill the space ends up with cards too small to show anything. Everything
+ * below this width is unaffected; above it, the background continues and the
+ * content stops.
  *
  * These are a choice the caller makes, not a class they pass. Passing
  * `max-w-3xl` through `className` looks like it works and does not reliably: it
@@ -30,7 +36,7 @@ import type { ReactNode } from "react";
  * the order Tailwind happens to emit them in.
  */
 const WIDTHS = {
-  site: "max-w-[1600px]",
+  site: "max-w-[1280px]",
   prose: "max-w-3xl",
 } as const;
 

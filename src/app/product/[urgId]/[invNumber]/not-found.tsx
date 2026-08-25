@@ -11,7 +11,7 @@ import { site } from "@/lib/site";
  */
 export default function PartNotFound() {
   return (
-    <div className="bg-surface flex min-h-screen items-center justify-center px-4 py-16 text-white">
+    <div className="bg-admin flex min-h-screen items-center justify-center px-4 py-16 text-white">
       <div className="max-w-md text-center">
         <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
           That part is no longer listed
@@ -31,13 +31,13 @@ export default function PartNotFound() {
           </Link>
           <a
             href={`tel:${site.contact.phoneE164}`}
-            className="rounded border border-gray-500 px-6 py-3 font-semibold transition-colors hover:bg-gray-800"
+            className="border-line rounded-xl border px-6 py-3 font-semibold transition-colors hover:bg-white/5"
           >
             Call {site.contact.phone}
           </a>
           <Link
             href="/contact"
-            className="rounded border border-gray-500 px-6 py-3 font-semibold transition-colors hover:bg-gray-800"
+            className="border-line rounded-xl border px-6 py-3 font-semibold transition-colors hover:bg-white/5"
           >
             Ask us to source it
           </Link>

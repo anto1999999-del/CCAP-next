@@ -49,7 +49,7 @@ export default function PartsSearch({
           type="search"
           defaultValue={query}
           placeholder="Search parts, e.g. hilux alternator"
-          className="focus:border-brand min-w-0 flex-1 rounded-xl border border-gray-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none"
+          className="focus:border-brand min-w-0 flex-1 rounded-xl border-line border bg-tile px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:outline-none"
         />
         <button
           type="submit"

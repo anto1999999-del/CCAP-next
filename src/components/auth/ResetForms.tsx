@@ -32,7 +32,7 @@ function Shell({
 }) {
   return (
     <div className="bg-canvas px-4 py-14 text-white md:py-20">
-      <div className="border-line bg-card mx-auto w-full max-w-md rounded-3xl border p-8 shadow-[0_24px_70px_rgba(0,0,0,0.55)] sm:p-10">
+      <div className="border-line bg-card mx-auto w-full max-w-md rounded-3xl border p-8 sm:p-10">
         <h1 className="mb-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
           {title}
         </h1>
@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
         <>
           <p
             role="status"
-            className="border-line rounded-xl border bg-[#0b0b0d] p-4 text-sm text-gray-200"
+            className="border-line rounded-xl border bg-field p-4 text-sm text-gray-200"
           >
             {state.message}
           </p>
@@ -169,8 +169,8 @@ function Field({
         autoComplete={autoComplete}
         required
         aria-invalid={error ? true : undefined}
-        className={`focus:ring-brand/30 w-full rounded-xl border bg-[#0b0b0d] px-4 py-3 text-base text-white transition-colors focus:ring-4 focus:outline-none ${
-          error ? "border-brand" : "focus:border-brand border-white/10"
+        className={`focus:ring-brand/30 w-full rounded-xl border bg-field px-4 py-3 text-base text-white transition-colors focus:ring-4 focus:outline-none ${
+          error ? "border-brand" : "focus:border-brand border-line"
         }`}
       />
       {hint && <p className="mt-2 text-xs text-gray-500">{hint}</p>}

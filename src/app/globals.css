@@ -41,14 +41,24 @@
   --color-brand-deep: #c11227;
 
   /* Surfaces, darkest first */
-  --color-canvas: #000000;        /* body background, as computed live */
-  --color-admin: #050505;         /* admin screens */
+  /*
+     The surface ramp, back to front. Five steps, and there is no sixth: a page
+     is `admin`, a panel on it is `card`, a panel on that is `tile`, and a field
+     you type into is `field`. Anything that wanted its own shade of dark got
+     one of these instead.
+
+     This used to be twelve. Twelve near-identical darks across nine pages is
+     what made the site feel like nine sites: nobody could name the difference
+     between #0a0a0a and #0d0d0d, but the eye reads each page as a slightly
+     different colour and stops trusting that it is one place.
+  */
+  --color-canvas: #000000;        /* body behind everything, and the header */
+  --color-admin: #050505;         /* every page and section background */
+  --color-field: #0b0b0d;         /* inputs, the one surface darker than a card */
   --color-tile-well: #0d0d0d;     /* product card image area */
-  --color-card: #0f0f10;          /* cards and panels */
+  --color-card: #0f0f10;          /* cards, panels, the footer */
   --color-card-hover: #17171b;    /* table row hover */
-  --color-tile: #1a1a1a;          /* product card body */
-  --color-surface: #1c1c1c;       /* page sections */
-  --color-surface-raised: #2b2b2b;/* product detail panel */
+  --color-tile: #1a1a1a;          /* a card sitting on a card */
 
   /* Lines and text */
   --color-line: #232327;

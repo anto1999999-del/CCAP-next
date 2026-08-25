@@ -124,7 +124,7 @@ export default async function VehiclePage({
               />
 
               <div className="border-line bg-card mt-8 rounded-2xl border p-6">
-                <p className="mb-1 text-sm text-white/70">
+                <p className="mb-1 text-sm text-gray-400">
                   Looking for a part off this car, or one like it?
                 </p>
                 <a
@@ -133,7 +133,7 @@ export default async function VehiclePage({
                 >
                   {site.contact.phone}
                 </a>
-                <p className="mt-3 text-sm text-white/60">
+                <p className="mt-3 text-sm text-gray-400">
                   {site.hours.displayLine}
                 </p>
               </div>

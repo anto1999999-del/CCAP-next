@@ -137,7 +137,7 @@ function ContactDetails() {
 
 export default function Footer() {
   return (
-    <div className="bg-surface text-white">
+    <div className="bg-card text-white">
       <HelpBand />
 
       <Container className="py-8 text-sm">
@@ -201,7 +201,7 @@ export default function Footer() {
         CSS, which it is in globals.css. Removing one without the other breaches
         their terms, keep the two together.
       */}
-      <div className="border-t border-gray-800 bg-[#141414] px-4 py-3 text-center text-[10px] text-gray-400">
+      <div className="border-line border-t bg-card px-4 py-3 text-center text-[10px] text-gray-400">
         This site is protected by reCAPTCHA and the Google{" "}
         <a
           href="https://policies.google.com/privacy"

@@ -31,7 +31,7 @@ export default async function OrderSuccessPage({
     paymentIntent && isConfigured() ? await findByPayment(paymentIntent) : null;
 
   return (
-    <div className="bg-surface flex min-h-[70vh] items-center justify-center px-4 py-16 text-white">
+    <div className="bg-admin flex min-h-[70vh] items-center justify-center px-4 py-16 text-white">
       <div className="w-full max-w-lg text-center">
         <h1 className="mb-3 text-3xl font-extrabold tracking-tight md:text-4xl">
           Thank you, we have your order
@@ -47,7 +47,7 @@ export default async function OrderSuccessPage({
                 : " We will be in touch about delivery."}
             </p>
 
-            <ul className="bg-surface-raised mb-8 space-y-1 rounded-2xl border border-gray-800 p-6 text-left text-sm text-gray-300">
+            <ul className="bg-card border-line mb-8 space-y-1 rounded-2xl border p-6 text-left text-sm text-gray-300">
               {order.items.map((item, index) => (
                 <li key={index} className="flex justify-between gap-4">
                   <span className="truncate">
@@ -76,7 +76,7 @@ export default async function OrderSuccessPage({
           </Link>
           <Link
             href="/products"
-            className="rounded-full border border-gray-700 px-6 py-3 text-sm font-semibold text-gray-200 transition-colors hover:bg-gray-800"
+            className="rounded-full border-line border px-6 py-3 text-sm font-semibold text-gray-200 transition-colors hover:bg-white/5"
           >
             Keep browsing
           </Link>

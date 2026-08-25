@@ -44,8 +44,10 @@ const FIELDS: {
   label: string;
   type: string;
   autoComplete: string;
+  /** Spans both columns. A street address in half a row wraps awkwardly. */
+  wide?: boolean;
 }[] = [
-  { name: "name", label: "Full name", type: "text", autoComplete: "name" },
+  { name: "name", label: "Full name", type: "text", autoComplete: "name", wide: true },
   { name: "email", label: "Email", type: "email", autoComplete: "email" },
   { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
   {
@@ -53,6 +55,7 @@ const FIELDS: {
     label: "Street address",
     type: "text",
     autoComplete: "street-address",
+    wide: true,
   },
   {
     name: "suburb",
@@ -192,7 +195,7 @@ export default function Checkout() {
 
   if (lines.length === 0) {
     return (
-      <div className="bg-surface flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
+      <div className="bg-admin flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
         <h1 className="mb-3 text-3xl font-bold">
           There is nothing to check out
         </h1>
@@ -217,10 +220,10 @@ export default function Checkout() {
   );
 
   return (
-    <div className="bg-admin min-h-screen py-10 text-white">
+    <div className="bg-admin py-10 pb-16 text-white md:pb-24">
       <Container>
         <header className="mb-8">
-          <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl">
+          <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
             Checkout
           </h1>
           <p className="mt-2 text-sm text-gray-400 md:text-base">
@@ -230,13 +233,14 @@ export default function Checkout() {
         </header>
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          <section className="w-full min-w-0 shrink-0 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl lg:max-w-lg">
-            <h2 className="mb-5 text-xl font-bold md:text-2xl">
-              Delivery Info
+          <section className="border-line bg-card w-full min-w-0 flex-1 rounded-2xl border p-6 md:p-7">
+            <h2 className="mb-5 text-sm font-bold tracking-wide text-white uppercase">
+              Where is it going?
             </h2>
 
-            {FIELDS.map((field) => (
-              <div key={field.name} className="mb-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {FIELDS.map((field) => (
+              <div key={field.name} className={field.wide ? "sm:col-span-2" : ""}>
                 <label
                   htmlFor={`checkout-${field.name}`}
                   className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-400 uppercase"
@@ -255,26 +259,69 @@ export default function Checkout() {
                       [field.name]: event.target.value,
                     }))
                   }
-                  className="focus:border-brand box-border w-full min-w-0 rounded-lg border border-gray-800 bg-[#0d0d0d] p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
+                  className="focus:border-brand border-line bg-field box-border w-full min-w-0 rounded-xl border p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
                 />
               </div>
-            ))}
+              ))}
+            </div>
 
-            <label className="mt-1 inline-flex cursor-pointer items-center gap-2.5 rounded-lg border border-gray-800 bg-[#0d0d0d] px-4 py-3 text-sm transition-colors hover:border-gray-700">
+            {/*
+              A choice, not a field. On a card the same colour as the inputs
+              with the same border, this read as one more empty box to fill in.
+            */}
+            <label className="border-line hover:border-white/25 mt-5 flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors">
               <input
                 type="checkbox"
                 checked={pickup}
                 onChange={() => setPickup((current) => !current)}
-                className="accent-brand h-4 w-4"
+                className="accent-brand mt-0.5 h-4 w-4"
               />
-              Pickup from Berkeley Vale (skip delivery)
+              <span>
+                <span className="block text-sm font-semibold text-white">
+                  Pick it up yourself
+                </span>
+                <span className="block text-xs text-gray-500">
+                  Collect from Berkeley Vale and pay no delivery.
+                </span>
+              </span>
             </label>
           </section>
 
-          <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
-            <h2 className="mb-5 text-xl font-bold md:text-2xl">
+          <section className="border-line bg-card flex w-full min-w-0 flex-col rounded-2xl border p-6 lg:sticky lg:top-24 lg:w-[26rem] lg:shrink-0">
+            <h2 className="mb-5 text-sm font-bold tracking-wide text-white uppercase">
               Order summary
             </h2>
+
+            {/*
+              What you are buying, before anything is priced. This list used to
+              appear only once a freight quote came back, so up to that point a
+              checkout page showed a total and no way to see what it was for.
+            */}
+            {!quote?.ok && (
+              <ul className="border-line mb-5 space-y-3 border-b pb-5">
+                {lines.map((line) => (
+                  <li
+                    key={`${line.urgId}-${line.invNumber}`}
+                    className="flex justify-between gap-4 text-sm"
+                  >
+                    <span className="min-w-0 text-gray-300">
+                      {line.quantity > 1 && `${line.quantity} x `}
+                      {line.itemName}
+                      <span className="block text-xs text-gray-500">
+                        {[line.manufacturer, line.model]
+                          .filter(Boolean)
+                          .join(" ")}
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-semibold tabular-nums">
+                      {formatCents(
+                        Math.round(line.price * 100) * line.quantity,
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {quote?.ok && (
               <ul className="border-line mb-5 space-y-3 border-b pb-5">
@@ -328,11 +375,31 @@ export default function Checkout() {
                 }
                 muted={!quote?.ok || pending}
               />
-              <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-3">
+              <div className="border-line mt-2 flex items-center justify-between gap-4 border-t pt-3">
                 <span className="text-base font-semibold">Total</span>
-                <span className="text-xl font-bold">
-                  {quote?.ok ? quote.total : "..."}
-                </span>
+                {quote?.ok && !quote.freightUnavailable ? (
+                  <span className="text-xl font-extrabold tabular-nums">
+                    {quote.total}
+                  </span>
+                ) : quote?.ok && quote.freightUnavailable ? (
+                  <span className="text-right">
+                    <span className="block text-xl font-extrabold tabular-nums text-gray-500">
+                      {quote.total}
+                    </span>
+                    <span className="block text-xs font-medium text-amber-400">
+                      delivery not included
+                    </span>
+                  </span>
+                ) : (
+                  <span className="text-right">
+                    <span className="block text-xl font-extrabold tabular-nums text-gray-500">
+                      {formatCents(indicativeSubtotal)}
+                    </span>
+                    <span className="block text-xs font-medium text-gray-500">
+                      {pickup ? "nothing to add" : "plus delivery"}
+                    </span>
+                  </span>
+                )}
               </div>
             </div>
 
@@ -357,7 +424,7 @@ export default function Checkout() {
             {quote?.ok &&
               quote.freightEstimated &&
               !quote.freightUnavailable && (
-                <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+                <p className="mb-4 rounded-xl border-line border bg-field p-4 text-sm text-gray-300">
                   One of these parts has not been weighed yet, so the delivery
                   price above is an estimate. We will confirm it before it ships
                   and let you know if it changes.
@@ -365,7 +432,7 @@ export default function Checkout() {
               )}
 
             {quote?.ok && quote.freightUnavailable && (
-              <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+              <p className="mb-4 rounded-xl border-line border bg-field p-4 text-sm text-gray-300">
                 We could not price the freight automatically for that address.
                 Call us on{" "}
                 <a
@@ -379,7 +446,7 @@ export default function Checkout() {
             )}
 
             {quote && !quote.ok && (
-              <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+              <p className="mb-4 rounded-xl border-line border bg-field p-4 text-sm text-gray-300">
                 {quote.message}
               </p>
             )}
@@ -391,7 +458,7 @@ export default function Checkout() {
               />
             ) : (
               <PaymentStep
-                ready={Boolean(quote?.ok) && complete}
+                ready={Boolean(quote?.ok && !quote.freightUnavailable) && complete}
                 starting={starting}
                 error={paymentError}
                 onPay={beginPayment}
@@ -444,7 +511,7 @@ function PaymentStep({
 
   if (!configured) {
     return (
-      <div className="mt-auto rounded-lg border border-gray-700 bg-[#0d0d0d] p-5">
+      <div className="mt-auto rounded-xl border-line border bg-admin p-5">
         <p className="mb-2 text-sm font-semibold text-white">
           Card payment is not switched on yet
         </p>
@@ -467,7 +534,7 @@ function PaymentStep({
       {error && (
         <p
           role="alert"
-          className="mb-3 rounded-lg border border-gray-700 bg-[#0d0d0d] p-3 text-sm text-gray-200"
+          className="mb-3 rounded-xl border-line border bg-field p-3 text-sm text-gray-200"
         >
           {error}
         </p>

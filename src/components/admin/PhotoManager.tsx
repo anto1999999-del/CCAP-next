@@ -105,7 +105,7 @@ export default function PhotoManager({
         <button
           type="button"
           onClick={() => input.current?.click()}
-          className="border-line hover:border-brand/60 flex h-40 w-full items-center justify-center rounded-xl border border-dashed bg-[#0b0b0d] text-sm text-gray-500 transition-colors"
+          className="border-line hover:border-brand/60 flex h-40 w-full items-center justify-center rounded-xl border border-dashed bg-field text-sm text-gray-500 transition-colors"
         >
           No photos yet. Add the first one.
         </button>
@@ -138,7 +138,7 @@ export default function PhotoManager({
                   }
                   placeholder="Describe this photo"
                   aria-label={`Description for photo ${index + 1}`}
-                  className="focus:border-brand border-line w-full rounded-lg border bg-[#0b0b0d] px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none"
+                  className="focus:border-brand border-line w-full rounded-lg border bg-field px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none"
                 />
 
                 <div className="flex flex-wrap items-center gap-1.5">

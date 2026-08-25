@@ -30,7 +30,7 @@ export default function PaymentPanel({
 }) {
   if (!stripePromise) {
     return (
-      <p className="rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+      <p className="rounded-xl border-line border bg-field p-4 text-sm text-gray-300">
         Card payment is not switched on. Call {site.contact.phone} to pay.
       </p>
     );
@@ -98,7 +98,7 @@ function PayForm({ onCancel }: { onCancel: () => void }) {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-gray-700 bg-[#0d0d0d] p-3 text-sm text-gray-200"
+          className="rounded-xl border-line border bg-field p-3 text-sm text-gray-200"
         >
           {error}
         </p>

@@ -24,7 +24,7 @@ export default function PartGallery({
 
   if (images.length === 0) {
     return (
-      <div className="bg-tile-well flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-white/10 text-sm tracking-wider text-white/40 uppercase">
+      <div className="bg-tile-well flex aspect-[4/3] w-full items-center justify-center rounded-xl border-line border text-sm tracking-wider text-gray-500 uppercase">
         No photo
       </div>
     );
@@ -34,7 +34,7 @@ export default function PartGallery({
 
   return (
     <div className="w-full">
-      <div className="bg-tile-well overflow-hidden rounded-lg border border-white/10">
+      <div className="bg-tile-well overflow-hidden rounded-xl border-line border">
         <PartThumbnail
           key={fullImageUrl(current)}
           src={fullImageUrl(current)}
@@ -60,7 +60,7 @@ export default function PartGallery({
               className={`shrink-0 overflow-hidden rounded-md border transition-colors ${
                 index === selected
                   ? "border-brand"
-                  : "border-white/10 hover:border-white/40"
+                  : "border-line hover:border-white/40"
               }`}
             >
               <PartThumbnail

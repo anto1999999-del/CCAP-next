@@ -66,13 +66,13 @@ export default function NotFound() {
         </Link>
         <Link
           href="/"
-          className="rounded-md border border-gray-500 px-6 py-3 text-white transition-colors hover:bg-white/10"
+          className="border-line rounded-xl border px-6 py-3 text-white transition-colors hover:bg-white/10"
         >
           Back to Home
         </Link>
         <Link
           href="/contact"
-          className="rounded-md border border-gray-500 px-6 py-3 text-white transition-colors hover:bg-white/10"
+          className="border-line rounded-xl border px-6 py-3 text-white transition-colors hover:bg-white/10"
         >
           Contact Us
         </Link>
