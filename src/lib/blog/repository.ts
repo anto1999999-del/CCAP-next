@@ -1,18 +1,21 @@
 import "server-only";
-import { rewriteImageUrl, withoutDashes } from "./html";
-import postsData from "../../../content/blog/posts.json";
-import taxonomiesData from "../../../content/blog/taxonomies.json";
+import { postBySlug, publishedPostSlugs, publishedPosts } from "../content/store";
+import { renderBody } from "../content/render";
+import { toSlug, type Post } from "../content/schema";
 
 /**
  * Where blog content comes from.
  *
- * Backed by the JSON exported from WordPress today. When posts move into the
- * database behind an admin screen, only this file changes, every page and
- * component reads through the functions below, so none of them has to know
- * whether a post came from a file or a collection.
+ * The database, now. It was the WordPress export in JSON files, which was fine
+ * to read and impossible to edit; this module was written as a layer so that
+ * when that changed, only this file would change. That is what happened.
  *
- * That is the whole reason this layer exists, rather than pages importing the
- * JSON directly.
+ * Every function here returns published posts only. Drafts are the admin's
+ * business and reach the public pages through no path at all.
+ *
+ * The shape below is what the pages and components already expect. It is a view
+ * over the stored post rather than the stored post itself: the body arrives
+ * rendered and sanitised, and the tags carry the slugs the templates want.
  */
 
 export type BlogTag = { name: string; slug: string };
@@ -24,142 +27,96 @@ export type BlogImage = {
   alt: string;
 };
 
-export type BlogPostSeo = {
-  metaTitle: string | null;
-  metaDescription: string | null;
-  /** The URL WordPress published this at, kept for the redirect map. */
-  legacyCanonical: string | null;
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImage: string | null;
-  /**
-   * Yoast's robots directives, as an object rather than a string.
-   *
-   * Checked across the export: all 113 posts are `index, follow`, so nothing
-   * needs excluding from search when they move. Kept so that stays verifiable
-   * rather than assumed, if a post is ever set to noindex in the admin, this
-   * is where the page decides to honour it.
-   */
-  robots: {
-    index?: string;
-    follow?: string;
-    "max-snippet"?: string;
-    "max-image-preview"?: string;
-    "max-video-preview"?: string;
-  } | null;
-};
-
 export type BlogPost = {
-  id: number;
   slug: string;
   title: string;
   excerpt: string;
+  /** Rendered and sanitised. Safe to place in the document as-is. */
   contentHtml: string;
   publishedAt: string | null;
   updatedAt: string | null;
-  category: string | null;
-  categorySlug: string | null;
   tags: BlogTag[];
   featuredImage: BlogImage | null;
-  seo: BlogPostSeo;
-};
-
-export type Taxonomy = { name: string; slug: string; count: number };
-
-/**
- * The export, with dashes normalised on the way in.
- *
- * Every page reads posts through this module, so doing it here is the one place
- * that guarantees no em dash reaches a template, a meta tag or a JSON-LD block.
- */
-const posts = (postsData as BlogPost[]).map((post) => ({
-  ...post,
-  title: withoutDashes(post.title),
-  excerpt: withoutDashes(post.excerpt),
-  contentHtml: withoutDashes(post.contentHtml),
-  // Images live under public/blog-media now, not on the WordPress host.
-  featuredImage: post.featuredImage && {
-    ...post.featuredImage,
-    url: rewriteImageUrl(post.featuredImage.url),
-  },
   seo: {
-    ...post.seo,
-    metaTitle: post.seo.metaTitle && withoutDashes(post.seo.metaTitle),
-    metaDescription:
-      post.seo.metaDescription && withoutDashes(post.seo.metaDescription),
-    ogTitle: post.seo.ogTitle && withoutDashes(post.seo.ogTitle),
-    // The share image is served from here too, not from WordPress.
-    ogImage: post.seo.ogImage && rewriteImageUrl(post.seo.ogImage),
-    ogDescription:
-      post.seo.ogDescription && withoutDashes(post.seo.ogDescription),
-  },
-}));
-const taxonomies = taxonomiesData as {
-  categories: Taxonomy[];
-  tags: Taxonomy[];
+    metaTitle: string | null;
+    metaDescription: string | null;
+    /** Kept out of search results even while the page is public. */
+    noindex: boolean;
+    /** The image used when the link is shared. The cover shot, when there is one. */
+    ogImage: string | null;
+    /** Where this lived on WordPress, for the redirect map. */
+    legacyCanonical: string | null;
+  };
 };
 
-/**
- * Every entry, newest first, articles and gallery vehicles together.
- *
- * Most callers want `listArticles()` instead. In WordPress the 26 salvage
- * vehicles are filed as ordinary posts under a "Gallery" category, so anything
- * reading this list unfiltered puts "2019 KIA CERATO 2.0 SEDAN" in among the
- * repair guides.
- */
-export function listPosts(): BlogPost[] {
-  return posts;
+function toBlogPost(post: Post): BlogPost {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    contentHtml: renderBody(post.body, post.bodyFormat),
+    publishedAt: post.publishedAt,
+    updatedAt: post.updatedAt,
+    tags: post.tags.map((name) => ({ name, slug: toSlug(name) })),
+    featuredImage: post.featuredImage && {
+      url: post.featuredImage.url,
+      width: post.featuredImage.width,
+      height: post.featuredImage.height,
+      alt: post.featuredImage.alt,
+    },
+    seo: {
+      metaTitle: post.seo.metaTitle || null,
+      metaDescription: post.seo.metaDescription || null,
+      noindex: post.seo.noindex,
+      ogImage: post.featuredImage?.url ?? null,
+      legacyCanonical: post.seo.legacyCanonical,
+    },
+  };
 }
 
-/** Articles only, the 87 written posts, excluding gallery vehicles. */
-export function listArticles(): BlogPost[] {
-  return posts.filter((post) => post.categorySlug !== "gallery");
+/** Published articles, newest first. */
+export async function listArticles(): Promise<BlogPost[]> {
+  return (await publishedPosts()).map(toBlogPost);
 }
 
-export function getPost(slug: string): BlogPost | null {
-  return posts.find((post) => post.slug === slug) ?? null;
+export async function getPost(slug: string): Promise<BlogPost | null> {
+  const post = await postBySlug(slug);
+  return post ? toBlogPost(post) : null;
 }
 
-/** Slugs that get a /blog/[slug] page. Gallery vehicles do not. */
-export function listPostSlugs(): string[] {
-  return listArticles().map((post) => post.slug);
-}
-
-export function listByCategory(categorySlug: string): BlogPost[] {
-  return posts.filter((post) => post.categorySlug === categorySlug);
-}
-
-export function listByTag(tagSlug: string): BlogPost[] {
-  return posts.filter((post) => post.tags.some((tag) => tag.slug === tagSlug));
-}
-
-export function listCategories(): Taxonomy[] {
-  return taxonomies.categories;
-}
-
-export function listTags(): Taxonomy[] {
-  return taxonomies.tags;
+/** Slugs that get a /blog/[slug] page. Drafts are not among them. */
+export async function listPostSlugs(): Promise<string[]> {
+  return publishedPostSlugs();
 }
 
 /**
  * Posts to show beneath an article.
  *
- * Prefers the same category, then fills from the most recent. The old blog had
- * no related posts at all, so every article was a dead end for a reader who
- * finished it.
+ * Ranked by how many tags they share with the one being read, then filled from
+ * the most recent. This used to prefer the same category, which sorted nothing:
+ * all 87 articles were filed under one category called "Blog".
+ *
+ * The old blog had no related posts at all, so every article was a dead end for
+ * a reader who finished it.
  */
-export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
-  const current = getPost(slug);
+export async function getRelatedPosts(
+  slug: string,
+  limit = 3,
+): Promise<BlogPost[]> {
+  const articles = await listArticles();
+  const current = articles.find((post) => post.slug === slug);
   if (!current) return [];
 
-  const articles = listArticles();
-  const sameCategory = articles.filter(
-    (post) => post.slug !== slug && post.categorySlug === current.categorySlug,
-  );
-  const rest = articles.filter(
-    (post) => post.slug !== slug && post.categorySlug !== current.categorySlug,
-  );
+  const tags = new Set(current.tags.map((tag) => tag.slug));
 
-  return [...sameCategory,
-  ...rest].slice(0, limit);
+  return articles
+    .filter((post) => post.slug !== slug)
+    .map((post) => ({
+      post,
+      shared: post.tags.filter((tag) => tags.has(tag.slug)).length,
+    }))
+    // Stable within a score: the source list is already newest first.
+    .sort((a, b) => b.shared - a.shared)
+    .slice(0, limit)
+    .map((scored) => scored.post);
 }

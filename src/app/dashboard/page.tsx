@@ -11,6 +11,7 @@ import {
 import { adminOnly } from "@/lib/auth/guard";
 import { listAccounts } from "@/lib/auth/accounts";
 import { listOrders, summarise } from "@/lib/orders/repository";
+import { contentCounts } from "@/lib/content/store";
 import { STATUS_COLOURS } from "@/lib/orders/status";
 import { formatCents } from "@/lib/parts/price";
 
@@ -30,10 +31,11 @@ const AU_DATE = new Intl.DateTimeFormat("en-AU", {
 export default async function DashboardPage() {
   const admin = await adminOnly("/dashboard");
 
-  const [summary, recent, accounts] = await Promise.all([
+  const [summary, recent, accounts, content] = await Promise.all([
     summarise(),
     listOrders({ perPage: 8 }),
     listAccounts(),
+    contentCounts(),
   ]);
 
   return (
@@ -79,6 +81,63 @@ export default async function DashboardPage() {
           </span>
         </Link>
       )}
+
+      {/*
+        The two content sections, with what is live and what is waiting. A draft
+        that nobody remembers writing is a draft that never gets published, so
+        the count is on the first screen an admin sees rather than two clicks in.
+      */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Link
+          href="/manage-blog"
+          className="border-line bg-card hover:border-brand/50 flex items-center justify-between gap-4 rounded-2xl border p-5 transition-colors"
+        >
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-gray-500 uppercase">
+              Blog
+            </p>
+            <p className="mt-2 text-2xl font-extrabold tabular-nums text-white">
+              {content.posts.published.toLocaleString()}
+              <span className="ml-2 text-sm font-semibold text-gray-500">
+                published
+              </span>
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              {content.posts.draft === 0
+                ? "No drafts waiting"
+                : `${content.posts.draft} draft${content.posts.draft === 1 ? "" : "s"} waiting`}
+            </p>
+          </div>
+          <span aria-hidden="true" className="text-brand-text text-xl">
+            &rarr;
+          </span>
+        </Link>
+
+        <Link
+          href="/manage-gallery"
+          className="border-line bg-card hover:border-brand/50 flex items-center justify-between gap-4 rounded-2xl border p-5 transition-colors"
+        >
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-gray-500 uppercase">
+              Gallery
+            </p>
+            <p className="mt-2 text-2xl font-extrabold tabular-nums text-white">
+              {content.vehicles.published.toLocaleString()}
+              <span className="ml-2 text-sm font-semibold text-gray-500">
+                vehicles
+              </span>
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              {content.vehicles.draft === 0
+                ? "No drafts waiting"
+                : `${content.vehicles.draft} draft${content.vehicles.draft === 1 ? "" : "s"} waiting`}
+            </p>
+          </div>
+          <span aria-hidden="true" className="text-brand-text text-xl">
+            &rarr;
+          </span>
+        </Link>
+      </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
         <ChartCard title="Revenue by month">

@@ -73,14 +73,14 @@ export default async function sitemap(props: {
     priority: 0.8,
   }));
 
-  const articles = listArticles().map((post) => ({
+  const articles = (await listArticles()).map((post) => ({
     url: `${site.url}/blog/${post.slug}`,
     lastModified: post.updatedAt ?? post.publishedAt ?? undefined,
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  const vehicles = listVehicles().map((vehicle) => ({
+  const vehicles = (await listVehicles()).map((vehicle) => ({
     url: `${site.url}/gallery/${vehicle.slug}`,
     lastModified: vehicle.addedAt ?? undefined,
     changeFrequency: "monthly" as const,

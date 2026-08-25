@@ -411,3 +411,60 @@ and lints clean, but nothing has run against real data because MONGO_URI is not
 available here. Without it the account pages say accounts are unavailable and
 the rest of the site is unaffected, which is also what a deployment missing that
 variable would look like.
+
+## 29. The blog and the gallery are edited from the dashboard now
+
+They were JSON files exported from WordPress: fine to read, impossible to edit.
+They are two collections in the database, with an admin behind them under
+Content in the sidebar.
+
+What changed for a reader: nothing. Every address is the same, every title and
+description is the same, all 87 articles and 26 vehicles are still prerendered
+as static HTML, and the sitemap still lists them. What changed for the yard is
+that a new article no longer needs a developer.
+
+Three decisions worth recording.
+
+**Saving and publishing are separate buttons.** Save changes nothing anybody can
+see. Publish is the moment a page appears on the website. Anything written in
+the admin starts as a draft; everything imported arrived published, because it
+was already live.
+
+**Unpublishing is offered before deleting.** A car that has been stripped comes
+out of the gallery with one click from the list and keeps its page, its
+photographs and its record. Delete exists, is only in the editor, and asks
+first.
+
+**Articles that came from WordPress stay HTML and are edited as HTML.** They
+carry tables and layout that a round trip through a visual editor mangles, and
+they are pages with live rankings. Anything written from now on is markdown with
+buttons, so nobody has to know markdown to use bold.
+
+## 30. Sixty-four links inside articles pointed at pages that do not exist
+
+Found by a test, not by looking at the site. Every in-article link to another
+article rendered as `/blog/blog/...` and returned a 404.
+
+Two correct changes made it wrong together. The importer rewrote the old
+WordPress addresses into new ones and stored the result, which is what stops the
+articles breaking when WordPress is switched off. The renderer still resolved
+every link against the WordPress address first, which was right while the stored
+links were WordPress's own and wrong once they were ours: a path that already
+said `/blog/car-wreckers-central-coast` had `/blog` put in front of it again.
+
+The renderer now only rewrites links that are absolute and on the old blog
+hosts. A path is an address on this site already and is left alone. All 64
+resolve to real pages, checked against the list of slugs in the database.
+
+Worth saying plainly: the pages looked correct. The titles were right, the text
+was right, the images were right, and one in every fifteen links was dead.
+
+## 31. The category label above an article said "Blog" on all 87 of them
+
+WordPress filed every article under one category, called Blog, and the article
+page printed it above the headline. It told a reader nothing they could not see
+from the address bar.
+
+The first tag is shown instead, where there is one, which on the Kia article
+reads "Cerato". Related articles are chosen by shared tags for the same reason:
+sorting by a category that every article shares sorts nothing.

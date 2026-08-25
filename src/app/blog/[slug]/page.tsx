@@ -11,17 +11,18 @@ import {
   getRelatedPosts,
   listPostSlugs,
 } from "@/lib/blog/repository";
-import { cleanPostHtml, readingTimeMinutes } from "@/lib/blog/html";
+import { readingTimeMinutes } from "@/lib/blog/html";
 import { absoluteUrl, site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
 /**
- * Every post is known at build time, so all 113 are prerendered as static HTML.
- * Nothing waits on a database or an API when a reader arrives.
+ * Every published article is known at build time and prerendered as static
+ * HTML, so nothing waits on the database when a reader arrives. Publishing from
+ * the admin revalidates the page it affects.
  */
-export function generateStaticParams() {
-  return listPostSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  return (await listPostSlugs()).map((slug) => ({ slug }));
 }
 
 /**
@@ -33,7 +34,7 @@ export function generateStaticParams() {
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPost(slug);
   if (!post) return {};
 
   const title = post.seo.metaTitle ?? post.title;
@@ -43,10 +44,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: `/blog/${post.slug}` },
+    // Set from the admin. A published article can still be held back from
+    // search results while it is being corrected.
+    robots: post.seo.noindex ? { index: false, follow: true } : undefined,
     openGraph: {
       type: "article",
-      title: post.seo.ogTitle ?? title,
-      description: post.seo.ogDescription ?? description,
+      title,
+      description,
       url: `/blog/${post.slug}`,
       publishedTime: post.publishedAt ?? undefined,
       modifiedTime: post.updatedAt ?? undefined,
@@ -54,8 +58,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: post.seo.ogTitle ?? title,
-      description: post.seo.ogDescription ?? description,
+      title,
+      description,
     },
   };
 }
@@ -71,12 +75,14 @@ function formatDate(iso: string | null): string {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPost(slug);
   if (!post) notFound();
 
-  const html = cleanPostHtml(post.contentHtml);
-  const minutes = readingTimeMinutes(post.contentHtml);
-  const related = getRelatedPosts(slug);
+  // Already rendered and sanitised by the repository, whichever format it was
+  // written in.
+  const html = post.contentHtml;
+  const minutes = readingTimeMinutes(html);
+  const related = await getRelatedPosts(slug);
 
   return (
     <>
@@ -113,9 +119,14 @@ export default async function BlogPostPage({ params }: Props) {
           </nav>
 
           <header className="mb-8">
-            {post.category && (
+            {/*
+              The first tag, where there is one. This used to print the
+              category, which said "Blog" on all 87 articles and told the reader
+              nothing they could not see from the address bar.
+            */}
+            {post.tags[0] && (
               <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase">
-                {post.category}
+                {post.tags[0].name}
               </p>
             )}
             <h1 className="mb-4 text-3xl leading-tight font-extrabold tracking-tight md:text-4xl lg:text-5xl">

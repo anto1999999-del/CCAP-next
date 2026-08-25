@@ -25,8 +25,8 @@ function formatDate(iso: string | null): string {
   });
 }
 
-export default function BlogIndexPage() {
-  const posts = listArticles();
+export default async function BlogIndexPage() {
+  const posts = await listArticles();
   const [latest, ...rest] = posts;
 
   return (

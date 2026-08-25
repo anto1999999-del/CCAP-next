@@ -16,8 +16,8 @@ import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { absoluteUrl, site } from "@/lib/site";
 
 /** Every vehicle is known at build time, so every page is static. */
-export function generateStaticParams() {
-  return listVehicleSlugs().map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  return (await listVehicleSlugs()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -26,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const vehicle = getVehicle(slug);
+  const vehicle = await getVehicle(slug);
   if (!vehicle) return {};
 
   /*
@@ -58,10 +58,10 @@ export default async function VehiclePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const vehicle = getVehicle(slug);
+  const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
 
-  const related = getRelatedVehicles(slug);
+  const related = await getRelatedVehicles(slug);
 
   return (
     <>

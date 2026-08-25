@@ -41,10 +41,17 @@ const BLOG_HOSTS = [
  * 51 links across the posts point at the blog subdomain. They would still work
  * through the redirects, but every one would cost the reader a round trip and
  * leak a redirect chain into the crawl. Internal links should be internal.
+ *
+ * Only absolute links on those hosts are touched. This used to resolve every
+ * href against the blog's address, which meant a path on this site was treated
+ * as a path on WordPress and had /blog put in front of it: the 64 in-article
+ * links the importer had already corrected came out as /blog/blog/... and
+ * every one of them was a 404. A root-relative href is an address here
+ * already; there is nothing to translate.
  */
 export function rewriteInternalLink(href: string): string {
   try {
-    const url = new URL(href, "https://blog.centralcoastautoparts.com.au");
+    const url = new URL(href);
     if (!BLOG_HOSTS.includes(url.hostname)) return href;
 
     const path = url.pathname.replace(/\/+$/, "");

@@ -14,14 +14,47 @@ import type { Account } from "@/lib/auth/accounts";
  * courtesy, not the control.
  */
 
-type Item = { href: string; label: string; adminOnly?: boolean };
+type Item = { href: string; label: string };
 
-const ITEMS: Item[] = [
-  { href: "/dashboard", label: "Dashboard", adminOnly: true },
-  { href: "/manage-orders", label: "Manage Orders", adminOnly: true },
-  { href: "/manage-users", label: "Manage Users", adminOnly: true },
-  { href: "/my-account", label: "My Profile" },
-  { href: "/orders", label: "My Orders" },
+/**
+ * The sidebar, in three groups.
+ *
+ * Running the business, writing the website, and the admin's own account are
+ * three different jobs, and seven links in one column made them look like one
+ * list of equals. The headings are what let somebody find "Gallery" without
+ * reading every entry.
+ *
+ * A customer sees only the last group, and it appears without its heading:
+ * "My account" above two links, in a sidebar that has nothing else in it, is a
+ * label for the whole page rather than for a section of it.
+ */
+type Group = { heading: string; adminOnly?: boolean; items: Item[] };
+
+const GROUPS: Group[] = [
+  {
+    heading: "Manage",
+    adminOnly: true,
+    items: [
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/manage-orders", label: "Orders" },
+      { href: "/manage-users", label: "Users" },
+    ],
+  },
+  {
+    heading: "Content",
+    adminOnly: true,
+    items: [
+      { href: "/manage-blog", label: "Blog" },
+      { href: "/manage-gallery", label: "Gallery" },
+    ],
+  },
+  {
+    heading: "My account",
+    items: [
+      { href: "/my-account", label: "My Profile" },
+      { href: "/orders", label: "My Orders" },
+    ],
+  },
 ];
 
 export default function AccountShell({
@@ -38,7 +71,7 @@ export default function AccountShell({
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const items = ITEMS.filter((item) => account.isAdmin || !item.adminOnly);
+  const groups = GROUPS.filter((group) => account.isAdmin || !group.adminOnly);
 
   return (
     <div className="bg-admin min-h-screen text-white">
@@ -52,27 +85,36 @@ export default function AccountShell({
               {account.name}
             </p>
 
-            <nav aria-label="Account">
-              <ul className="space-y-1.5">
-                {items.map((item) => {
-                  const current = item.href === active;
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        aria-current={current ? "page" : undefined}
-                        className={
-                          current
-                            ? "bg-brand block rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-                            : "block rounded-xl px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
-                        }
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+            <nav aria-label="Account" className="space-y-6">
+              {groups.map((group) => (
+                <div key={group.heading}>
+                  {groups.length > 1 && (
+                    <p className="mb-2 px-4 text-[11px] font-semibold tracking-[0.22em] text-gray-600 uppercase">
+                      {group.heading}
+                    </p>
+                  )}
+                  <ul className="space-y-1.5">
+                    {group.items.map((item) => {
+                      const current = item.href === active;
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            aria-current={current ? "page" : undefined}
+                            className={
+                              current
+                                ? "bg-brand block rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+                                : "block rounded-xl px-4 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                            }
+                          >
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
             </nav>
 
             <form action={signOut} className="border-line mt-6 border-t pt-6">

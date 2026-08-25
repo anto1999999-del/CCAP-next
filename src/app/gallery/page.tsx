@@ -15,9 +15,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/gallery" },
 };
 
-export default function GalleryPage() {
-  const vehicles = listVehicles();
-  const makes = listMakes();
+export default async function GalleryPage() {
+  const [vehicles, makes] = await Promise.all([listVehicles(), listMakes()]);
 
   return (
     <>

@@ -90,7 +90,8 @@ export async function storeImage(
   if (!ACCEPTED.has(file.type)) {
     return {
       ok: false,
-      message: "That file type is not accepted. Use WebP, JPEG, PNG or AVIF.",
+      message:
+        "That file type is not accepted. Use WebP, JPEG, PNG, AVIF or GIF.",
     };
   }
 
@@ -109,6 +110,9 @@ export async function storeImage(
   let height: number;
 
   try {
+    // Not animated: an animated GIF becomes its first frame. Nothing on this
+    // site is a place for a moving image, and a multi-frame WebP would defeat
+    // the size limit the owner asked for.
     const image = sharp(input, { animated: false });
     const meta = await image.metadata();
 
