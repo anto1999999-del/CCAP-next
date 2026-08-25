@@ -5,6 +5,7 @@ import PartCard from "@/components/parts/PartCard";
 import PartsFilters from "@/components/parts/PartsFilters";
 import PartsPagination from "@/components/parts/PartsPagination";
 import PartsSearch from "@/components/parts/PartsSearch";
+import Container from "@/components/layout/Container";
 import { getCatalogPage } from "@/lib/parts/repository";
 import { partKey } from "@/lib/parts/identity";
 import { productsListSchema } from "@/lib/schema/products";
@@ -81,7 +82,7 @@ export default async function ProductsPage({
       />
 
       <div className="border-b border-gray-800 bg-[#141414]/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1920px] flex-col gap-4 px-4 py-6 md:px-8 lg:flex-row lg:items-start lg:justify-between">
+        <Container className="flex flex-col gap-4 py-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white md:text-3xl">
               Explore Our <span className="text-brand-text">Parts</span>
@@ -89,11 +90,14 @@ export default async function ProductsPage({
             <p className="mt-1 text-sm text-gray-400">
               Filter by year, make, model and part type
               {syncedAt
-                ? `. Stock as at ${new Date(syncedAt).toLocaleDateString("en-AU", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}.`
+                ? `. Stock as at ${new Date(syncedAt).toLocaleDateString(
+                    "en-AU",
+                    {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    },
+                  )}.`
                 : "."}
             </p>
           </div>
@@ -103,17 +107,17 @@ export default async function ProductsPage({
             filters={filters}
             resultCount={available ? page.totalResults : null}
           />
-        </div>
+        </Container>
       </div>
 
-      <div className="mx-auto flex max-w-[1920px] flex-col md:flex-row">
-        <aside className="w-full flex-shrink-0 border-gray-800 bg-[#141414] p-6 md:max-w-[320px] md:border-r lg:max-w-[360px]">
-          <div className="md:sticky md:top-6">
+      <Container className="flex flex-col gap-8 py-8 md:flex-row">
+        <aside className="border-line bg-card w-full flex-shrink-0 rounded-2xl border p-6 md:max-w-[300px]">
+          <div className="md:sticky md:top-24">
             <PartsFilters filters={filters} options={options} query={query} />
           </div>
         </aside>
 
-        <main className="flex-1 p-4 md:p-8">
+        <main className="min-w-0 flex-1">
           {!available ? (
             <Empty
               heading="The parts catalogue is not loaded"
@@ -142,7 +146,7 @@ export default async function ProductsPage({
             </>
           )}
         </main>
-      </div>
+      </Container>
 
       <FaqSection faqs={HOMEPAGE_FAQS} fromClass="from-[#0d0d0d]" />
     </div>

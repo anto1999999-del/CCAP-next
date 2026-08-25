@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Container from "@/components/layout/Container";
 import PartThumbnail from "@/components/parts/PartThumbnail";
 import { useCart } from "@/lib/cart/CartProvider";
 import { PART_IMAGE_PLACEHOLDER } from "@/lib/parts/images";
@@ -45,105 +46,110 @@ export default function CartContents() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050509] px-4 py-10 text-white md:px-8 lg:px-16">
-      <header className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl lg:text-5xl">
-          Your <span className="text-brand-text">Shopping Cart</span>
-        </h1>
-        <p className="mt-2 text-sm text-gray-400 md:text-base">
-          Review your items, adjust quantities, and proceed to secure checkout.
-        </p>
-      </header>
+    <div className="bg-admin min-h-screen py-10 text-white">
+      <Container>
+        <header className="mb-8">
+          <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl lg:text-5xl">
+            Your <span className="text-brand-text">Shopping Cart</span>
+          </h1>
+          <p className="mt-2 text-sm text-gray-400 md:text-base">
+            Review your items, adjust quantities, and proceed to secure
+            checkout.
+          </p>
+        </header>
 
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-        <ul className="flex-1 space-y-4">
-          {lines.map((line) => (
-            <li
-              key={`${line.urgId}-${line.invNumber}`}
-              className="flex flex-col items-start gap-4 rounded-xl border border-gray-800 bg-[#151518] p-5 shadow-lg md:flex-row md:items-center md:gap-6"
-            >
-              <Link
-                href={`/product/${line.urgId}/${line.invNumber}`}
-                className="shrink-0"
-                aria-label={line.itemName}
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          <ul className="flex-1 space-y-4">
+            {lines.map((line) => (
+              <li
+                key={`${line.urgId}-${line.invNumber}`}
+                className="flex flex-col items-start gap-4 rounded-xl border border-gray-800 bg-[#151518] p-5 shadow-lg md:flex-row md:items-center md:gap-6"
               >
-                <PartThumbnail
-                  src={line.thumbnail ?? PART_IMAGE_PLACEHOLDER}
-                  alt={line.itemName}
-                  className="h-28 w-28 rounded-lg bg-[#0d0d0d] object-cover transition hover:opacity-90"
-                />
-              </Link>
+                <Link
+                  href={`/product/${line.urgId}/${line.invNumber}`}
+                  className="shrink-0"
+                  aria-label={line.itemName}
+                >
+                  <PartThumbnail
+                    src={line.thumbnail ?? PART_IMAGE_PLACEHOLDER}
+                    alt={line.itemName}
+                    className="h-28 w-28 rounded-lg bg-[#0d0d0d] object-cover transition hover:opacity-90"
+                  />
+                </Link>
 
-              <div className="flex-1">
-                <h2 className="mb-1 text-lg font-semibold md:text-xl">
-                  <Link
-                    href={`/product/${line.urgId}/${line.invNumber}`}
-                    className="hover:text-brand-text transition-colors"
+                <div className="flex-1">
+                  <h2 className="mb-1 text-lg font-semibold md:text-xl">
+                    <Link
+                      href={`/product/${line.urgId}/${line.invNumber}`}
+                      className="hover:text-brand-text transition-colors"
+                    >
+                      {line.itemName}
+                    </Link>
+                  </h2>
+                  <Detail label="Manufacturer" value={line.manufacturer} />
+                  <Detail label="Model" value={line.model} />
+                  <p className="text-brand-text mt-2 text-lg font-bold md:text-xl">
+                    {formatCents(Math.round(line.price * 100))}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4 self-stretch md:ml-auto md:self-auto">
+                  <Quantity line={line} onChange={setQuantity} />
+                  <button
+                    type="button"
+                    onClick={() => remove(line)}
+                    className="bg-brand hover:bg-brand-hover rounded-full px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase transition-colors md:text-sm"
                   >
-                    {line.itemName}
-                  </Link>
-                </h2>
-                <Detail label="Manufacturer" value={line.manufacturer} />
-                <Detail label="Model" value={line.model} />
-                <p className="text-brand-text mt-2 text-lg font-bold md:text-xl">
-                  {formatCents(Math.round(line.price * 100))}
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <aside className="w-full lg:w-80">
+            <div className="space-y-4 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
+              <h2 className="mb-2 text-xl font-bold md:text-2xl">
+                Cart Summary
+              </h2>
+
+              <Row label="Total Items" value={String(count)} />
+              <Row
+                label="Total Price"
+                value={formatCents(Math.round(subtotal * 100))}
+              />
+              <Row
+                label="Shipping"
+                value="At checkout"
+                hint="Calculated from your address and the size of the parts"
+              />
+
+              <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-2">
+                <p className="text-sm text-gray-300 md:text-base">Subtotal</p>
+                <p className="text-xl font-bold text-white">
+                  {formatCents(Math.round(subtotal * 100))}
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 self-stretch md:ml-auto md:self-auto">
-                <Quantity line={line} onChange={setQuantity} />
+              <div className="space-y-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => remove(line)}
-                  className="bg-brand hover:bg-brand-hover rounded-full px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase transition-colors md:text-sm"
+                  onClick={clear}
+                  className="w-full rounded-full border border-gray-700 px-4 py-3 text-sm font-semibold tracking-wide text-gray-200 uppercase transition-colors hover:bg-gray-800 md:text-base"
                 >
-                  Remove
+                  Clear Cart
                 </button>
+                <Link
+                  href="/place-order"
+                  className="bg-brand hover:bg-brand-hover shadow-brand/40 block w-full rounded-full px-4 py-3 text-center text-sm font-semibold tracking-wide text-white uppercase shadow-lg transition-colors md:text-base"
+                >
+                  Proceed to Checkout
+                </Link>
               </div>
-            </li>
-          ))}
-        </ul>
-
-        <aside className="w-full lg:w-80">
-          <div className="space-y-4 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
-            <h2 className="mb-2 text-xl font-bold md:text-2xl">Cart Summary</h2>
-
-            <Row label="Total Items" value={String(count)} />
-            <Row
-              label="Total Price"
-              value={formatCents(Math.round(subtotal * 100))}
-            />
-            <Row
-              label="Shipping"
-              value="At checkout"
-              hint="Calculated from your address and the size of the parts"
-            />
-
-            <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-2">
-              <p className="text-sm text-gray-300 md:text-base">Subtotal</p>
-              <p className="text-xl font-bold text-white">
-                {formatCents(Math.round(subtotal * 100))}
-              </p>
             </div>
-
-            <div className="space-y-3 pt-4">
-              <button
-                type="button"
-                onClick={clear}
-                className="w-full rounded-full border border-gray-700 px-4 py-3 text-sm font-semibold tracking-wide text-gray-200 uppercase transition-colors hover:bg-gray-800 md:text-base"
-              >
-                Clear Cart
-              </button>
-              <Link
-                href="/place-order"
-                className="bg-brand hover:bg-brand-hover shadow-brand/40 block w-full rounded-full px-4 py-3 text-center text-sm font-semibold tracking-wide text-white uppercase shadow-lg transition-colors md:text-base"
-              >
-                Proceed to Checkout
-              </Link>
-            </div>
-          </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      </Container>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Container from "@/components/layout/Container";
 import { useEffect, useState, useTransition } from "react";
 import { quoteCheckout, type CheckoutQuote } from "@/app/actions/checkout";
 import { startPayment } from "@/app/actions/payment";
@@ -38,13 +39,33 @@ const EMPTY: Details = {
   postcode: "",
 };
 
-const FIELDS: { name: keyof Details; label: string; type: string; autoComplete: string }[] = [
+const FIELDS: {
+  name: keyof Details;
+  label: string;
+  type: string;
+  autoComplete: string;
+}[] = [
   { name: "name", label: "Full name", type: "text", autoComplete: "name" },
   { name: "email", label: "Email", type: "email", autoComplete: "email" },
   { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
-  { name: "address", label: "Street address", type: "text", autoComplete: "street-address" },
-  { name: "suburb", label: "Suburb", type: "text", autoComplete: "address-level2" },
-  { name: "postcode", label: "Postcode", type: "text", autoComplete: "postal-code" },
+  {
+    name: "address",
+    label: "Street address",
+    type: "text",
+    autoComplete: "street-address",
+  },
+  {
+    name: "suburb",
+    label: "Suburb",
+    type: "text",
+    autoComplete: "address-level2",
+  },
+  {
+    name: "postcode",
+    label: "Postcode",
+    type: "text",
+    autoComplete: "postal-code",
+  },
 ];
 
 export default function Checkout() {
@@ -56,7 +77,10 @@ export default function Checkout() {
     price changes the key, so a quote for Wyong can never sit on screen while
     the address says Perth: it simply stops matching and is not shown.
   */
-  const [answered, setAnswered] = useState<{ key: string; quote: CheckoutQuote } | null>(null);
+  const [answered, setAnswered] = useState<{
+    key: string;
+    quote: CheckoutQuote;
+  } | null>(null);
   const [pending, startQuoting] = useTransition();
   /*
     Set once the server has created the payment. Its presence is what swaps the
@@ -109,13 +133,16 @@ export default function Checkout() {
   */
   const deliverable =
     pickup ||
-    (details.suburb.trim().length > 1 && /^\d{4}$/.test(details.postcode.trim()));
+    (details.suburb.trim().length > 1 &&
+      /^\d{4}$/.test(details.postcode.trim()));
 
   const requestKey = [
     pickup ? "pickup" : "deliver",
     details.suburb.trim().toLowerCase(),
     details.postcode.trim(),
-    lines.map((line) => `${line.urgId}:${line.invNumber}:${line.quantity}`).join(","),
+    lines
+      .map((line) => `${line.urgId}:${line.invNumber}:${line.quantity}`)
+      .join(","),
   ].join("|");
 
   const quote = answered?.key === requestKey ? answered.quote : null;
@@ -154,12 +181,21 @@ export default function Checkout() {
     }, 900);
 
     return () => clearTimeout(timer);
-  }, [lines, pickup, details.suburb, details.postcode, deliverable, requestKey]);
+  }, [
+    lines,
+    pickup,
+    details.suburb,
+    details.postcode,
+    deliverable,
+    requestKey,
+  ]);
 
   if (lines.length === 0) {
     return (
       <div className="bg-surface flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white">
-        <h1 className="mb-3 text-3xl font-bold">There is nothing to check out</h1>
+        <h1 className="mb-3 text-3xl font-bold">
+          There is nothing to check out
+        </h1>
         <p className="mb-8 max-w-md text-sm text-gray-400">
           Your cart is empty, so there is nothing to pay for yet.
         </p>
@@ -181,178 +217,189 @@ export default function Checkout() {
   );
 
   return (
-    <div className="min-h-screen bg-[#050509] px-4 py-10 text-white md:px-8 lg:px-16">
-      <header className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl">
-          Checkout
-        </h1>
-        <p className="mt-2 text-sm text-gray-400 md:text-base">
-          Tell us where it is going and we will price the freight before you pay.
-        </p>
-      </header>
+    <div className="bg-admin min-h-screen py-10 text-white">
+      <Container>
+        <header className="mb-8">
+          <h1 className="text-3xl font-extrabold tracking-wide md:text-4xl">
+            Checkout
+          </h1>
+          <p className="mt-2 text-sm text-gray-400 md:text-base">
+            Tell us where it is going and we will price the freight before you
+            pay.
+          </p>
+        </header>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <section className="w-full min-w-0 shrink-0 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl lg:max-w-lg">
-          <h2 className="mb-5 text-xl font-bold md:text-2xl">Delivery Info</h2>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+          <section className="w-full min-w-0 shrink-0 rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl lg:max-w-lg">
+            <h2 className="mb-5 text-xl font-bold md:text-2xl">
+              Delivery Info
+            </h2>
 
-          {FIELDS.map((field) => (
-            <div key={field.name} className="mb-4">
-              <label
-                htmlFor={`checkout-${field.name}`}
-                className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-400 uppercase"
-              >
-                {field.label}
-              </label>
+            {FIELDS.map((field) => (
+              <div key={field.name} className="mb-4">
+                <label
+                  htmlFor={`checkout-${field.name}`}
+                  className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-400 uppercase"
+                >
+                  {field.label}
+                </label>
+                <input
+                  id={`checkout-${field.name}`}
+                  name={field.name}
+                  type={field.type}
+                  autoComplete={field.autoComplete}
+                  value={details[field.name]}
+                  onChange={(event) =>
+                    setDetails((current) => ({
+                      ...current,
+                      [field.name]: event.target.value,
+                    }))
+                  }
+                  className="focus:border-brand box-border w-full min-w-0 rounded-lg border border-gray-800 bg-[#0d0d0d] p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
+                />
+              </div>
+            ))}
+
+            <label className="mt-1 inline-flex cursor-pointer items-center gap-2.5 rounded-lg border border-gray-800 bg-[#0d0d0d] px-4 py-3 text-sm transition-colors hover:border-gray-700">
               <input
-                id={`checkout-${field.name}`}
-                name={field.name}
-                type={field.type}
-                autoComplete={field.autoComplete}
-                value={details[field.name]}
-                onChange={(event) =>
-                  setDetails((current) => ({
-                    ...current,
-                    [field.name]: event.target.value,
-                  }))
-                }
-                className="focus:border-brand box-border w-full min-w-0 rounded-lg border border-gray-800 bg-[#0d0d0d] p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
+                type="checkbox"
+                checked={pickup}
+                onChange={() => setPickup((current) => !current)}
+                className="accent-brand h-4 w-4"
               />
-            </div>
-          ))}
+              Pickup from Berkeley Vale (skip delivery)
+            </label>
+          </section>
 
-          <label className="mt-1 inline-flex cursor-pointer items-center gap-2.5 rounded-lg border border-gray-800 bg-[#0d0d0d] px-4 py-3 text-sm transition-colors hover:border-gray-700">
-            <input
-              type="checkbox"
-              checked={pickup}
-              onChange={() => setPickup((current) => !current)}
-              className="accent-brand h-4 w-4"
-            />
-            Pickup from Berkeley Vale (skip delivery)
-          </label>
-        </section>
+          <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
+            <h2 className="mb-5 text-xl font-bold md:text-2xl">
+              Order summary
+            </h2>
 
-        <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-gray-800 bg-[#151518] p-6 shadow-xl">
-          <h2 className="mb-5 text-xl font-bold md:text-2xl">Order summary</h2>
-
-          {quote?.ok && (
-            <ul className="border-line mb-5 space-y-3 border-b pb-5">
-              {quote.lines.map((line) => (
-                <li key={`${line.name}-${line.dimensions}`}>
-                  <div className="flex justify-between gap-4 text-sm">
-                    <span className="truncate text-gray-200">
-                      {line.quantity > 1 && `${line.quantity} x `}
-                      {line.name}
-                    </span>
-                    <span className="shrink-0 font-semibold">{line.parts}</span>
-                  </div>
-                  <div className="mt-0.5 flex justify-between gap-4 text-xs text-gray-500">
-                    <span>
-                      {line.weightKg} kg, {line.dimensions}
-                      {line.measured ? "" : " (estimated)"}
-                    </span>
-                    {line.freightAlone && (
-                      <span className="shrink-0">
-                        {line.freightAlone} to send on its own
+            {quote?.ok && (
+              <ul className="border-line mb-5 space-y-3 border-b pb-5">
+                {quote.lines.map((line) => (
+                  <li key={`${line.name}-${line.dimensions}`}>
+                    <div className="flex justify-between gap-4 text-sm">
+                      <span className="truncate text-gray-200">
+                        {line.quantity > 1 && `${line.quantity} x `}
+                        {line.name}
                       </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                      <span className="shrink-0 font-semibold">
+                        {line.parts}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 flex justify-between gap-4 text-xs text-gray-500">
+                      <span>
+                        {line.weightKg} kg, {line.dimensions}
+                        {line.measured ? "" : " (estimated)"}
+                      </span>
+                      {line.freightAlone && (
+                        <span className="shrink-0">
+                          {line.freightAlone} to send on its own
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          <div className="mb-4 space-y-2">
-            <Line
-              label="Parts"
-              value={
-                quote?.ok ? quote.subtotal : formatCents(indicativeSubtotal)
-              }
-              muted={!quote?.ok}
-            />
-            <Line
-              label="Delivery"
-              value={
-                pickup
-                  ? "Pickup"
-                  : !deliverable
-                    ? "Enter a suburb and postcode"
-                    : pending
-                      ? "Calculating..."
-                      : quote?.ok
-                        ? quote.freight
-                        : "Not available"
-              }
-              muted={!quote?.ok || pending}
-            />
-            <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-3">
-              <span className="text-base font-semibold">Total</span>
-              <span className="text-xl font-bold">
-                {quote?.ok ? quote.total : "..."}
-              </span>
+            <div className="mb-4 space-y-2">
+              <Line
+                label="Parts"
+                value={
+                  quote?.ok ? quote.subtotal : formatCents(indicativeSubtotal)
+                }
+                muted={!quote?.ok}
+              />
+              <Line
+                label="Delivery"
+                value={
+                  pickup
+                    ? "Pickup"
+                    : !deliverable
+                      ? "Enter a suburb and postcode"
+                      : pending
+                        ? "Calculating..."
+                        : quote?.ok
+                          ? quote.freight
+                          : "Not available"
+                }
+                muted={!quote?.ok || pending}
+              />
+              <div className="mt-2 flex items-center justify-between border-t border-gray-700 pt-3">
+                <span className="text-base font-semibold">Total</span>
+                <span className="text-xl font-bold">
+                  {quote?.ok ? quote.total : "..."}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {quote?.ok && quote.lines.some((line) => line.freightAlone) && (
-            <p className="mb-4 text-xs leading-relaxed text-gray-500">
-              The per-part figures are what each would cost to send by itself.
-              They add up to more than the delivery charged above, because the
-              carrier prices the whole consignment as one shipment.
-            </p>
-          )}
+            {quote?.ok && quote.lines.some((line) => line.freightAlone) && (
+              <p className="mb-4 text-xs leading-relaxed text-gray-500">
+                The per-part figures are what each would cost to send by itself.
+                They add up to more than the delivery charged above, because the
+                carrier prices the whole consignment as one shipment.
+              </p>
+            )}
 
-          {quote?.ok && quote.problems.length > 0 && (
-            <ul className="mb-4 space-y-2 rounded-lg border border-yellow-700/40 bg-yellow-900/10 p-4 text-sm text-yellow-200">
-              {quote.problems.map((problem) => (
-                <li key={`${problem.urgId}-${problem.invNumber}`}>
-                  {problem.message}
-                </li>
-              ))}
-            </ul>
-          )}
+            {quote?.ok && quote.problems.length > 0 && (
+              <ul className="mb-4 space-y-2 rounded-lg border border-yellow-700/40 bg-yellow-900/10 p-4 text-sm text-yellow-200">
+                {quote.problems.map((problem) => (
+                  <li key={`${problem.urgId}-${problem.invNumber}`}>
+                    {problem.message}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {quote?.ok && quote.freightEstimated && !quote.freightUnavailable && (
-            <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
-              One of these parts has not been weighed yet, so the delivery price
-              above is an estimate. We will confirm it before it ships and let
-              you know if it changes.
-            </p>
-          )}
+            {quote?.ok &&
+              quote.freightEstimated &&
+              !quote.freightUnavailable && (
+                <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+                  One of these parts has not been weighed yet, so the delivery
+                  price above is an estimate. We will confirm it before it ships
+                  and let you know if it changes.
+                </p>
+              )}
 
-          {quote?.ok && quote.freightUnavailable && (
-            <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
-              We could not price the freight automatically for that address.
-              Call us on{" "}
-              <a
-                href={`tel:${site.contact.phoneE164}`}
-                className="text-brand-text font-semibold"
-              >
-                {site.contact.phone}
-              </a>{" "}
-              and we will quote it while you wait.
-            </p>
-          )}
+            {quote?.ok && quote.freightUnavailable && (
+              <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+                We could not price the freight automatically for that address.
+                Call us on{" "}
+                <a
+                  href={`tel:${site.contact.phoneE164}`}
+                  className="text-brand-text font-semibold"
+                >
+                  {site.contact.phone}
+                </a>{" "}
+                and we will quote it while you wait.
+              </p>
+            )}
 
-          {quote && !quote.ok && (
-            <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
-              {quote.message}
-            </p>
-          )}
+            {quote && !quote.ok && (
+              <p className="mb-4 rounded-lg border border-gray-700 bg-[#0d0d0d] p-4 text-sm text-gray-300">
+                {quote.message}
+              </p>
+            )}
 
-          {payment ? (
-            <PaymentPanel
-              clientSecret={payment.clientSecret}
-              onCancel={() => setPayment(null)}
-            />
-          ) : (
-            <PaymentStep
-              ready={Boolean(quote?.ok) && complete}
-              starting={starting}
-              error={paymentError}
-              onPay={beginPayment}
-            />
-          )}
-        </section>
-      </div>
+            {payment ? (
+              <PaymentPanel
+                clientSecret={payment.clientSecret}
+                onCancel={() => setPayment(null)}
+              />
+            ) : (
+              <PaymentStep
+                ready={Boolean(quote?.ok) && complete}
+                starting={starting}
+                error={paymentError}
+                onPay={beginPayment}
+              />
+            )}
+          </section>
+        </div>
+      </Container>
     </div>
   );
 }

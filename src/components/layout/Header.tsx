@@ -22,10 +22,11 @@ import Container from "./Container";
  * mean lifting that state into a provider for no real benefit, the component
  * is small and ships very little JavaScript.
  *
- * The red used here is Tailwind's red-500/red-600, not the brand red. That is
- * deliberate: it is what the live site renders (measured as rgb(239, 68, 68)),
- * and the brief is to match exactly. The inconsistency is recorded in
- * docs/DESIGN-NOTES.md rather than quietly corrected.
+ * The header used to render Tailwind's red-500, which is what the live site
+ * renders (measured as rgb(239, 68, 68)) and not the brand red on everything
+ * below it. Two reds a shade apart look like a mistake rather than a choice, so
+ * with the owner's agreement the header now uses the brand red like the rest of
+ * the site.
  */
 
 const NAV_LINKS = [
@@ -115,7 +116,7 @@ export default function Header() {
               <Link
                 key={href}
                 href={href}
-                className="font-bold uppercase hover:text-red-500"
+                className="font-bold uppercase hover:text-brand-text"
               >
                 {label}
               </Link>
@@ -127,19 +128,19 @@ export default function Header() {
                 aria-expanded={resourcesOpen}
                 aria-haspopup="true"
                 onClick={() => setResourcesOpen((open) => !open)}
-                className="flex items-center font-bold uppercase hover:text-red-500"
+                className="flex items-center font-bold uppercase hover:text-brand-text"
               >
                 Resources
                 <ChevronDownIcon className="ml-1 h-4 w-4" aria-hidden="true" />
               </button>
               {resourcesOpen && (
-                <div className="bg-surface absolute z-10 mt-2 min-w-[150px] rounded-lg whitespace-nowrap shadow-lg">
+                <div className="bg-card border-line absolute z-10 mt-3 min-w-[170px] overflow-hidden rounded-xl border whitespace-nowrap shadow-2xl">
                   {RESOURCE_LINKS.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setResourcesOpen(false)}
-                      className="hover:bg-brand block px-4 py-2 first:rounded-t-lg last:rounded-b-lg"
+                      className="hover:bg-brand block px-4 py-2.5 text-sm transition-colors"
                     >
                       {label}
                     </Link>
@@ -153,14 +154,19 @@ export default function Header() {
             <Link
               href="/cart"
               aria-label={count > 0 ? `Cart, ${count} items` : "Cart"}
-              className="relative flex h-8 w-8 items-center justify-center"
+              className="hover:text-brand-text relative flex h-8 w-8 items-center justify-center rounded-md text-white transition-colors"
             >
               <ShoppingCartIcon
-                className="h-5 w-5 text-white hover:text-red-500"
+                className="h-5 w-5 text-white hover:text-brand-text"
                 aria-hidden="true"
               />
               {count > 0 && (
-                <span className="absolute -top-3 -right-2 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] leading-none font-bold text-white">
+                /*
+                  Ringed in the header's own black so the badge reads as a
+                  separate object sitting on the icon. At 10px on a 16px circle
+                  it was neither legible nor clearly attached to anything.
+                */
+                <span className="bg-brand ring-canvas absolute -top-1.5 -right-1.5 z-10 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] leading-none font-bold text-white tabular-nums ring-2">
                   {count > 99 ? "99+" : count}
                 </span>
               )}
@@ -175,12 +181,12 @@ export default function Header() {
                 onClick={() => setAccountOpen((open) => !open)}
               >
                 <UserIcon
-                  className="h-5 w-5 cursor-pointer text-white hover:text-red-500"
+                  className="h-5 w-5 cursor-pointer text-white hover:text-brand-text"
                   aria-hidden="true"
                 />
               </button>
               {accountOpen && (
-                <div className="bg-surface absolute right-0 z-10 mt-2 max-w-[300px] overflow-hidden rounded-lg shadow-lg">
+                <div className="bg-card border-line absolute right-0 z-10 mt-3 max-w-[300px] overflow-hidden rounded-xl border shadow-2xl">
                   <Link
                     href="/login"
                     onClick={() => setAccountOpen(false)}
@@ -194,7 +200,7 @@ export default function Header() {
 
             <Link
               href="/contact"
-              className="hidden rounded-lg bg-red-500 px-4 py-2 text-sm font-bold text-white hover:bg-red-600 md:block"
+              className="bg-brand hover:bg-brand-hover focus-visible:ring-brand focus-visible:ring-offset-canvas hidden rounded-lg px-4 py-2 text-sm font-bold text-white transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none md:block"
             >
               CONTACT US
             </Link>
@@ -222,7 +228,7 @@ export default function Header() {
                 key={href}
                 href={href}
                 onClick={closeMobile}
-                className="font-bold text-white uppercase hover:text-red-500"
+                className="font-bold text-white uppercase hover:text-brand-text"
               >
                 {label}
               </Link>
@@ -230,7 +236,7 @@ export default function Header() {
             <Link
               href="/terms-conditions"
               onClick={closeMobile}
-              className="font-bold text-white uppercase hover:text-red-500"
+              className="font-bold text-white uppercase hover:text-brand-text"
             >
               Terms and conditions
             </Link>
@@ -240,7 +246,7 @@ export default function Header() {
                 type="button"
                 aria-expanded={resourcesOpen}
                 onClick={() => setResourcesOpen((open) => !open)}
-                className="flex items-center justify-center font-bold uppercase hover:text-red-500"
+                className="flex items-center justify-center font-bold uppercase hover:text-brand-text"
               >
                 RESOURCES
                 <ChevronDownIcon className="ml-1 h-4 w-4" aria-hidden="true" />
@@ -264,7 +270,7 @@ export default function Header() {
             <Link
               href="/contact"
               onClick={closeMobile}
-              className="w-full rounded-lg bg-red-500 px-4 py-2 text-center text-sm font-bold text-white hover:bg-red-600"
+              className="bg-brand hover:bg-brand-hover w-full rounded-lg px-4 py-2.5 text-center text-sm font-bold text-white transition-colors"
             >
               Contact Us
             </Link>
