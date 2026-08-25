@@ -2,13 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { countAdmins, requireAdmin, setAdmin } from "@/lib/auth/accounts";
 import {
-  ORDER_STATUSES,
-  setHidden,
-  setStatus,
-  type OrderStatus,
-} from "@/lib/orders/repository";
+  countAdmins,
+  deleteAccount,
+  requireAdmin,
+  setAdmin,
+} from "@/lib/auth/accounts";
+import { beginReset } from "@/lib/auth/reset";
+import { sendEmail } from "@/lib/email";
+import { site } from "@/lib/site";
+import { setHidden, setStatus } from "@/lib/orders/repository";
+import { ORDER_STATUSES } from "@/lib/orders/types";
 
 /**
  * The back office.
@@ -26,7 +30,7 @@ const ObjectIdSchema = z
 
 const StatusSchema = z.object({
   orderId: ObjectIdSchema,
-  status: z.enum(ORDER_STATUSES as [OrderStatus, ...OrderStatus[]]),
+  status: z.enum(ORDER_STATUSES),
 });
 
 const HideSchema = z.object({
@@ -117,4 +121,79 @@ export async function updateUserAdmin(
   revalidatePath("/manage-users");
 
   return { message: granting ? "Admin access granted." : "Admin access removed." };
+}
+
+/**
+ * Remove an account.
+ *
+ * Their orders stay. An order records money that changed hands and keeps the
+ * name, email and address it was placed with, so deleting a customer must not
+ * delete the sale or leave the yard unable to say who bought what.
+ */
+export async function deleteUser(
+  _previous: AdminState,
+  form: FormData,
+): Promise<AdminState> {
+  const actor = await requireAdmin();
+  if (!actor) return { message: "You are not signed in as an admin." };
+
+  const parsed = ObjectIdSchema.safeParse(field(form, "userId"));
+  if (!parsed.success) return { message: "That account could not be removed." };
+
+  // The same guard as removing admin: an admin cannot delete themselves, and
+  // the last one cannot go at all.
+  if (parsed.data === actor.id) {
+    return { message: "You cannot delete your own account." };
+  }
+  if ((await countAdmins()) <= 1) {
+    const target = parsed.data;
+    const actorIsOnlyAdmin = target !== actor.id;
+    if (!actorIsOnlyAdmin) {
+      return { message: "That is the only admin left." };
+    }
+  }
+
+  await deleteAccount(parsed.data);
+  revalidatePath("/manage-users");
+
+  return { message: "Account removed. Their orders are still here." };
+}
+
+/**
+ * Send somebody a reset link.
+ *
+ * The admin never sees or sets the password: the link goes to the customer's
+ * own inbox. An admin who can type a new password for somebody else can also
+ * sign in as them afterwards.
+ */
+export async function sendResetLink(
+  _previous: AdminState,
+  form: FormData,
+): Promise<AdminState> {
+  if (!(await requireAdmin())) {
+    return { message: "You are not signed in as an admin." };
+  }
+
+  const email = field(form, "email").trim();
+  if (!email.includes("@")) return { message: "That account has no email address." };
+
+  const token = await beginReset(email);
+  if (!token) return { message: "No account with that address." };
+
+  const origin = process.env.NEXT_PUBLIC_SITE_ORIGIN ?? site.url;
+  const sent = await sendEmail({
+    to: email,
+    subject: `Reset your ${site.name} password`,
+    text: [
+      "Somebody at Central Coast Auto Parts started a password reset for you.",
+      "",
+      `${origin}/reset-password/${token}`,
+      "",
+      "The link works once and expires in an hour.",
+    ].join("\n"),
+  });
+
+  return sent.ok
+    ? { message: `Reset link sent to ${email}.` }
+    : { message: "The email could not be sent. Check the mail configuration." };
 }

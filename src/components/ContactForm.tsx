@@ -29,7 +29,7 @@ const INITIAL_STATE: ContactState = { status: "idle" };
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="mt-1.5 text-xs font-semibold text-red-600" role="alert">
+    <p className="text-brand-text mt-1.5 text-xs font-semibold" role="alert">
       {message}
     </p>
   );
@@ -105,9 +105,13 @@ export default function ContactForm() {
               role="status"
               aria-live="polite"
               className={`mb-6 rounded-lg border px-4 py-3 text-sm font-semibold ${
+                /*
+                  Dark, like the page it sits on. This was a light-theme box:
+                  a pale red panel with dark red text, on black.
+                */
                 state.status === "success"
-                  ? "border-green-200 bg-green-50 text-green-800"
-                  : "border-red-200 bg-red-50 text-red-700"
+                  ? "border-green-500/40 bg-green-500/10 text-green-200"
+                  : "border-brand/40 bg-[#1a0d10] text-gray-100"
               }`}
             >
               {state.message}

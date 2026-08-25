@@ -42,9 +42,13 @@ export type OrderItemDocument = {
   urgId?: string;
   invNumber?: string;
   stockNo?: string;
+  /** The yard's shelf tag, quoted when a customer rings about an order. */
+  tag?: string;
   manufacturer?: string;
   model?: string;
-  year?: number;
+  year?: number | string;
+  partType?: string;
+  itemTypeCode?: string;
   productUrl?: string;
 };
 

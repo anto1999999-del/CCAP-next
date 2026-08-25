@@ -114,14 +114,14 @@ function ContactDetails() {
 
       <p className="mb-2 flex items-center justify-center lg:justify-start">
         <Image src="/icons/call.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
-        <a href={`tel:${contact.phone}`} className="hover:text-red-600">
+        <a href={`tel:${contact.phone}`} className="hover:text-brand-text">
           {contact.phone}
         </a>
       </p>
 
       <p className="flex items-center justify-center lg:justify-start">
         <Image src="/icons/email.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
-        <a href={`mailto:${contact.email}`} className="hover:text-red-600">
+        <a href={`mailto:${contact.email}`} className="hover:text-brand-text">
           {contact.email}
         </a>
       </p>
@@ -137,22 +137,43 @@ function ContactDetails() {
 export default function Footer() {
   return (
     <div className="bg-surface text-white">
-      {/* Customer help band. The background image carries the red. */}
+      {/*
+        The band above the footer proper. It was a photograph with a heading,
+        a line of text and a button stacked down the left of it, which read as
+        three unrelated things. It is one offer now: a question, and the two
+        ways of answering it.
+      */}
       <div
-        className="bg-cover bg-center py-6 text-white"
+        className="relative bg-cover bg-center py-10 text-white md:py-12"
         style={{ backgroundImage: "url(/images/section.webp)" }}
       >
-        <Container>
-          <h3 className="mb-2 text-lg font-bold lg:text-xl">Customer Help</h3>
-          <p className="mb-4">
-            Can&rsquo;t find the part you need? Our friendly team is ready to help.
-          </p>
-          <a
-            href={`tel:${site.contact.phone}`}
-            className="inline-block rounded bg-white px-6 py-2 font-semibold text-red-600 shadow"
-          >
-            Call Us Now
-          </a>
+        <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+
+        <Container className="relative flex flex-col items-center gap-6 text-center md:flex-row md:justify-between md:text-left">
+          <div>
+            <h3 className="text-2xl font-extrabold tracking-tight md:text-3xl">
+              Can&rsquo;t find the part you need?
+            </h3>
+            <p className="mt-2 max-w-xl text-sm text-white/85 md:text-base">
+              We hold thousands more than are listed, and we can source what we
+              do not have. Tell us the car and the part.
+            </p>
+          </div>
+
+          <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row">
+            <a
+              href={`tel:${site.contact.phoneE164}`}
+              className="rounded-full bg-white px-7 py-3 text-sm font-bold tracking-wide text-black uppercase transition-transform hover:scale-[1.02]"
+            >
+              Call {site.contact.phone}
+            </a>
+            <Link
+              href="/contact"
+              className="rounded-full border border-white/70 px-7 py-3 text-sm font-bold tracking-wide text-white uppercase transition-colors hover:bg-white/10"
+            >
+              Send an enquiry
+            </Link>
+          </div>
         </Container>
       </div>
 
@@ -166,7 +187,7 @@ export default function Footer() {
               <ul className="space-y-2">
                 {NAV_LINKS.map(({ href, label }) => (
                   <li key={href}>
-                    <Link href={href} className="block hover:text-red-600">
+                    <Link href={href} className="block hover:text-brand-text">
                       {label}
                     </Link>
                   </li>

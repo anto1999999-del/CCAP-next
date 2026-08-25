@@ -162,7 +162,7 @@ export async function requireAdmin(): Promise<Account | null> {
   return account?.isAdmin ? account : null;
 }
 
-/** Every account, for the admin list. Newest first where a date was recorded. */
+/** Every account, newest first. Used where a total is wanted rather than a page. */
 export async function listAccounts(limit = 500): Promise<Account[]> {
   const documents = await (await users())
     .find({})
@@ -171,6 +171,69 @@ export async function listAccounts(limit = 500): Promise<Account[]> {
     .toArray();
 
   return documents.map(toAccount);
+}
+
+export type AccountPage = {
+  accounts: Account[];
+  page: number;
+  pageCount: number;
+  total: number;
+  from: number;
+  to: number;
+};
+
+/**
+ * A page of accounts, searched by the three things an admin has to hand: a
+ * name, an email address, or a phone number.
+ */
+export async function searchAccounts({
+  search = "",
+  page = 1,
+  perPage = 20,
+}: { search?: string; page?: number; perPage?: number } = {}): Promise<AccountPage> {
+  const collection = await users();
+  const term = search.trim();
+
+  const filter: Record<string, unknown> = {};
+  if (term) {
+    const like = {
+      $regex: term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      $options: "i",
+    };
+    filter.$or = [{ name: like }, { email: like }, { phone: like }];
+  }
+
+  const total = await collection.countDocuments(filter);
+  const size = Math.min(100, Math.max(1, perPage));
+  const pageCount = Math.max(1, Math.ceil(total / size));
+  const safePage = Math.min(Math.max(1, page), pageCount);
+
+  const documents = await collection
+    .find(filter)
+    .sort({ _id: -1 })
+    .skip((safePage - 1) * size)
+    .limit(size)
+    .toArray();
+
+  return {
+    accounts: documents.map(toAccount),
+    page: safePage,
+    pageCount,
+    total,
+    from: total === 0 ? 0 : (safePage - 1) * size + 1,
+    to: Math.min(safePage * size, total),
+  };
+}
+
+/**
+ * Remove an account.
+ *
+ * Their orders are left alone. An order is a record of money that changed
+ * hands, and deleting the customer should not delete the sale: the order keeps
+ * the name, email and address it was placed with.
+ */
+export async function deleteAccount(userId: string): Promise<void> {
+  await (await users()).deleteOne({ _id: new ObjectId(userId) });
 }
 
 /**

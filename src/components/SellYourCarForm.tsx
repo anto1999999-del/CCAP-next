@@ -29,7 +29,7 @@ const INITIAL_STATE: SaleOfferState = { status: "idle" };
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="mt-1.5 text-xs font-semibold text-red-400" role="alert">
+    <p className="text-brand-text mt-1.5 text-xs font-semibold" role="alert">
       {message}
     </p>
   );
@@ -124,8 +124,8 @@ export default function SellYourCarForm() {
               aria-live="polite"
               className={`mb-6 rounded-lg border px-4 py-3 text-sm font-semibold ${
                 state.status === "success"
-                  ? "border-green-500/40 bg-green-500/10 text-green-300"
-                  : "border-red-500/40 bg-red-500/10 text-red-300"
+                  ? "border-green-500/40 bg-green-500/10 text-green-200"
+                  : "border-brand/40 bg-[#1a0d10] text-gray-100"
               }`}
             >
               {state.message}
