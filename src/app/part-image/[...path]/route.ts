@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
 import type { NextRequest } from "next/server";
 
 /**
@@ -19,6 +20,13 @@ import type { NextRequest } from "next/server";
  * with a transparent pixel "so image tags do not break"; a transparent pixel is
  * a successful load, so nothing downstream could tell a missing photo from a
  * real one, and pages showed empty frames instead of their own placeholder.
+ *
+ * `?w=` asks for a resized copy, because the supplier offers only two sizes and
+ * neither suits a grid. Its thumbnails are 250x187 and its originals are
+ * 1600x1200: a 289px card stretches the thumbnail to twice its size on any
+ * retina screen, which is visibly soft, and twenty originals is five megabytes
+ * of page. A resized copy is made from the original once, cached beside it, and
+ * is around 30KB.
  */
 
 const UPSTREAM = process.env.PARTS_API_URL ?? "http://api.carparts-au.com";
@@ -47,10 +55,55 @@ function cacheDir(): string {
   );
 }
 
-function cacheFile(imagePath: string): string {
-  const digest = createHash("sha1").update(imagePath).digest("hex");
+/**
+ * The widths that may be asked for.
+ *
+ * An allowlist, not a number from the query string. An open parameter is an
+ * invitation to ask for ten thousand different widths of the same photograph,
+ * each of which costs a decode, a resize and a file on disk.
+ *
+ * 600 is the grid at twice its 289px card, which is what a retina screen wants.
+ * 900 covers a wider card if the layout ever changes.
+ *
+ * No full-size entry. Re-encoding the 1600x1200 originals to WebP was tried and
+ * measured at 402KB against the JPEG's 393KB: the supplier's files are already
+ * well compressed at that size. The detail page serves them untouched.
+ */
+const WIDTHS = new Set([600, 900]);
+
+function readWidth(request: NextRequest): number | null {
+  const asked = Number(request.nextUrl.searchParams.get("w"));
+  return WIDTHS.has(asked) ? asked : null;
+}
+
+function cacheFile(imagePath: string, width: number | null): string {
+  // The width is part of the key, or one size would be served for another.
+  const digest = createHash("sha1")
+    .update(width ? `${imagePath}@${width}` : imagePath)
+    .digest("hex");
   // Two levels of fan-out: a single directory of 30,000 files is slow to stat.
   return path.join(cacheDir(), digest.slice(0, 2), `${digest}.bin`);
+}
+
+/**
+ * A smaller copy, or the original if it cannot be made.
+ *
+ * A resize failing is not a reason to show no photograph, so anything that goes
+ * wrong here falls back to sending what the supplier sent. `withoutEnlargement`
+ * matters: a part whose only copy is already small must not be blown up, which
+ * is the problem this whole route exists to solve.
+ */
+async function resized(body: Buffer, width: number) {
+  try {
+    const output = await sharp(body)
+      .resize({ width, withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
+
+    return { body: output, type: "image/webp" };
+  } catch {
+    return null;
+  }
 }
 
 function contentTypeFor(imagePath: string): string {
@@ -79,14 +132,15 @@ function imageResponse(body: Buffer, type: string, cacheState: string) {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path: segments } = await params;
   const imagePath = `/${segments.join("/")}`;
-  const type = contentTypeFor(imagePath);
+  const width = readWidth(request);
+  const type = width ? "image/webp" : contentTypeFor(imagePath);
 
-  const cached = await readFile(cacheFile(imagePath)).catch(() => null);
+  const cached = await readFile(cacheFile(imagePath, width)).catch(() => null);
   if (cached) return imageResponse(cached, type, "HIT");
 
   const auth = credentials();
@@ -112,19 +166,21 @@ export async function GET(
       });
     }
 
-    const body = Buffer.from(await upstream.arrayBuffer());
+    const original = Buffer.from(await upstream.arrayBuffer());
+
+    const smaller = width ? await resized(original, width) : null;
+    const body = smaller?.body ?? original;
+    const sent = smaller
+      ? smaller.type
+      : (upstream.headers.get("content-type") ?? type);
 
     // Best effort: a disk problem must slow the response, never fail it.
-    const file = cacheFile(imagePath);
+    const file = cacheFile(imagePath, smaller ? width : null);
     void mkdir(path.dirname(file), { recursive: true })
       .then(() => writeFile(file, body))
       .catch(() => {});
 
-    return imageResponse(
-      body,
-      upstream.headers.get("content-type") ?? type,
-      "MISS",
-    );
+    return imageResponse(body, sent, "MISS");
   } catch {
     return new Response(null, {
       status: 504,

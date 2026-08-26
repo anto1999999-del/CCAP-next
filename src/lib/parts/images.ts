@@ -38,6 +38,18 @@ export function thumbnailUrl(part: CatalogPart): string {
   return proxied(image?.thumb ?? image?.img ?? null) ?? PART_IMAGE_PLACEHOLDER;
 }
 
+/**
+ * The large copy, exactly as the supplier sent it.
+ *
+ * Deliberately not re-encoded. Converting these to WebP was tried and measured:
+ * a 393KB original came out at 402KB, because the supplier's JPEGs are already
+ * well compressed at 1600x1200 and WebP has no advantage on photographic
+ * content that size. It cost a decode and an encode to make the file slightly
+ * bigger.
+ *
+ * The grid is different, and that is where the resizing earns its place: there
+ * the win is 250px of detail becoming 600px, not the encoding.
+ */
 export function fullImageUrl(image: PartImage): string {
   return proxied(image.img ?? image.thumb) ?? PART_IMAGE_PLACEHOLDER;
 }
@@ -63,6 +75,26 @@ export function thumbUrl(image: PartImage): string {
 export function fullPhotoUrl(part: CatalogPart): string {
   const image = coverImage(part);
   return proxied(image?.img ?? image?.thumb ?? null) ?? PART_IMAGE_PLACEHOLDER;
+}
+
+/**
+ * The copy to show in a grid.
+ *
+ * Made from the supplier's original rather than its thumbnail, because the
+ * thumbnail is 250x187 and a card is 289 CSS pixels wide: on any retina screen
+ * that is a 2.3x upscale, which is the blur. The original is 1600x1200 and
+ * twenty of those is five megabytes of page.
+ *
+ * So the proxy resizes one to 600px and keeps it, which is what a 289px card
+ * wants at twice the density and about 30KB. A part with only a thumbnail
+ * falls back to it and is not enlarged.
+ */
+export function gridImageUrl(part: CatalogPart): string {
+  const image = coverImage(part);
+  const source = image?.img ?? image?.thumb ?? null;
+  const url = proxied(source);
+
+  return url ? `${url}?w=600` : PART_IMAGE_PLACEHOLDER;
 }
 
 export function hasPhoto(part: CatalogPart): boolean {

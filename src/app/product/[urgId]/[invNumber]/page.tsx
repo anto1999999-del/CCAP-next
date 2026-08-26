@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
+import Container from "@/components/layout/Container";
 import AddToCartButton from "@/components/parts/AddToCartButton";
 import PartCard from "@/components/parts/PartCard";
 import PartGallery from "@/components/parts/PartGallery";
@@ -198,12 +199,25 @@ export default async function ProductPage({ params }: { params: Params }) {
         }}
       />
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 lg:flex-row">
-        <div className="flex-1">
+      {/*
+        The site's container, like every other page.
+
+        This was `max-w-6xl px-4`, which is 1152 wide with a 16px gutter, where
+        the header and footer are 1280 with a 40px one. Every edge on the page
+        was a few pixels off the edge above it, which reads as sloppy without
+        being obviously wrong.
+
+        The two columns are also no longer `flex-1` each. A photograph and a
+        spec table are not the same kind of thing and do not want the same
+        width: the picture is what somebody is here to look at, so it takes the
+        room and the details column is sized to its content.
+      */}
+      <Container className="flex flex-col gap-8 py-10 lg:flex-row lg:gap-10">
+        <div className="min-w-0 flex-1">
           <PartGallery images={images} name={name} />
         </div>
 
-        <div className="bg-card border-line flex-1 rounded-2xl border p-6">
+        <div className="bg-card border-line w-full self-start rounded-2xl border p-6 lg:sticky lg:top-24 lg:w-[26rem] lg:shrink-0">
           <h1 className="mb-4 text-xl font-bold break-words sm:text-2xl md:text-3xl lg:text-4xl">
             {name}
           </h1>
@@ -256,10 +270,15 @@ export default async function ProductPage({ params }: { params: Params }) {
             </div>
           )}
         </div>
-      </div>
+      </Container>
 
-      <div className="mx-auto mt-10 max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <Container className="pb-4">
+        {/*
+          `items-start`, so a panel is the height of what is in it. These were
+          stretched to match the tallest, which left the Details panel as a
+          mostly empty box whenever a part had one line of description.
+        */}
+        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-3">
           <Panel title="Details">
             <p className="whitespace-pre-wrap text-gray-300">
               {description ||
@@ -287,11 +306,11 @@ export default async function ProductPage({ params }: { params: Params }) {
             <Points points={SHIPPING.points} />
           </Panel>
         </div>
-      </div>
+      </Container>
 
       {related.length > 0 && (
-        <div className="mx-auto mt-10 max-w-6xl px-4 py-8 sm:px-6">
-          <h2 className="mb-6 text-2xl font-bold text-white sm:text-3xl">
+        <Container className="py-12">
+          <h2 className="mb-6 text-2xl font-extrabold tracking-tight text-white md:text-3xl">
             More from the same vehicle
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -305,7 +324,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           >
             See every {part.manufacturer ?? "matching"} part we hold
           </Link>
-        </div>
+        </Container>
       )}
     </div>
   );
@@ -349,7 +368,9 @@ function Panel({
 }) {
   return (
     <section className="bg-card border-line rounded-2xl border p-6 text-sm sm:text-base">
-      <h2 className="text-brand-text mb-3 text-lg font-bold">{title}</h2>
+      <h2 className="mb-3 text-sm font-bold tracking-wide text-white uppercase">
+        {title}
+      </h2>
       {children}
     </section>
   );
