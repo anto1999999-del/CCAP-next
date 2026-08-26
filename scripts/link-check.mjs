@@ -54,7 +54,15 @@ async function main() {
 
     // The canonical each page declares, so a paginated list pointing at page
     // one shows up. That silently removes pages two onward from the index.
-    const canonical = html.match(/<link rel="canonical" href="([^"]*)"/i)?.[1];
+    /*
+      Entities decoded before comparing. A canonical containing a query string
+      is written &amp; in the attribute, which is correct HTML and identical to
+      the address that was requested. Comparing the raw strings reported 97
+      self-canonical pages as pointing somewhere else.
+    */
+    const canonical = html
+      .match(/<link rel="canonical" href="([^"]*)"/i)?.[1]
+      ?.replace(/&amp;/g, "&");
     if (canonical) {
       const declared = new URL(canonical).pathname + new URL(canonical).search;
       const asked = path;

@@ -38,15 +38,33 @@ function readFilters(params: SearchParams): PartFilters {
   };
 }
 
-/** Keep the filters and search on a link, change only the page. */
-function buildHref(params: SearchParams, page: number): string {
-  const search = new URLSearchParams();
+/**
+ * The query string for one view of the catalogue, built one way.
+ *
+ * `encodeURIComponent`, not `URLSearchParams`, which spells a space as "+"
+ * where every other link on the site spells it "%20". Both are the same
+ * address, but a page whose links use one spelling and whose canonical uses the
+ * other tells a crawler that two addresses exist where there is one.
+ *
+ * The order is fixed, so a set of filters always produces the same string
+ * rather than one per order the parameters happened to arrive in.
+ */
+function viewQuery(params: SearchParams, page: number): string {
+  const parts: string[] = [];
+
   for (const key of ["year", "make", "model", "part_type", "q"]) {
     const value = one(params, key);
-    if (value) search.set(key, value);
+    if (value) parts.push(`${key}=${encodeURIComponent(value)}`);
   }
-  if (page > 1) search.set("page", String(page));
-  const query = search.toString();
+
+  if (page > 1) parts.push(`page=${page}`);
+
+  return parts.join("&");
+}
+
+/** Keep the filters and search on a link, change only the page. */
+function buildHref(params: SearchParams, page: number): string {
+  const query = viewQuery(params, page);
   return query ? `/products?${query}` : "/products";
 }
 
@@ -78,15 +96,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await searchParams;
 
-  const query = new URLSearchParams();
-  // A fixed order, so one set of filters always produces one canonical rather
-  // than one per order the parameters happen to arrive in.
-  for (const key of ["year", "make", "model", "part_type", "q", "page"]) {
-    const value = one(params, key);
-    if (value && !(key === "page" && value === "1")) query.set(key, value);
-  }
-
-  const search = query.toString();
+  // The same builder the links use, and the page number the URL states, so the
+  // canonical is the address that was followed rather than a second spelling
+  // of it.
+  const search = viewQuery(params, Number(one(params, "page")) || 1);
   if (!search) return BASE_METADATA;
 
   return {
