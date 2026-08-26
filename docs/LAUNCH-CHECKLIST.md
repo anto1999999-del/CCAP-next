@@ -32,16 +32,36 @@ and sign-in, registration, password reset, checkout quotes and payments each
 have their own limit. But a rate limit slows a bot down; it does not identify
 one.
 
-### Payment, still outstanding
+### Payment: tested end to end on 27 August 2026
+
+All three are set locally with **sandbox** keys and the whole flow has been run:
 
 | Variable | Notes |
 | --- | --- |
-| `STRIPE_SECRET_KEY` | Checkout shows "card payment is not switched on" until this and the publishable key are both present |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | |
-| `STRIPE_WEBHOOK_SECRET` | Without it cards would charge and **no order would ever be marked paid** |
+| `STRIPE_SECRET_KEY` | `sk_test_`. Checkout says "card payment is not switched on" until this and the publishable key are both present |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_test_`. **Anything named `NEXT_PUBLIC_` is compiled into the JavaScript every visitor downloads.** The two were pasted in swapped once, which would have published the secret key on the website. Check the prefixes match the names |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_`. Without it cards charge and **no order is ever marked paid** |
 
-Use the **test** keys until the owner has reviewed the site. The live secret key
-that was in the droplet's `.env` has been exposed in a chat transcript and needs
+What was proven, against the real sandbox:
+
+- An order for $500 of parts plus a live $39.08 carrier quote created a
+  PaymentIntent for exactly $539.08, with the split in its metadata.
+- **The price cannot be tampered with.** The cart was edited in browser storage
+  to make a $500 gearbox cost $1. The server priced it from the catalogue and
+  charged $539.08 anyway. This is the flaw the current live site has.
+- **An unpriceable address cannot be paid for.** When the carrier failed, the
+  summary said "Call us for a price" and the pay button was disabled.
+- **The webhook works.** After the payment succeeded, the order moved from
+  "Awaiting payment" to Pending with a `paidAt` timestamp on its own. The
+  current live site has no webhook at all, so it has never had this.
+
+For production the webhook secret does **not** come from the CLI. Create the
+endpoint in the Stripe dashboard at Developers → Webhooks, pointing at
+`https://centralcoastautoparts.com.au/api/stripe/webhook`, subscribed to
+`payment_intent.succeeded`, and use the signing secret it gives you.
+
+Live keys are a separate step and still outstanding. The live secret key that
+was in the droplet's `.env` has been exposed in a chat transcript and needs
 rolling with a 24-hour overlap, not reusing.
 
 ### Have working defaults, set only to override
