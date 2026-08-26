@@ -100,12 +100,24 @@ export default function PageHero({
         {children}
 
         {actions.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-4">
-            {actions.map((action) => (
+          /*
+            The first action is red and the rest are outlined.
+
+            Red means "do this" everywhere on this site, so two red buttons side
+            by side ask the visitor to choose between two of them and answer
+            neither. About had exactly that: VIEW PARTS and CONTACT US, both in
+            brand red, both equally loud.
+          */
+          <div className="mt-7 flex flex-wrap gap-3">
+            {actions.map((action, index) => (
               <Link
                 key={action.href}
                 href={action.href}
-                className="bg-brand hover:bg-brand-hover rounded-md px-5 py-2.5 font-semibold text-white transition-colors"
+                className={
+                  index === 0
+                    ? "bg-brand hover:bg-brand-hover rounded-xl px-6 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors"
+                    : "rounded-xl border border-white/25 px-6 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors hover:border-white/50 hover:bg-white/5"
+                }
               >
                 {action.label}
               </Link>

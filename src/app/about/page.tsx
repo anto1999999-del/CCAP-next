@@ -42,10 +42,12 @@ export default function AboutPage() {
       />
 
       <PageHero
+        eyebrow="Berkeley Vale NSW"
         title="ABOUT US"
+        subtitle="A licensed auto dismantler on the Central Coast, supplying used engines, gearboxes, panels and electrical parts. Inspected before they leave the yard and shipped Australia-wide."
         image="/images/AboutUs.webp"
         actions={[
-          { href: "/products", label: "VIEW PARTS" },
+          { href: "/products", label: "BROWSE PARTS" },
           { href: "/contact", label: "CONTACT US" },
         ]}
       />

@@ -43,6 +43,10 @@ export default function SellYourCarPage() {
         title="SELL YOUR CAR"
         subtitle="Ready to sell your car hassle-free? Turn to our trusted team in Berkeley Vale. We buy cars in any condition, running or not, and pay on the spot."
         image="/images/HEROSell.webp"
+        actions={[
+          { href: "#sell-form", label: "GET A PRICE" },
+          { href: "/products", label: "BROWSE PARTS" },
+        ]}
       />
 
       {/*
@@ -51,7 +55,7 @@ export default function SellYourCarPage() {
         to sell a car was shown two forms stacked one on the other and had to
         work out which one was for them.
       */}
-      <div className="bg-admin py-14 text-white md:py-20">
+      <div id="sell-form" className="bg-admin py-14 text-white md:py-20">
         <Container>
           <div className="mx-auto max-w-3xl">
             <SectionHeading

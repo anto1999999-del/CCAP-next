@@ -121,6 +121,10 @@ export default async function BlogIndexPage({
         eyebrow="Guides & advice"
         title="BLOG"
         subtitle="Common faults by make and model, what to check before buying a used part, and how to get more life out of the car you have. Written by the workshop team."
+        actions={[
+          { href: "/products", label: "BROWSE PARTS" },
+          { href: "/gallery", label: "VEHICLE GALLERY" },
+        ]}
       />
 
       <div className="bg-admin py-14 text-white md:py-20">
