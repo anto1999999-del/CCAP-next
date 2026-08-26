@@ -9,7 +9,7 @@ import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { listArticles } from "@/lib/blog/repository";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Car Parts Blog | Guides & Advice | Central Coast Auto Parts",
   description:
     "Practical guides on used car parts, common faults by make and model, and what to check before you buy. Written by the workshop team at Central Coast Auto Parts.",
@@ -24,6 +24,31 @@ function formatDate(iso: string | null): string {
     month: "long",
     year: "numeric",
   });
+}
+
+/**
+ * Page one is the blog. Pages two to eight are how you reach it.
+ *
+ * They used to canonicalise to /blog, which claims they are duplicates of page
+ * one when each holds twelve different articles. They point at themselves now
+ * and carry `noindex, follow`: every article is in the sitemap and indexed on
+ * its own, so the list pages exist to be crawled through rather than found.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const { page } = await searchParams;
+  const number = Number(page) || 1;
+
+  if (number <= 1) return BASE_METADATA;
+
+  return {
+    ...BASE_METADATA,
+    alternates: { canonical: `/blog?page=${number}` },
+    robots: { index: false, follow: true },
+  };
 }
 
 /**

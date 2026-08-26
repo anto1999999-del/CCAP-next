@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
@@ -10,6 +11,25 @@ import {
 } from "@/components/sections/MarketingSections";
 import { HOMEPAGE_FAQS, faqSchema } from "@/lib/faqs";
 import { homeBusinessSchema } from "@/lib/schema/business";
+
+export const metadata: Metadata = {
+  /*
+    Set here rather than inherited from the layout. A canonical on the layout
+    is handed to every page that does not set its own, and four of them did
+    not: the cart, the checkout, the order confirmation and the sign-in page
+    were all naming the home page as their canonical address.
+
+    The bare origin is what the current site emits with a trailing slash. An
+    empty path normalises to "/" so crawlers treat them identically and no
+    value is lost.
+
+    Do NOT reach for `trailingSlash: true` in next.config to close that gap: it
+    redirects every route on the site (/about -> /about/), which would change
+    all ~32k product URLs and is precisely the risk this migration exists to
+    avoid.
+  */
+  alternates: { canonical: "/" },
+};
 
 /**
  * Home page.

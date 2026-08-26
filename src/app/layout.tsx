@@ -32,17 +32,18 @@ export const metadata: Metadata = {
     The live site does not emit one either, so removing it loses nothing and
     stops publishing the keyword targets to anyone who views source.
   */
-  alternates: {
-    // Emits the bare origin, where the current site emits it with a trailing
-    // slash. The two are the same resource, an empty path normalises to "/",
-  // so crawlers treat them identically and no value is lost.
-    //
-    // Do NOT reach for `trailingSlash: true` in next.config to close the gap:
-    // that setting redirects every route on the site (/about -> /about/), which
-    // would change all ~32k product URLs and is precisely the risk this
-    // migration exists to avoid.
-    canonical: "/",
-  },
+  /*
+    No `alternates` here.
+
+    A canonical set in the root layout is inherited by every page that does not
+    set its own, and four of them did not: /cart, /place-order, /order-success
+    and /login were all telling Google that the home page was their canonical
+    address. A wrong canonical is worse than none, because it is an instruction
+    rather than an absence.
+
+    The home page sets its own, below. Pages with nothing to canonicalise now
+    emit nothing, which is the honest answer for a cart.
+  */
   robots: {
     index: true,
     follow: true,

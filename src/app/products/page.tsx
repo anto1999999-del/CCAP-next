@@ -13,7 +13,7 @@ import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { HOMEPAGE_FAQS } from "@/lib/faqs";
 import type { PartFilters } from "@/lib/parts/types";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title:
     "Used Car Parts for Sale NSW | Central Coast Auto Parts",
   description:
@@ -48,6 +48,52 @@ function buildHref(params: SearchParams, page: number): string {
   if (page > 1) search.set("page", String(page));
   const query = search.toString();
   return query ? `/products?${query}` : "/products";
+}
+
+/**
+ * The catalogue's own address is indexable. Its filtered and paginated views
+ * are not.
+ *
+ * Two separate problems were being solved with one wrong answer. Every
+ * parameterised view declared `/products` as its canonical, which tells Google
+ * that page 47 of the gearboxes is a duplicate of page one. It is not: it holds
+ * twenty different parts. That instruction is why none of them would ever be
+ * indexed.
+ *
+ * But there are 1,635 pages of pagination and a filter combination for every
+ * make, model, year and part type, and putting that in the index is the
+ * textbook faceted-navigation problem: thousands of near-identical pages
+ * competing with each other and burning the crawl budget that should be going
+ * to products.
+ *
+ * So each view now canonicalises to itself, which is the truth, and carries
+ * `noindex, follow`, which is the instruction. Follow matters: Googlebot still
+ * walks these pages to reach all 32,000 product pages, and those are the ones
+ * in the sitemap and the ones that rank.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+
+  const query = new URLSearchParams();
+  // A fixed order, so one set of filters always produces one canonical rather
+  // than one per order the parameters happen to arrive in.
+  for (const key of ["year", "make", "model", "part_type", "q", "page"]) {
+    const value = one(params, key);
+    if (value && !(key === "page" && value === "1")) query.set(key, value);
+  }
+
+  const search = query.toString();
+  if (!search) return BASE_METADATA;
+
+  return {
+    ...BASE_METADATA,
+    alternates: { canonical: `/products?${search}` },
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function ProductsPage({
