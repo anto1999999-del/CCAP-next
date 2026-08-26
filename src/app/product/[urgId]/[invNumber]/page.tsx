@@ -125,6 +125,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   const name = formatItemName(part.itemName);
   const sellable = hasPrice(part);
   const description = descriptionText(part);
+  const vehicle = vehicleLabel(part);
 
   const related = parts
     .filter(
@@ -217,70 +218,111 @@ export default async function ProductPage({ params }: { params: Params }) {
           <PartGallery images={images} name={name} />
         </div>
 
-        <div className="bg-card border-line w-full self-start rounded-2xl border p-6 lg:sticky lg:top-24 lg:w-[26rem] lg:shrink-0">
-          <h1 className="mb-4 text-xl font-bold break-words sm:text-2xl md:text-3xl lg:text-4xl">
+        <div className="w-full self-start lg:sticky lg:top-24 lg:w-[24rem] lg:shrink-0">
+          {/*
+            The vehicle first, then the part.
+
+            Somebody reaches this page searching for a part for their own car,
+            so the car is the thing that tells them in one line whether they are
+            in the right place. It used to be four rows down a grey table.
+          */}
+          {vehicle && (
+            <p className="text-brand-text mb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+              {vehicle}
+            </p>
+          )}
+
+          <h1 className="mb-5 text-2xl leading-tight font-extrabold tracking-tight text-balance break-words md:text-3xl">
             {name}
           </h1>
 
-          <dl className="mb-6 space-y-2.5 rounded-xl border-line border bg-tile p-4 text-sm sm:text-base">
+          <div className="border-line bg-card rounded-2xl border p-6">
+            {sellable ? (
+              <>
+                <p className="text-3xl font-extrabold tabular-nums text-white md:text-4xl">
+                  {formatPrice(part.price)}
+                </p>
+                <p className="mt-1 mb-5 text-xs text-gray-500">
+                  Delivery calculated at checkout, or collect from Berkeley Vale
+                </p>
+
+                <AddToCartButton
+                  className="bg-brand hover:bg-brand-hover w-full rounded-xl px-6 py-3.5 text-base font-semibold text-white transition-colors"
+                  line={{
+                    urgId: String(part.urgId),
+                    invNumber: String(part.invNumber),
+                    itemName: name,
+                    manufacturer: part.manufacturer ?? undefined,
+                    model: part.model ?? undefined,
+                    year: part.year == null ? undefined : String(part.year),
+                    price: Number(part.price),
+                    thumbnail: coverImage(part) ? thumbnailUrl(part) : undefined,
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-extrabold text-white md:text-3xl">
+                  Contact for price
+                </p>
+                <p className="mt-1 mb-5 text-xs text-gray-500">
+                  Not priced yet. Ring the yard with stock{" "}
+                  {part.stockNo ?? "number"} and we will price it while you wait.
+                </p>
+
+                <a
+                  href={`tel:${site.contact.phoneE164}`}
+                  className="bg-brand hover:bg-brand-hover block w-full rounded-xl px-6 py-3.5 text-center text-base font-semibold text-white transition-colors"
+                >
+                  Call {site.contact.phone}
+                </a>
+              </>
+            )}
+
+            {/*
+              What every buyer of a second-hand part wants to know before they
+              press the button, on three lines rather than in three tall boxes
+              further down the page.
+            */}
+            <ul className="border-line mt-5 space-y-2.5 border-t pt-5 text-sm text-gray-400">
+              <Assurance>3 month parts warranty</Assurance>
+              <Assurance>Ships Australia-wide, or pick up free</Assurance>
+              <Assurance>Inspected before it leaves the yard</Assurance>
+            </ul>
+          </div>
+
+          {/*
+            The specification, as a list rather than a boxed table. Hairlines
+            between rows do the same job as a border round the whole thing
+            without making it look like a form.
+          */}
+          <dl className="divide-line border-line mt-4 divide-y rounded-2xl border px-5 text-sm">
             <Row label="Make" value={orNotRecorded(part.manufacturer)} />
             <Row label="Model" value={orNotRecorded(part.model)} />
-            <Row label="Year" value={yearLabel(part)} />
-            <Row label="Description" value={orNotRecorded(description)} />
+            <Row label="Fits" value={yearLabel(part)} />
             <Row label="Stock number" value={orNotRecorded(part.stockNo)} />
             <Row label="Tag number" value={orNotRecorded(part.tag)} />
             <Row label="Odometer" value={formatOdometer(part.odoReading)} />
-            <Row label="Item type" value={orNotRecorded(part.itemTypeCode)} muted />
+            <Row label="Item type" value={orNotRecorded(part.itemTypeCode)} />
           </dl>
-
-          {sellable ? (
-            <>
-              <p className="text-brand-text mb-6 text-2xl font-semibold sm:text-3xl">
-                {formatPrice(part.price)}
-              </p>
-              <AddToCartButton
-                className="bg-brand hover:bg-brand-hover w-full rounded px-6 py-3 text-base font-semibold text-white transition-colors sm:text-lg"
-                line={{
-                  urgId: String(part.urgId),
-                  invNumber: String(part.invNumber),
-                  itemName: name,
-                  manufacturer: part.manufacturer ?? undefined,
-                  model: part.model ?? undefined,
-                  year: part.year == null ? undefined : String(part.year),
-                  price: Number(part.price),
-                  thumbnail: coverImage(part) ? thumbnailUrl(part) : undefined,
-                }}
-              />
-            </>
-          ) : (
-            <div>
-              <p className="mb-2 text-2xl font-semibold text-gray-100">
-                Contact for price
-              </p>
-              <p className="mb-6 text-sm text-gray-400">
-                This one has not been priced yet. Ring the yard with the stock
-                number and we will price it while you wait.
-              </p>
-              <a
-                href={`tel:${site.contact.phoneE164}`}
-                className="bg-brand hover:bg-brand-hover block rounded px-6 py-3 text-center text-base font-semibold text-white transition-colors sm:text-lg"
-              >
-                Call {site.contact.phone}
-              </a>
-            </div>
-          )}
         </div>
       </Container>
 
       <Container className="pb-4">
         {/*
-          `items-start`, so a panel is the height of what is in it. These were
-          stretched to match the tallest, which left the Details panel as a
-          mostly empty box whenever a part had one line of description.
+          The description leads, and the warranty and shipping sit beside it.
+
+          These were three boxes of equal weight across the page, which said the
+          terms mattered as much as the part. They are identical on all 32,000
+          parts; the description is the only thing on this page that is about
+          the part in front of you.
         */}
-        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-3">
-          <Panel title="Details">
-            <p className="whitespace-pre-wrap text-gray-300">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <section>
+            <h2 className="mb-4 text-lg font-bold text-white">
+              About this part
+            </h2>
+            <p className="text-base leading-relaxed whitespace-pre-wrap text-gray-300">
               {description ||
                 `${name}.${
                   part.longIcYear?.length
@@ -289,22 +331,23 @@ export default async function ProductPage({ params }: { params: Params }) {
                 }`}
             </p>
             {part.comments && part.comments !== description && (
-              <p className="mt-4 border-line border-t pt-4 text-sm text-gray-400">
-                <span className="font-semibold text-gray-300">Comments: </span>
+              <p className="border-line mt-4 border-t pt-4 text-sm text-gray-400">
+                <span className="font-semibold text-gray-300">
+                  From the yard:{" "}
+                </span>
                 {part.comments}
               </p>
             )}
-          </Panel>
+          </section>
 
-          <Panel title="Warranty">
-            <p className="mb-3 text-gray-300">{WARRANTY.intro}</p>
-            <Points points={WARRANTY.points} />
-          </Panel>
-
-          <Panel title="Shipping &amp; Handling">
-            <p className="mb-3 text-gray-300">{SHIPPING.intro}</p>
-            <Points points={SHIPPING.points} />
-          </Panel>
+          <div className="space-y-4">
+            <Terms title="Warranty" intro={WARRANTY.intro} points={WARRANTY.points} />
+            <Terms
+              title="Shipping and handling"
+              intro={SHIPPING.intro}
+              points={SHIPPING.points}
+            />
+          </div>
         </div>
       </Container>
 
@@ -330,49 +373,79 @@ export default async function ProductPage({ params }: { params: Params }) {
   );
 }
 
-function Row({
-  label,
-  value,
-  muted = false,
+/**
+ * The warranty and the shipping terms, closed by default.
+ *
+ * The same words on every one of 32,000 parts, so they are reference rather
+ * than reading. A native `details` element gives the open and shut behaviour,
+ * the keyboard support and the disclosure semantics without a line of
+ * JavaScript, and search engines read the contents whether it is open or not.
+ */
+function Terms({
+  title,
+  intro,
+  points,
 }: {
-  label: string;
-  value: string;
-  muted?: boolean;
+  title: string;
+  intro: string;
+  points: readonly string[];
 }) {
   return (
-    <div
-      className={
-        muted
-          ? "flex flex-col border-line border-t pt-2 sm:flex-row sm:gap-3"
-          : "flex flex-col sm:flex-row sm:gap-3"
-      }
-    >
-      <dt className="shrink-0 text-gray-500 sm:w-40">{label}</dt>
-      <dd
-        className={
-          muted ? "text-gray-300" : "font-medium break-words text-gray-100"
-        }
-      >
+    <details className="border-line bg-card group rounded-2xl border open:pb-5">
+      <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-sm font-bold text-white">
+        {title}
+        <svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </summary>
+
+      <div className="px-5">
+        <p className="mb-3 text-sm leading-relaxed text-gray-300">{intro}</p>
+        <Points points={points} />
+      </div>
+    </details>
+  );
+}
+
+/** One line of the specification. Label left, value right, on its own row. */
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2.5">
+      <dt className="shrink-0 text-gray-500">{label}</dt>
+      <dd className="text-right font-medium break-words text-gray-200">
         {value}
       </dd>
     </div>
   );
 }
 
-function Panel({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+/** One reassurance in the buy panel: a tick, then the words. */
+function Assurance({ children }: { children: React.ReactNode }) {
   return (
-    <section className="bg-card border-line rounded-2xl border p-6 text-sm sm:text-base">
-      <h2 className="mb-3 text-sm font-bold tracking-wide text-white uppercase">
-        {title}
-      </h2>
+    <li className="flex items-start gap-2.5">
+      <svg
+        viewBox="0 0 24 24"
+        className="text-brand-text mt-0.5 h-4 w-4 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={3}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
       {children}
-    </section>
+    </li>
   );
 }
 

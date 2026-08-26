@@ -259,3 +259,23 @@ body {
   font-size: 0.9em;
   padding: 0.15em 0.4em;
 }
+
+/* ---------------------------------------------------------------------------
+   A scrolling strip with no visible bar
+
+   The part gallery's thumbnail rail scrolls, and a native scrollbar under six
+   photographs reads as a fault rather than an affordance. The content still
+   scrolls by wheel, drag, touch and keyboard; only the bar is hidden, and the
+   thumbnails cut off at the edge are what say there is more.
+
+   Not a Tailwind built-in, which is why the class did nothing until this
+   existed.
+--------------------------------------------------------------------------- */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
