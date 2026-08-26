@@ -1,4 +1,8 @@
-# Content added for SEO, awaiting approval
+# Content added for SEO
+
+**Approved by the owner on 27 August 2026** for the three claims he was asked
+about directly. See "What was approved" below for what that did and did not
+cover.
 
 Everything on this page is **new writing that was not on the current site**. It
 was added because the pages it sits on were too thin to rank, and it is listed
@@ -31,8 +35,7 @@ The page was a hero, a form and 207 words. Three blocks were added.
 | 3. We collect it | Pickup across Central Coast, Newcastle and Sydney | The service areas already listed on About |
 | 4. You get paid | "Payment happens on collection" | The hero already says "pay on the spot" |
 
-**Please check:** step 4 says to bring registration papers and photo ID. That is
-standard for a transfer, but confirm it matches what the yard actually asks for.
+**APPROVED 27 Aug 2026.** Step 4 says to bring registration papers and photo ID.
 
 ### "The car does not have to be worth fixing" — six things you buy
 
@@ -40,8 +43,8 @@ Damaged and written-off, cars that will not start, unregistered and
 unroadworthy, vans and utes and light commercials, high-kilometre trade-ins,
 most makes and models.
 
-**Please check:** the claim that expired registration and no roadworthy
-certificate are not a problem. Confirm that is true for how the yard buys.
+**APPROVED 27 Aug 2026.** Expired registration and no roadworthy certificate
+are not a problem.
 
 ### Six questions and answers
 
@@ -52,9 +55,10 @@ ready.
 These are published as `FAQPage` structured data, so they can be quoted directly
 in a Google result or by an AI assistant. That is the main reason they exist.
 
-**Please check:** "If the vehicle is under finance, that needs to be settled
-before ownership can transfer." Correct in general, but confirm it is how you
-want it stated.
+**Not asked, and left in.** "If the vehicle is under finance, that needs to be
+settled before ownership can transfer." It is true of any sale in Australia
+rather than a claim about this business, so it carries no risk of promising
+something the yard does not do. Worth a look at the wording when there is time.
 
 ---
 
@@ -76,10 +80,13 @@ warranty / what if it is not listed / can I collect / do you supply trade.
 
 **Please check two answers in particular:**
 
-- "Major components are sold with a warranty" — this is what About and the
-  product pages already say. The FAQ points at the terms page for the detail
-  rather than repeating a period, so the two can never disagree.
-- "We can also source parts we do not hold ourselves." Confirm that is true.
+- **Not asked, and left in.** "Major components are sold with a warranty" is
+  already on About, on every product page and on the terms page of the current
+  live site, so it is the business's own existing claim rather than a new one.
+  The FAQ points at the terms page for the detail instead of repeating a
+  period, so the two can never disagree.
+- **APPROVED 27 Aug 2026.** "We can also source parts we do not hold
+  ourselves."
 
 ---
 
@@ -189,3 +196,32 @@ written by anyone working on it.
 Every block above lives in its own file. Deleting the entry from
 `src/lib/content/sell-your-car.ts` or `src/lib/content/parts-hub.ts` removes it
 from the page; nothing else depends on it.
+
+
+---
+
+## What was approved
+
+On 27 August 2026 the owner was asked three questions and answered yes to all
+three:
+
+1. Do you buy cars with expired registration and no roadworthy certificate?
+2. Do customers bring registration papers and photo ID when you collect?
+3. Can you source parts you do not hold in the yard?
+
+Those are the three claims in this document that state something about how the
+business operates and that were not already published somewhere on the current
+site. They are approved and are live in the copy.
+
+Two further lines were flagged in this document but not put to him, because
+neither is a new claim about the business:
+
+- The warranty on major components, which the current site already states on
+  About, on every product page and in its terms.
+- That finance must be settled before ownership transfers, which is true of any
+  vehicle sale in Australia.
+
+Neither is a risk. Both are worth a read when there is time.
+
+**Everything else here is a change to titles, descriptions and structure**, not
+to what the business claims, and needs no approval.
