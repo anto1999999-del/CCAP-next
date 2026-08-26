@@ -18,7 +18,13 @@ export function sellYourCarServiceSchema() {
       "Sell your used, damaged or unwanted car, van or light vehicle to Central Coast Auto Parts in Berkeley Vale NSW. We buy all makes and models across NSW and offer fast assessment and fair prices.",
     url: `${site.url}/sellyourcar`,
     provider: {
-      "@type": "AutoWrecked",
+      /*
+        Not "AutoWrecked", which this said and which is not a schema.org type
+        at all. The automotive branch has AutoBodyShop, AutoDealer,
+        AutoPartsStore, AutoRental, AutoRepair, AutoWash, GasStation and the
+        two motorcycle ones, and nothing else.
+      */
+      "@type": "AutoPartsStore",
       name: site.name,
       url: `${site.url}/`,
       telephone: contact.phoneE164,

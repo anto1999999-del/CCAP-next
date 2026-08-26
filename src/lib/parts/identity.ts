@@ -1,3 +1,4 @@
+import { formatItemName, vehicleLabel } from "./format";
 import type { CatalogPart } from "./types";
 
 /**
@@ -66,11 +67,17 @@ export function partPath(part: CatalogPart): string {
  * competing with each other in search results.
  */
 
-/** What makes two parts the same listing: what it is, and what it came off. */
+/**
+ * What makes two parts the same listing.
+ *
+ * Built from the same two functions the page title is built from, not from the
+ * raw fields. Those disagree: `vehicleLabel` prints the first year a part
+ * fits, so a gearbox off a 2019 Cerato and one off a 2021 both read "2018 KIA
+ * CERATO", and comparing the raw `year` said they were different pages when
+ * every word a search engine sees was identical.
+ */
 function listingIdentity(part: CatalogPart): string {
-  return [part.itemName, part.manufacturer, part.model, part.year]
-    .map((value) => String(value ?? "").trim().toUpperCase())
-    .join("|");
+  return `${formatItemName(part.itemName)}|${vehicleLabel(part)}`.toUpperCase();
 }
 
 /**

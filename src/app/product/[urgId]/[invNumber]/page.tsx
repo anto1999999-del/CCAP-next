@@ -12,6 +12,7 @@ import {
   formatItemName,
   formatOdometer,
   orNotRecorded,
+  vehicleLabel,
   yearLabel,
 } from "@/lib/parts/format";
 import { canonicalPathFor, partKey } from "@/lib/parts/identity";
@@ -29,15 +30,6 @@ async function lookup(params: Params): Promise<CatalogPart | null> {
   const { urgId, invNumber } = await params;
   const { parts } = await loadCatalog();
   return findPart(parts, urgId, invNumber);
-}
-
-/** "Used Engine for 2015 Toyota Hilux", the way somebody would search for it. */
-function vehicleLabel(part: CatalogPart): string {
-  const make = part.manufacturer?.trim();
-  const model = part.model?.trim();
-  const years = part.longIcYear ?? [];
-  const year = years.length > 0 ? String(years[0]) : (part.year ?? "");
-  return [year, make, model].filter(Boolean).join(" ");
 }
 
 export async function generateMetadata({

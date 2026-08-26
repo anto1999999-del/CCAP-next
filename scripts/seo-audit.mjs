@@ -98,7 +98,13 @@ async function urlsFromSitemap(origin) {
   */
   const robots = await fetch(`${origin}/robots.txt`).then((r) => r.text());
   const listed = [...robots.matchAll(/^Sitemap:\s*(\S+)/gim)].map((m) => m[1]);
-  const files = listed.filter((url) => !url.endsWith("/sitemap.xml"));
+  /*
+    robots.txt names the index as well as the files it points at. Following the
+    index too meant reading its <loc> entries as if they were pages, so the
+    sitemap files themselves ended up in the crawl and were then flagged for
+    having no title and no H1.
+  */
+  const files = listed.filter((url) => /\/sitemap\/\d+\.xml$/.test(url));
 
   // File 0 is the site's own pages. The rest are the 24,000 catalogue pages,
   // which are checked by sampling rather than one at a time.
@@ -108,7 +114,12 @@ async function urlsFromSitemap(origin) {
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 
     if (path.endsWith("/0.xml")) {
-      for (const loc of locs) urls.add(new URL(loc).pathname);
+      // The sitemap files list themselves. They are XML, not pages, so every
+      // rule below would flag them for having no title and no H1.
+      for (const loc of locs) {
+        const target = new URL(loc).pathname;
+        if (!target.endsWith(".xml")) urls.add(target);
+      }
     } else {
       // Ten from each catalogue file is enough to prove the template.
       for (const loc of locs.slice(0, 10)) urls.add(new URL(loc).pathname);

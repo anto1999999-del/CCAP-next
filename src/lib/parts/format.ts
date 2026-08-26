@@ -62,3 +62,23 @@ export function yearLabel(part: CatalogPart): string {
 export function descriptionText(part: CatalogPart): string {
   return part.icDesc?.trim() || "";
 }
+
+/**
+ * "2015 Toyota Hilux", the way somebody would search for it.
+ *
+ * The year is the first of the fitment range rather than the build year: a
+ * gearbox off a 2021 Cerato fits a 2018 and is worth finding under both.
+ *
+ * This lives here, beside `formatItemName`, because the page title is built
+ * from the two of them and so is the check for pages whose titles collide. When
+ * they were in different files the check compared the raw fields instead, and
+ * missed every pair that differed in build year but shared a fitment range.
+ */
+export function vehicleLabel(part: CatalogPart): string {
+  const make = part.manufacturer?.trim();
+  const model = part.model?.trim();
+  const years = part.longIcYear ?? [];
+  const year = years.length > 0 ? String(years[0]) : (part.year ?? "");
+
+  return [year, make, model].filter(Boolean).join(" ");
+}
