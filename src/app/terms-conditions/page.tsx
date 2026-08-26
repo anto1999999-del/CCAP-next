@@ -18,7 +18,7 @@ import { TERMS_SECTIONS } from "@/lib/content/terms";
  * appearance is identical.
  */
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Warranty & Returns | Central Coast Auto Parts",
+  title: "Terms & Conditions | Central Coast Auto Parts",
   description:
     "Warranty, returns and purchase conditions for used car parts from Central Coast Auto Parts, Berkeley Vale NSW. 3-month parts warranty, 14-day returns.",
   alternates: { canonical: "/terms-conditions" },

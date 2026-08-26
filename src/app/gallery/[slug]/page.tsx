@@ -123,9 +123,42 @@ export default async function VehiclePage({
                 dangerouslySetInnerHTML={{ __html: vehicle.bodyHtml }}
               />
 
+              {/*
+                A way into the catalogue, not just a phone number.
+
+                These twenty-six pages were a dead end: somebody who searched
+                for their own car, found it here and wanted a part off it had
+                nothing to click. Now the car's own make and model go straight
+                into the catalogue filter, which is both the journey a visitor
+                wants and a link from a page about a vehicle to the pages
+                selling its parts.
+              */}
               <div className="border-line bg-card mt-8 rounded-2xl border p-6">
+                <h2 className="mb-4 text-base font-bold text-white">
+                  Looking for a part off this car?
+                </h2>
+
+                <div className="mb-5 flex flex-wrap gap-3">
+                  {vehicle.make && vehicle.model && (
+                    <Link
+                      href={`/products?make=${encodeURIComponent(vehicle.make)}&model=${encodeURIComponent(vehicle.model)}`}
+                      className="bg-brand hover:bg-brand-hover rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors"
+                    >
+                      {vehicle.make} {vehicle.model} parts in stock
+                    </Link>
+                  )}
+                  {vehicle.make && (
+                    <Link
+                      href={`/products?make=${encodeURIComponent(vehicle.make)}`}
+                      className="border-line rounded-xl border px-5 py-2.5 text-sm font-semibold text-gray-200 transition-colors hover:border-white/30"
+                    >
+                      All {vehicle.make} parts
+                    </Link>
+                  )}
+                </div>
+
                 <p className="mb-1 text-sm text-gray-400">
-                  Looking for a part off this car, or one like it?
+                  Cannot see it listed? We hold far more than we photograph.
                 </p>
                 <a
                   href={`tel:${site.contact.phoneE164}`}

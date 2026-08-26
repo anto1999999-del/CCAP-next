@@ -10,8 +10,7 @@ import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title:
-    "Contact Us | Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
+  title: "Contact Us | Central Coast Auto Parts Berkeley Vale",
   description:
     "Get in touch with Central Coast Auto Parts in Berkeley Vale NSW. Call 02 4388 1818, request a part quote, or visit us Mon, Fri 8am, 5pm, Sat 9am, 2pm.",
   alternates: { canonical: "/contact" },

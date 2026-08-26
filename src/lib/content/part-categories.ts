@@ -87,7 +87,7 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
   gearboxes: {
     title: "Used Gearboxes for Sale NSW | Central Coast Auto Parts",
     description:
-      "Second-hand manual and automatic gearboxes for sale NSW. Used transmissions for cars, 4x4s and vans, inspected, warranted and shipped Australia-wide from Berkeley Vale.",
+      "Second-hand manual and automatic gearboxes for sale NSW. Used transmissions for cars, 4x4s and vans, inspected and warranted, shipped Australia-wide.",
     h1: "Used Gearboxes & Transmissions, Central Coast NSW",
     tagline: "GEARBOXES & TRANSMISSIONS, BERKELEY VALE NSW",
     intro:
@@ -123,7 +123,7 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
   "body-panels": {
     title: "Used Body Panels for Sale NSW | Central Coast Auto Parts",
     description:
-      "Second-hand doors, bonnets, guards, bumpers and body panels for sale NSW. Quality used car body parts, a fraction of dealer cost. Ships Australia-wide from Berkeley Vale.",
+      "Second-hand doors, bonnets, guards and bumpers for sale NSW. Quality used body panels at a fraction of dealer cost, shipped Australia-wide.",
     h1: "Used Body Panels & Doors, Central Coast NSW",
     tagline: "BODY PANELS & DOORS, BERKELEY VALE NSW",
     intro:
@@ -157,9 +157,9 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
     ],
   },
   electrical: {
-    title: "Used Electrical Parts for Sale NSW | Central Coast Auto Parts",
+    title: "Used Electrical Parts NSW | Central Coast Auto Parts",
     description:
-      "Second-hand ECUs, headlights, alternators, starter motors and auto electrical parts for sale NSW. Quality used car electricals, tested before dispatch. Ships Australia-wide.",
+      "Second-hand ECUs, headlights, alternators and starter motors for sale NSW. Quality used auto electrical parts, tested before dispatch.",
     h1: "Used Auto Electrical Parts, Central Coast NSW",
     tagline: "AUTO ELECTRICAL PARTS, BERKELEY VALE NSW",
     intro:
@@ -193,9 +193,9 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
     ],
   },
   suspension: {
-    title: "Used Suspension & Steering Parts NSW | Central Coast Auto Parts",
+    title: "Used Suspension & Steering NSW | Central Coast Auto Parts",
     description:
-      "Second-hand suspension, steering and drivetrain parts for sale NSW. Used struts, control arms, tie rods, CV joints and more, shipped Australia-wide from Berkeley Vale.",
+      "Second-hand suspension, steering and drivetrain parts for sale NSW. Struts, control arms, tie rods and CV joints, shipped Australia-wide.",
     h1: "Used Suspension & Steering Parts, Central Coast NSW",
     tagline: "SUSPENSION & STEERING, BERKELEY VALE NSW",
     intro:
@@ -231,7 +231,7 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
   cooling: {
     title: "Used Cooling System Parts NSW | Central Coast Auto Parts",
     description:
-      "Second-hand radiators, intercoolers, fans and cooling system parts for sale NSW. Quality used car cooling components, tested and shipped Australia-wide from Berkeley Vale.",
+      "Second-hand radiators, intercoolers and cooling fans for sale NSW. Quality used cooling components, tested and shipped Australia-wide.",
     h1: "Used Cooling System Parts, Central Coast NSW",
     tagline: "COOLING SYSTEM PARTS, BERKELEY VALE NSW",
     intro:
@@ -267,7 +267,7 @@ const COPY: Record<string, Omit<PartCategory, "slug" | "label" | "icon">> = {
   interior: {
     title: "Used Interior Parts for Sale NSW | Central Coast Auto Parts",
     description:
-      "Second-hand seats, dashboards, door trims, carpet and interior parts for sale NSW. Quality used car interior components, shipped Australia-wide from Berkeley Vale.",
+      "Second-hand seats, dashboards, door trims and carpet for sale NSW. Quality used car interior parts, shipped Australia-wide from Berkeley Vale.",
     h1: "Used Interior Parts, Central Coast NSW",
     tagline: "INTERIOR PARTS, BERKELEY VALE NSW",
     intro:

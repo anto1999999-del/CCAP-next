@@ -149,9 +149,26 @@ export default async function ProductPage({ params }: { params: Params }) {
           "@type": "Product",
           name,
           brand: { "@type": "Brand", name: part.manufacturer ?? site.name },
-          sku: part.stockNo ?? `${urgId}-${invNumber}`,
+          /*
+            The inventory number, not the stock number.
+
+            `stockNo` is the donor vehicle: stock CC0342 is one 2014 Hyundai
+            IX35 and 147 parts carry it. Publishing that as the SKU told Google
+            those 147 pages were all the same product. `urgId` with `invNumber`
+            is the supplier's own key for one physical part, and it is what the
+            page's own address is built from.
+          */
+          sku: `${urgId}-${invNumber}`,
           image: images[0] ? [absoluteUrl(fullImageUrl(images[0]))] : [],
           description: description || `Used ${name}`,
+          /*
+            Second-hand, stated rather than assumed. Google treats a Product
+            with no `itemCondition` as new, which for a wrecker is the one thing
+            every listing is not, and it is the difference between appearing in
+            a search for a used part and being judged against dealer pricing for
+            a new one.
+          */
+          itemCondition: "https://schema.org/UsedCondition",
           offers: {
             "@type": "Offer",
             priceCurrency: "AUD",
@@ -159,8 +176,24 @@ export default async function ProductPage({ params }: { params: Params }) {
             // $0 is a rich result promising something the yard will not honour.
             ...(sellable ? { price: Number(part.price).toFixed(2) } : {}),
             availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/UsedCondition",
             url: absoluteUrl(`/product/${urgId}/${invNumber}`),
             seller: { "@id": `${site.url}/#organization` },
+            /*
+              The returns window from the terms page, said once here so the
+              two can never drift apart. Google shows this in a product result
+              and holds the business to it, so it is deliberately the
+              conservative reading of what the terms already promise.
+            */
+            hasMerchantReturnPolicy: {
+              "@type": "MerchantReturnPolicy",
+              applicableCountry: "AU",
+              returnPolicyCategory:
+                "https://schema.org/MerchantReturnFiniteReturnWindow",
+              merchantReturnDays: 14,
+              returnMethod: "https://schema.org/ReturnByMail",
+              returnFees: "https://schema.org/ReturnShippingFees",
+            },
           },
         }}
       />

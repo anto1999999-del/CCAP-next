@@ -3,6 +3,7 @@ import { site, absoluteUrl } from "@/lib/site";
 import { CartProvider } from "@/lib/cart/CartProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ThirdPartyGate from "@/components/layout/ThirdPartyGate";
 import "./globals.css";
 
 /**
@@ -19,23 +20,18 @@ import "./globals.css";
  */
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title:
-    "Used Car Parts Berkeley Vale NSW | Warranty-Backed | Central Coast Auto Parts",
+  title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
   description: site.description,
-  keywords: [
-    "Central Coast Auto Parts",
-    "used car parts central coast",
-    "car parts NSW",
-    "second hand car parts NSW",
-    "auto wreckers central coast NSW",
-    "car wreckers central coast",
-    "wreckers central coast",
-    "toyota wreckers central coast",
-    "4WD wreckers central coast",
-    "buy used engines NSW",
-    "gearbox replacement central coast",
-    "sell your car NSW",
-  ],
+  /*
+    No `keywords`. Google has ignored the meta keywords tag since 2009 and no
+    major engine reads it, so a list here changes nothing about how the site
+    ranks. It was also declared once in this layout, which meant every page
+    inherited the identical list: Sell Your Car was telling crawlers its
+    keywords were "buy used engines NSW".
+
+    The live site does not emit one either, so removing it loses nothing and
+    stops publishing the keyword targets to anyone who views source.
+  */
   alternates: {
     // Emits the bare origin, where the current site emits it with a trailing
     // slash. The two are the same resource, an empty path normalises to "/",
@@ -55,16 +51,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    title:
-      "Used Car Parts Berkeley Vale NSW | Warranty-Backed | Central Coast Auto Parts",
+    /*
+      Australian English, stated rather than left to be guessed. Every price is
+      AUD, every phone number and postcode is Australian, and the yard ships
+      from one address in NSW. `lang` on the document says the same thing.
+    */
+    locale: "en_AU",
+    title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
     description: site.description,
     url: "/",
     images: [{ url: site.logo }],
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Used Car Parts Berkeley Vale NSW | Warranty-Backed | Central Coast Auto Parts",
+    title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
     description:
       "Quality used engines, gearboxes, body panels and more, all with warranty. Trusted car wreckers in Berkeley Vale NSW. Fast dispatch Australia-wide.",
     images: [site.logo],
@@ -142,13 +142,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en-AU">
       <body>
         <CartProvider>
           <Header />
           {children}
           <Footer />
         </CartProvider>
+        <ThirdPartyGate />
         <script
           type="application/ld+json"
           // Serialised server-side from a literal defined above; no user input

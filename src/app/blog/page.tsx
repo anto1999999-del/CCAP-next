@@ -130,9 +130,9 @@ export default async function BlogIndexPage({
                 <p className="text-brand-text mb-3 text-[11px] font-semibold tracking-[0.28em] uppercase">
                   Latest
                 </p>
-                <h3 className="group-hover:text-brand-text mb-3 text-2xl leading-snug font-bold transition-colors md:text-3xl">
+                <h2 className="group-hover:text-brand-text mb-3 text-2xl leading-snug font-bold transition-colors md:text-3xl">
                   {latest.title}
-                </h3>
+                </h2>
                 <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-gray-400 md:text-base">
                   {latest.excerpt}
                 </p>
@@ -142,6 +142,10 @@ export default async function BlogIndexPage({
               </div>
             </Link>
           )}
+
+          <h2 className="mb-6 text-xl font-extrabold tracking-tight text-white md:text-2xl">
+            {page === 1 ? "More from the workshop" : `Articles, page ${page}`}
+          </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {rest.map((post) => (

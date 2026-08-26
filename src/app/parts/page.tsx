@@ -3,15 +3,18 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 import SectionHeading from "@/components/layout/SectionHeading";
 import JsonLd from "@/components/JsonLd";
+import FaqSection from "@/components/FaqSection";
 import CategoryHero from "@/components/parts/CategoryHero";
 import { PART_CATEGORIES } from "@/lib/content/part-categories";
+import { BUYING_STEPS, PARTS_FAQS } from "@/lib/content/parts-hub";
+import { faqSchema } from "@/lib/faqs";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Used Car Parts by Category NSW | Central Coast Auto Parts",
   description:
-    "Browse used car parts by category at Central Coast Auto Parts Berkeley Vale NSW. Engines, gearboxes, body panels, electrical, suspension and more, all warranted.",
+    "Used car parts by category in Berkeley Vale NSW. Engines, gearboxes, body panels, electrical, suspension and more, all inspected and warranted.",
   alternates: { canonical: "/parts" },
 };
 
@@ -38,6 +41,8 @@ export default function PartsHubPage() {
           })),
         }}
       />
+
+      <JsonLd data={faqSchema(PARTS_FAQS)} />
 
       <CategoryHero
         tagline="USED AUTO PARTS, BERKELEY VALE NSW"
@@ -76,6 +81,38 @@ export default function PartsHubPage() {
           </div>
         </Container>
       </section>
+
+      <section className="bg-admin pb-14 text-white md:pb-20">
+        <Container>
+          <SectionHeading
+            className="mb-10 md:mb-12"
+            eyebrow="Buying a used part"
+            title="How it works"
+            intro="Four things worth knowing before you order, whether it is your own car or a workshop job."
+          />
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {BUYING_STEPS.map((step) => (
+              <div
+                key={step.title}
+                className="border-line bg-card rounded-2xl border p-6"
+              >
+                <h3 className="mb-2 text-base font-bold text-white">
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-400">
+                  {step.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <FaqSection
+        faqs={PARTS_FAQS}
+        intro="What people ask before buying a second-hand part"
+      />
     </>
   );
 }

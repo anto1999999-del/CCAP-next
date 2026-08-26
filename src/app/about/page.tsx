@@ -16,10 +16,9 @@ import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title:
-    "About Us | Car Wreckers Berkeley Vale NSW | Central Coast Auto Parts",
+  title: "Car Wreckers Berkeley Vale NSW | Central Coast Auto Parts",
   description:
-    "Central Coast Auto Parts is a trusted car wrecker and used parts supplier in Berkeley Vale NSW. Engines, gearboxes, body panels and more, all tested and sold with warranty.",
+    "A licensed auto dismantler in Berkeley Vale NSW. We supply used engines, gearboxes, panels and electrical parts, all tested and sold with warranty.",
   alternates: { canonical: "/about" },
 };
 

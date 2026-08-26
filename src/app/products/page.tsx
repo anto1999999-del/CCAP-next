@@ -15,9 +15,9 @@ import type { PartFilters } from "@/lib/parts/types";
 
 export const metadata: Metadata = {
   title:
-    "Used Car Parts for Sale NSW | Browse Our Stock | Central Coast Auto Parts",
+    "Used Car Parts for Sale NSW | Central Coast Auto Parts",
   description:
-    "Browse used car parts at Central Coast Auto Parts in Berkeley Vale NSW. Engines, gearboxes, body panels, electrical and more, all tested, warranted, ship Australia-wide.",
+    "Browse used car parts from Central Coast Auto Parts, Berkeley Vale NSW. Engines, gearboxes, panels and electrical, all tested and warranted.",
   alternates: { canonical: "/products" },
 };
 

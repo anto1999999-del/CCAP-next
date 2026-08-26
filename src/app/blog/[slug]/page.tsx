@@ -12,6 +12,7 @@ import {
   listPostSlugs,
 } from "@/lib/blog/repository";
 import { readingTimeMinutes } from "@/lib/blog/html";
+import { catalogueLinksForTags } from "@/lib/blog/catalogue-links";
 import { absoluteUrl, site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -82,7 +83,16 @@ export default async function BlogPostPage({ params }: Props) {
   // written in.
   const html = post.contentHtml;
   const minutes = readingTimeMinutes(html);
-  const related = await getRelatedPosts(slug);
+  const [related, catalogueLinks] = await Promise.all([
+    getRelatedPosts(slug),
+    // Built from this article's own tags, and only for makes and models the
+    // yard actually holds, so none of these can lead to an empty result.
+    catalogueLinksForTags(
+      post.tags.map((tag) => tag.name),
+      6,
+      post.title,
+    ),
+  ]);
 
   return (
     <>
@@ -163,6 +173,39 @@ export default async function BlogPostPage({ params }: Props) {
             className="blog-body"
             dangerouslySetInnerHTML={{ __html: html }}
           />
+
+          {/*
+            A way from the article to the parts it is about.
+
+            These pages rank and this one runs to four thousand words on what
+            goes wrong with a Kia, and until now the only route out of it was
+            the navigation. That is a dead end for a reader who has just been
+            convinced they need a part, and it wastes the link equity of the
+            pages that actually rank.
+          */}
+          {catalogueLinks.length > 0 && (
+            <aside className="border-line bg-card mt-12 rounded-2xl border p-6">
+              <h2 className="mb-1 text-base font-bold text-white">
+                Parts for the cars in this article
+              </h2>
+              <p className="mb-4 text-sm text-gray-400">
+                Second-hand, inspected, and shipped Australia-wide from Berkeley
+                Vale.
+              </p>
+              <ul className="flex flex-wrap gap-2">
+                {catalogueLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="border-line hover:border-brand/60 hover:text-brand-text inline-block rounded-full border px-4 py-2 text-sm font-semibold text-gray-200 transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
 
           {post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2 border-line border-t pt-8">
