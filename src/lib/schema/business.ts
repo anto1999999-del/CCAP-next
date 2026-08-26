@@ -1,4 +1,5 @@
 import { site } from "@/lib/site";
+import { GOOGLE_REVIEWS } from "../content/reviews";
 
 /**
  * LocalBusiness + WebSite structured data for the home page.
@@ -96,8 +97,14 @@ export function homeBusinessSchema() {
         },
         aggregateRating: {
           "@type": "AggregateRating",
-          ratingValue: "5.0",
-          reviewCount: "103",
+          /*
+            The same values the reviews section on the page shows, read from
+            one place. Google's guidance is that rating markup must describe a
+            rating the visitor can see; this used to be emitted with nothing on
+            the page to back it.
+          */
+          ratingValue: String(GOOGLE_REVIEWS.ratingValue.toFixed(1)),
+          reviewCount: String(GOOGLE_REVIEWS.reviewCount),
           bestRating: "5",
           worstRating: "1",
         },

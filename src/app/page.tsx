@@ -1,6 +1,7 @@
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
+import Reviews from "@/components/sections/Reviews";
 import ContactFormSection from "@/components/ContactFormSection";
 import {
   WhatWeSupply,
@@ -91,6 +92,8 @@ export default function HomePage() {
           </>
         }
       />
+
+      <Reviews />
 
       <FaqSection faqs={HOMEPAGE_FAQS} />
       <ContactFormSection />

@@ -10,8 +10,9 @@ claim is one the current site already makes somewhere else, restated on a page
 where it was missing. Where a number would have helped and there was no source
 for it, the copy says nothing rather than guessing.
 
-**Nothing in this document is a customer review or a rating.** See the last
-section for why.
+The one exception is the reviews section, which is **not** new writing: it is
+six real Google reviews reproduced word for word, and the real rating from the
+Business Profile. See section 4.
 
 ---
 
@@ -112,36 +113,74 @@ already exist, so they stay exactly as they are unless the owner asks otherwise.
 
 ---
 
-## 4. Testimonials and ratings: not added, and why
+## 4. Reviews on the home page
 
-The brief asked for testimonials, pulled from the Google Business Profile if
-needed, and for review markup.
+**Source:** `src/lib/content/reviews.ts`, shown by
+`src/components/sections/Reviews.tsx` on the home page.
 
-**No reviews or ratings have been written.** Inventing a customer quote, or a
-star rating, would be fabricating a record: it puts words in the mouth of a
-customer who never said them, and `AggregateRating` markup makes a false claim
-directly to Google. Google's own guidelines treat invented review markup as
-spam, and it is exactly the kind of thing that earns a manual penalty rather
-than a ranking.
+### The rating
 
-There is an existing rating to check, though. `src/lib/schema/business.ts`
-emits an `AggregateRating` of **5.0 from 103 reviews** on the home page. That
-was carried across faithfully from the current site, where it sits in
-`src/pages/Home.jsx`, so it is the owner's own figure and not something invented
-in the rebuild.
+**5.0 from 126 Google reviews**, read off the Business Profile on 26 August
+2026.
 
-It still needs confirming before launch, for two reasons. Review counts only go
-up, so 103 is probably out of date. And Google is entitled to check a rating
-against the profile it belongs to: if the number on the page and the number on
-the Business Profile disagree, the markup is a liability rather than an asset.
+This corrects a real problem rather than adding decoration. The home page has
+been sending Google an `AggregateRating` of **5.0 from 103** since the current
+site was built, and **nothing on the page ever showed it**. Google's guidance is
+that rating markup must describe a rating the visitor can see, so an invisible
+one is worth nothing at best. The figure now appears on the page, and the
+structured data reads the same value from the same file, so the two cannot
+disagree.
 
-To do this properly, send me either:
+A third-party directory reports 118. That was not used. Only the profile's own
+number was, because that is the one Google checks against.
 
-- the Google Business Profile link, so the real rating and count can be read and
-  the existing markup verified, or
-- real quotes with the customer's first name and suburb, as they were written.
+**It goes up.** Check it before launch and whenever the site is next worked on.
 
-Then the testimonials go on the page and the markup describes something true.
+### Six real reviews
+
+Taken from the Business Profile screenshots, **word for word**, including the
+spelling and punctuation as each person typed them. Tidying a review changes
+what somebody said.
+
+| Reviewer | What it demonstrates |
+| --- | --- |
+| Resh Shankar | A gearbox, low kilometres, "exactly as described" |
+| Anthony Cook | Parts clean and well presented, the team going further |
+| reef1rat | A specific part, a Subaru blinker, as advertised |
+| Clinton Waterman | Honest staff and fair prices |
+| Travers Wood | Fast responses and price |
+| Artith Jariyap | Delivery speed |
+
+They were chosen to cover a different thing each, because six reviews all saying
+"great service" persuade nobody.
+
+**Only reviews whose full text was visible were used.** Google hides the longer
+ones behind "View full review", and half a sentence is not somebody's opinion.
+
+**Two things to check:**
+
+1. **Typos are reproduced.** Clinton Waterman's says "the yard boys know there
+   stuff", and Nathan's said "number1". That is what they wrote. Correcting a
+   customer's review is editing it; leaving it is honest but looks untidy.
+   The owner's call, and it is a one-line change either way.
+2. **"reef1rat" is a username, not a name.** It is how they appear on Google.
+   Drop that quote if it looks odd beside the real names.
+
+### What was deliberately NOT done
+
+**No `Review` structured data around these quotes.** Google does not allow a
+business to publish review markup about itself: that is the "self-serving
+review" pattern its guidelines name specifically, and it is ignored at best. The
+quotes are on the page for people to read, not to manufacture stars in a search
+result.
+
+Worth knowing about the aggregate too: a rating a business publishes about
+itself is generally not eligible for rich results either. Its value here is that
+the page and the markup now tell the truth and tell it consistently, not that it
+will put stars next to the listing.
+
+**Nothing was invented.** No quote, no name and no number on this site was
+written by anyone working on it.
 
 ---
 
