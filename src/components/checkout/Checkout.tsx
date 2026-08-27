@@ -47,7 +47,13 @@ const FIELDS: {
   /** Spans both columns. A street address in half a row wraps awkwardly. */
   wide?: boolean;
 }[] = [
-  { name: "name", label: "Full name", type: "text", autoComplete: "name", wide: true },
+  {
+    name: "name",
+    label: "Full name",
+    type: "text",
+    autoComplete: "name",
+    wide: true,
+  },
   { name: "email", label: "Email", type: "email", autoComplete: "email" },
   { name: "phone", label: "Phone", type: "tel", autoComplete: "tel" },
   {
@@ -269,28 +275,31 @@ export default function Checkout({
 
             <div className="grid gap-4 sm:grid-cols-2">
               {FIELDS.map((field) => (
-              <div key={field.name} className={field.wide ? "sm:col-span-2" : ""}>
-                <label
-                  htmlFor={`checkout-${field.name}`}
-                  className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-400 uppercase"
+                <div
+                  key={field.name}
+                  className={field.wide ? "sm:col-span-2" : ""}
                 >
-                  {field.label}
-                </label>
-                <input
-                  id={`checkout-${field.name}`}
-                  name={field.name}
-                  type={field.type}
-                  autoComplete={field.autoComplete}
-                  value={details[field.name]}
-                  onChange={(event) =>
-                    setDetails((current) => ({
-                      ...current,
-                      [field.name]: event.target.value,
-                    }))
-                  }
-                  className="focus:border-brand border-line bg-field box-border w-full min-w-0 rounded-xl border p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
-                />
-              </div>
+                  <label
+                    htmlFor={`checkout-${field.name}`}
+                    className="mb-1.5 block text-xs font-semibold tracking-wide text-gray-400 uppercase"
+                  >
+                    {field.label}
+                  </label>
+                  <input
+                    id={`checkout-${field.name}`}
+                    name={field.name}
+                    type={field.type}
+                    autoComplete={field.autoComplete}
+                    value={details[field.name]}
+                    onChange={(event) =>
+                      setDetails((current) => ({
+                        ...current,
+                        [field.name]: event.target.value,
+                      }))
+                    }
+                    className="focus:border-brand border-line bg-field box-border w-full min-w-0 rounded-xl border p-3 text-base text-white placeholder-gray-600 transition-colors focus:outline-none"
+                  />
+                </div>
               ))}
             </div>
 
@@ -451,6 +460,19 @@ export default function Checkout({
               </p>
             )}
 
+            {/*
+              Said out loud rather than left as an absence. On a long cart the
+              per-part figures disappear, and silence there reads as a page
+              still loading rather than a decision already made.
+            */}
+            {quote?.ok && quote.breakdownOmitted && (
+              <p className="mb-4 text-xs leading-relaxed text-gray-500">
+                Delivery above is for the whole consignment. On an order this
+                size we do not price each part separately &mdash; call us if you
+                need it broken down.
+              </p>
+            )}
+
             {quote?.ok && quote.problems.length > 0 && (
               <ul className="mb-4 space-y-2 rounded-lg border border-yellow-700/40 bg-yellow-900/10 p-4 text-sm text-yellow-200">
                 {quote.problems.map((problem) => (
@@ -498,7 +520,9 @@ export default function Checkout({
               />
             ) : (
               <PaymentStep
-                ready={Boolean(quote?.ok && !quote.freightUnavailable) && complete}
+                ready={
+                  Boolean(quote?.ok && !quote.freightUnavailable) && complete
+                }
                 starting={starting}
                 error={paymentError}
                 onPay={beginPayment}

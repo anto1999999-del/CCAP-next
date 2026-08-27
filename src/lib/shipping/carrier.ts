@@ -28,13 +28,24 @@ const RATE_URL =
 /*
   The carrier answers in about two seconds when it is well, and occasionally
   hangs. Waiting twenty seconds to find that out means a customer watches
-  "Calculating" for twenty seconds and is then told we could not price it. A
-  shorter wait with one retry gets an answer sooner in both cases: a hung
-  request is abandoned at eight seconds and the second attempt usually answers
-  straight away.
+  "Calculating" for twenty seconds and is then told we could not price it, so a
+  hung request is abandoned at eight seconds and asked again.
+
+  The waits between attempts are the important part, and they were missing.
+  The carrier throttles requests from one account: asked once and left alone it
+  answers in about 1.5 seconds and effectively never fails, but eight at once
+  makes every one of them take twice as long and roughly one in eight comes
+  back HTTP 500. Retrying that immediately asks the same overloaded service the
+  same question inside the same moment, and it fails again -- which is why a
+  checkout could sit on "call us for a price" until the customer edited the
+  postcode and, by then reading most of the answers from cache, asked again
+  alone.
+
+  Measured against the carrier on 27 August 2026: spaced out, six of six
+  succeeded; in a burst of eight, one failed twice in a row.
 */
 const TIMEOUT_MS = 8_000;
-const ATTEMPTS = 2;
+const ATTEMPT_DELAYS_MS = [0, 500, 1_500];
 
 /**
  * Limits the current site learned from the carrier the hard way, and they are
@@ -181,7 +192,14 @@ function ratingLines(items: readonly ShipmentItem[]): ShipmentItem[] {
         widthCm: Math.max(merged.widthCm, line.widthCm),
         heightCm: Math.max(merged.heightCm, line.heightCm),
       }),
-      { quantity: 1, weightKg: 0, volumeM3: 0, lengthCm: 1, widthCm: 1, heightCm: 1 },
+      {
+        quantity: 1,
+        weightKg: 0,
+        volumeM3: 0,
+        lengthCm: 1,
+        widthCm: 1,
+        heightCm: 1,
+      },
     ),
   );
 
@@ -270,7 +288,9 @@ export async function quoteFreight({
   const authorization = `Basic ${credentials()}`;
   let lastError: unknown;
 
-  for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
+  for (const wait of ATTEMPT_DELAYS_MS) {
+    if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+
     try {
       const response = await fetch(RATE_URL, {
         method: "POST",
@@ -293,7 +313,9 @@ export async function quoteFreight({
         this and it is not documented anywhere else, so it is handled here too.
       */
       const answer = body.TollMessage?.RateEnquiry?.Response;
-      const quote = readCharges((Array.isArray(answer) ? answer[0] : answer) ?? {});
+      const quote = readCharges(
+        (Array.isArray(answer) ? answer[0] : answer) ?? {},
+      );
 
       // Only a real price is worth remembering; a zero is worth retrying.
       if (quote.totalCents > 0) {

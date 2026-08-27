@@ -69,6 +69,13 @@ export type CheckoutQuote =
       freightUnavailable: boolean;
       /** True when a part in the order has never been weighed and measured. */
       freightEstimated: boolean;
+      /**
+       * True when the cart is too long to price each part separately.
+       *
+       * Without it the per-part figures simply vanished on a seventh line and
+       * nothing said why, which reads as a page that has not finished loading.
+       */
+      breakdownOmitted: boolean;
     }
   | { ok: false; message: string };
 
@@ -79,6 +86,39 @@ export type CheckoutQuote =
  * stops being readable well before it stops being affordable.
  */
 const MAX_LINES_TO_ITEMISE = 6;
+
+/**
+ * How many per-part quotes may be in flight at once.
+ *
+ * The carrier throttles per account: asked one at a time it answers in about
+ * 1.5 seconds and does not fail, asked eight at a time it takes twice as long
+ * and drops about one in eight. Three is the compromise -- quick enough that
+ * the breakdown does not hold the page up, gentle enough that the answers
+ * arrive.
+ */
+const PARALLEL_ITEM_QUOTES = 3;
+
+/**
+ * Runs `task` over everything, `size` at a time, keeping the input order.
+ *
+ * `Promise.all` over the whole list would put every request in flight at once,
+ * which is the thing being avoided.
+ */
+async function inBatches<In, Out>(
+  items: readonly In[],
+  size: number,
+  task: (item: In) => Promise<Out>,
+): Promise<Out[]> {
+  const results: Out[] = [];
+
+  for (let start = 0; start < items.length; start += size) {
+    results.push(
+      ...(await Promise.all(items.slice(start, start + size).map(task))),
+    );
+  }
+
+  return results;
+}
 
 function shipmentItem(line: PricedLine): ShipmentItem {
   const { profile } = shippingProfileFor(line.part);
@@ -135,33 +175,39 @@ export async function quoteCheckout(
   const itemise = quotable && order.lines.length <= MAX_LINES_TO_ITEMISE;
 
   /*
-    The consignment and each part within it, asked for at once. They are
-    independent questions, so asking them one after another would take as long
-    as the whole chain rather than as long as the slowest single answer.
+    The consignment first, on its own, and only then the parts within it.
+
+    These used to go out together in one Promise.all, which for a seven-line
+    cart was eight simultaneous requests. The carrier throttles that: every
+    call took twice as long and about one in eight came back HTTP 500. When the
+    unlucky one was the consignment, the customer was told to ring for a price
+    on an address that prices perfectly well.
+
+    So the number they actually pay is asked for alone, where it is fast and
+    reliable, and the per-part figures follow a few at a time.
   */
-  const [whole, ...alone] = await Promise.all([
-    quotable
-      ? quoteFreight({
-          destination,
-          items: order.lines.map(shipmentItem),
-        }).catch((error) => {
-          console.error(
-            `[checkout] freight quote failed for ${suburb} ${postcode}:`,
-            error instanceof Error ? error.message : error,
-          );
-          return null;
-        })
-      : Promise.resolve(null),
-    ...order.lines.map((line) =>
-      itemise
-        ? quoteFreight({ destination, items: [shipmentItem(line)] })
-            .then((quote) => quote.totalCents)
-            // A missing per-part figure is a gap in an explanation, not a
-            // failure. What the customer pays is the consignment price.
-            .catch(() => null)
-        : Promise.resolve(null),
-    ),
-  ]);
+  const whole = quotable
+    ? await quoteFreight({
+        destination,
+        items: order.lines.map(shipmentItem),
+      }).catch((error) => {
+        console.error(
+          `[checkout] freight quote failed for ${suburb} ${postcode}:`,
+          error instanceof Error ? error.message : error,
+        );
+        return null;
+      })
+    : null;
+
+  const alone = itemise
+    ? await inBatches(order.lines, PARALLEL_ITEM_QUOTES, (line) =>
+        quoteFreight({ destination, items: [shipmentItem(line)] })
+          .then((quote) => quote.totalCents)
+          // A missing per-part figure is a gap in an explanation, not a
+          // failure. What the customer pays is the consignment price.
+          .catch(() => null),
+      )
+    : order.lines.map(() => null);
 
   /*
     A failed carrier call and a genuine zero are not the same thing, and the
@@ -205,5 +251,6 @@ export async function quoteCheckout(
     problems: order.problems,
     freightUnavailable: freightUnpriced,
     freightEstimated: !pickup && quotedLines.some((line) => !line.measured),
+    breakdownOmitted: quotable && !itemise,
   };
 }

@@ -13,9 +13,10 @@ import { site } from "@/lib/site";
  * - Colours are literal hex here rather than the tokens in `globals.css`. A
  *   `var()` resolves to nothing in an email client and the text renders black
  *   on black. This is the one place in the codebase where hex is correct.
- * - The wordmark is text, not the logo image. Most clients block remote images
- *   until the reader allows them, so a logo header would be an empty box on
- *   first open, which is exactly when the email has to look legitimate.
+ * - The logo is a remote image, and most clients block those until the reader
+ *   allows them. So its alt text is styled to be the wordmark: blocked, the
+ *   header still reads CENTRAL COAST AUTO PARTS in white on the dark band, in
+ *   roughly the right size. Never leave that alt text empty.
  * - Every rendered value is escaped. Customer names and part descriptions
  *   arrive from a form and a supplier feed, and an unescaped apostrophe or
  *   angle bracket would break the layout at best.
@@ -26,8 +27,24 @@ const INK = "#16181d";
 const MUTED = "#5b616e";
 const LINE = "#e4e6eb";
 const PAGE = "#f5f6f8";
+/** The site header's own background, so the email opens the way the site does. */
+const BAND = "#0f0f10";
 
 export const COLOURS = { BRAND, INK, MUTED, LINE, PAGE } as const;
+
+/**
+ * Absolute URL for an image in an email.
+ *
+ * Relative paths mean nothing in an inbox, and the origin has to be the public
+ * one: an email is read somewhere else entirely, long after the request that
+ * built it. Set NEXT_PUBLIC_SITE_ORIGIN in production or this falls back to the
+ * canonical domain, which is right everywhere except a local test, where the
+ * image simply will not load and the alt text stands in for it.
+ */
+function asset(path: string): string {
+  const origin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim() || site.url;
+  return new URL(path, origin).toString();
+}
 
 /** HTML-escapes a value for interpolation into any of the templates below. */
 export function esc(value: string): string {
@@ -80,9 +97,9 @@ export function emailShell({
 
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%;">
   <tr>
-    <td style="background:${BRAND};border-radius:12px 12px 0 0;padding:22px 28px;">
-      <div style="font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:24px;font-weight:bold;color:#ffffff;letter-spacing:.4px;">CENTRAL COAST AUTO PARTS</div>
-      <div style="font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;color:#ffe3e6;padding-top:3px;">Quality used parts &middot; Berkeley Vale NSW &middot; Licence ${esc(site.contact.licence)}</div>
+    <td style="background:${BAND};border-radius:12px 12px 0 0;border-bottom:3px solid ${BRAND};padding:20px 28px 18px 28px;">
+      <img src="${asset("/images/email-logo.png")}" width="210" height="78" alt="Central Coast Auto Parts" style="display:block;border:0;outline:none;text-decoration:none;width:210px;height:auto;max-width:100%;font-family:Helvetica,Arial,sans-serif;font-size:17px;font-weight:bold;color:#ffffff;letter-spacing:.4px;">
+      <div style="font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:18px;color:#9aa0ac;padding-top:8px;">Quality used parts &middot; Berkeley Vale NSW &middot; Licence ${esc(site.contact.licence)}</div>
     </td>
   </tr>
   <tr>
