@@ -1,5 +1,9 @@
 import "server-only";
-import { postBySlug, publishedPostSlugs, publishedPosts } from "../content/store";
+import {
+  postBySlug,
+  publishedPostSlugs,
+  publishedPostSummaries,
+} from "../content/store";
 import { renderBody } from "../content/render";
 import { toSlug, type Post } from "../content/schema";
 
@@ -54,7 +58,8 @@ function toBlogPost(post: Post): BlogPost {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
-    contentHtml: renderBody(post.body, post.bodyFormat),
+    // An empty body means this came from a list, which does not show one.
+    contentHtml: post.body ? renderBody(post.body, post.bodyFormat) : "",
     publishedAt: post.publishedAt,
     updatedAt: post.updatedAt,
     tags: post.tags.map((name) => ({ name, slug: toSlug(name) })),
@@ -74,9 +79,17 @@ function toBlogPost(post: Post): BlogPost {
   };
 }
 
-/** Published articles, newest first. */
+/**
+ * Published articles for a list, newest first, without their bodies.
+ *
+ * `contentHtml` is empty here on purpose. Nothing that shows a list of articles
+ * displays one, and rendering eighty-eight of them to build an index took most
+ * of a second on every request.
+ */
 export async function listArticles(): Promise<BlogPost[]> {
-  return (await publishedPosts()).map(toBlogPost);
+  return (await publishedPostSummaries()).map((post) =>
+    toBlogPost({ ...post, body: "", bodyFormat: "markdown" }),
+  );
 }
 
 export async function getPost(slug: string): Promise<BlogPost | null> {

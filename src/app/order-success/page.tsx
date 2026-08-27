@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ClearCartOnOrder from "@/components/cart/ClearCartOnOrder";
 import { findByPayment } from "@/lib/orders/repository";
 import { isConfigured } from "@/lib/db/mongo";
 import { formatCents } from "@/lib/parts/price";
@@ -39,6 +40,13 @@ export default async function OrderSuccessPage({
 
         {order ? (
           <>
+            {/*
+              The parts have been bought, so they come out of the cart. Nothing
+              on the server can do that: the cart is in the customer's browser.
+              Only rendered when an order was actually found for this payment,
+              so landing here with an id that matches nothing leaves it alone.
+            */}
+            <ClearCartOnOrder orderId={order.id} />
             <p className="mb-6 text-gray-300">
               {formatCents(order.amountCents)} for {order.items.length}{" "}
               {order.items.length === 1 ? "part" : "parts"}.

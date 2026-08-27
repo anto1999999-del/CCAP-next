@@ -56,6 +56,14 @@ export type Post = {
   tags: string[];
 };
 
+/**
+ * A post without its body, for lists.
+ *
+ * The index, the sitemap and the related-posts strip all want the same seven
+ * fields and none of them want the article itself.
+ */
+export type PostSummary = Omit<Post, "body" | "bodyFormat">;
+
 export type Vehicle = {
   id: string;
   slug: string;

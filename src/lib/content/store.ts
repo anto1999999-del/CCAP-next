@@ -1,7 +1,13 @@
 import "server-only";
 import { ObjectId, type Collection } from "mongodb";
 import { db } from "../db/mongo";
-import { EMPTY_SEO, type ContentStatus, type Post, type Vehicle } from "./schema";
+import {
+  EMPTY_SEO,
+  type ContentStatus,
+  type Post,
+  type PostSummary,
+  type Vehicle,
+} from "./schema";
 
 /**
  * Where blog posts and gallery vehicles live.
@@ -61,6 +67,38 @@ export async function publishedPosts(): Promise<Post[]> {
     .toArray();
 
   return documents.map(toPost);
+}
+
+/**
+ * Everything a list needs, and no bodies.
+ *
+ * The blog index shows a title, an excerpt, a date and a picture. It was
+ * loading all eighty-eight articles in full to do that, several of them thirty
+ * thousand characters, and then rendering and sanitising every one of those
+ * bodies to build a page that displays none of them. Measured at 843ms a
+ * request against 5ms for the pages that do not.
+ *
+ * The projection leaves the bodies in the database.
+ */
+export async function publishedPostSummaries(): Promise<PostSummary[]> {
+  const documents = await (await posts())
+    .find(
+      { status: "published" },
+      {
+        projection: {
+          body: 0,
+          bodyFormat: 0,
+        },
+      },
+    )
+    .sort({ publishedAt: -1 })
+    .toArray();
+
+  return documents.map(({ _id, ...rest }) => ({
+    id: _id.toString(),
+    ...rest,
+    seo: { ...EMPTY_SEO, ...rest.seo },
+  })) as PostSummary[];
 }
 
 export async function publishedPostSlugs(): Promise<string[]> {

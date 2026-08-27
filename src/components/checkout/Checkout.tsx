@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Container from "@/components/layout/Container";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { quoteCheckout, type CheckoutQuote } from "@/app/actions/checkout";
 import { startPayment } from "@/app/actions/payment";
 import PaymentPanel from "./PaymentPanel";
@@ -89,7 +89,16 @@ export default function Checkout({
     key: string;
     quote: CheckoutQuote;
   } | null>(null);
-  const [pending, startQuoting] = useTransition();
+  const [, startQuoting] = useTransition();
+  /*
+    Whether a quote has ever come back in this session.
+
+    A ref rather than state, deliberately: the effect below reads it to decide
+    whether to debounce, and anything it reads from state would have to be a
+    dependency, which would re-run the effect on every answer and quote forever
+    in a loop.
+  */
+  const hasQuoted = useRef(false);
   /*
     Set once the server has created the payment. Its presence is what swaps the
     summary for the card form, so the customer cannot be paying while the
@@ -156,6 +165,13 @@ export default function Checkout({
   const quote = answered?.key === requestKey ? answered.quote : null;
 
   /*
+    True from the moment the address is worth quoting until an answer for that
+    exact address is on screen. `pending` alone misses the debounce, which is
+    most of a second at the start and after every keystroke.
+  */
+  const waiting = deliverable && !pickup && !quote;
+
+  /*
     Re-quoted whenever the destination changes, because freight is most of the
     difference between a $500 gearbox delivered to Wyong and the same one going
     to Perth, and a customer should see that before they commit to anything.
@@ -171,11 +187,18 @@ export default function Checkout({
     const key = requestKey;
 
     /*
-      Debounced by nearly a second. This runs as somebody types, each run is a
-      request to a paid service, and a suburb and postcode are usually typed one
-      after the other: waiting means one quote for the pair rather than one for
+      Debounced by nearly a second while somebody is typing: each run is a
+      request to a paid service, and a suburb and postcode are typed one after
+      the other, so waiting means one quote for the pair rather than one for
       every intermediate state.
+
+      But the first quote does not wait. A signed-in customer arrives with the
+      address already filled in and has typed nothing, so there is nothing to
+      debounce and no reason to make them look at "Calculating" for an extra
+      second before the request has even left.
     */
+    const delay = hasQuoted.current ? 900 : 0;
+
     const timer = setTimeout(() => {
       startQuoting(async () => {
         const quote = await quoteCheckout({
@@ -184,9 +207,10 @@ export default function Checkout({
           suburb: details.suburb.trim(),
           postcode: details.postcode.trim(),
         });
+        hasQuoted.current = true;
         setAnswered({ key, quote });
       });
-    }, 900);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [
@@ -372,13 +396,24 @@ export default function Checkout({
                     ? "Pickup"
                     : !deliverable
                       ? "Enter a suburb and postcode"
-                      : pending
+                      : /*
+                          Waiting counts as calculating.
+
+                          This used to fall through to "Not available" whenever
+                          there was no answer yet and no request in flight,
+                          which is the whole debounce window. So a checkout with
+                          the address already filled in said delivery was not
+                          available before it had tried, and only became a price
+                          ten seconds later. It read as broken, and the fix
+                          people found was to edit the postcode.
+                        */
+                        waiting
                         ? "Calculating..."
                         : quote?.ok
                           ? quote.freight
                           : "Not available"
                 }
-                muted={!quote?.ok || pending}
+                muted={!quote?.ok || waiting}
               />
               <div className="border-line mt-2 flex items-center justify-between gap-4 border-t pt-3">
                 <span className="text-base font-semibold">Total</span>
