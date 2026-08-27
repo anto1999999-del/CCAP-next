@@ -1,10 +1,54 @@
 # Launch checklist
 
-Written on 26 August 2026 from a debug pass over the whole site. Everything here
-is either something that must be set on the production server, or something that
-has been checked and is listed so nobody checks it twice.
+**Launched 27 August 2026.** The Next.js site is live at
+centralcoastautoparts.com.au, deployed onto the existing droplet rather than a
+new one. What follows is what was done, what remains, and the things somebody
+will need to know in six months.
+
+## How it is deployed
+
+The droplet runs **CyberPanel and OpenLiteSpeed**, not nginx, and it is also the
+mail server and a PowerDNS nameserver. Three things follow from that:
+
+- The app runs under systemd as `ccap-next` on **port 3100**, bound to
+  127.0.0.1. Port 3000 was already taken by the LiteSpeed stack's `nghttpx`.
+- Traffic reaches it through the OpenLiteSpeed vhost at
+  `/usr/local/lsws/conf/vhosts/centralcoastautoparts.com.au/vhost.conf`, which
+  proxies `context /` to 3100. Editing the web server means editing that file
+  and running `/usr/local/lsws/bin/lswsctrl restart`.
+- The service carries `OOMScoreAdjust=200`. On a 2 GB box shared with a mail
+  server, if memory runs out the kernel should kill the website rather than
+  postfix.
+
+**OpenLiteSpeed forwards the client's `Origin` header twice.** Node joins
+repeated headers with a comma, Next's Server Action check calls `new URL()` on
+the result, and it throws. Every form on the site returned 500 while ordinary
+pages were fine. `src/middleware.ts` takes the first value. Do not remove it.
+
+**The parts catalogue is not in the repo.** `PARTS_CATALOG_PATH` points at
+`/root/ccautoparts/ccautoparts-api/data/partsCatalog.json`, which the surviving
+3am cron still refreshes. The app re-reads the file whenever its mtime changes,
+so nothing needs restarting after a sync. That directory must stay.
+
+**The blog subdomain is now redirects only.** WordPress and its database are
+gone; the 134 rules live in the `blog.` vhost's own rewrite block. They use
+`^/?` patterns because vhost context keeps the leading slash that .htaccess
+strips -- with plain `^`, every rule silently falls through to the catch-all and
+all 152 ranking URLs land on the blog index instead of their article.
+
+## Still outstanding
+
+- **Roll the Stripe secret key.** It is live, it sat on a droplet that was
+  compromised twice, and it appeared in a chat transcript. Rolling needs the
+  owner's authenticator app. Until then, watch Stripe → Payments.
+- **131 upgradable packages.** Upgrading a CyberPanel box is its own job with
+  its own rollback plan, not something to fold into a launch.
+- **The old site's files remain** at `/home/centralcoastautoparts.com.au/public_html`
+  and `/root/ccautoparts/ccautoparts-api`, deliberately: they are the way back.
+  Remove them once nobody wants that option.
 
 ---
+
 
 ## 1. Environment variables
 
