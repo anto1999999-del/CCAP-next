@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth/accounts";
 import { beginReset } from "@/lib/auth/reset";
 import { sendEmail } from "@/lib/email";
+import { orderStatusUpdate } from "@/lib/emails/orders";
 import { site } from "@/lib/site";
 import { setHidden, setStatus } from "@/lib/orders/repository";
 import { ORDER_STATUSES } from "@/lib/orders/types";
@@ -52,7 +53,8 @@ export async function updateOrderStatus(
   _previous: AdminState,
   form: FormData,
 ): Promise<AdminState> {
-  if (!(await requireAdmin())) return { message: "You are not signed in as an admin." };
+  if (!(await requireAdmin()))
+    return { message: "You are not signed in as an admin." };
 
   const parsed = StatusSchema.safeParse({
     orderId: field(form, "orderId"),
@@ -60,17 +62,51 @@ export async function updateOrderStatus(
   });
   if (!parsed.success) return { message: "That status could not be applied." };
 
-  await setStatus(parsed.data.orderId, parsed.data.status);
+  const { changed, order } = await setStatus(
+    parsed.data.orderId,
+    parsed.data.status,
+  );
+
   revalidatePath("/manage-orders");
   revalidatePath("/dashboard");
-  return { message: `Marked ${parsed.data.status.toLowerCase()}.` };
+  revalidatePath("/orders");
+
+  if (!order) return { message: "That order no longer exists." };
+
+  const marked = `Marked ${parsed.data.status.toLowerCase()}.`;
+
+  /*
+    Only a real move is worth an email. Re-selecting the status an order is
+    already on is a mis-click, and telling the customer their parts have been
+    delivered twice reads as a mistake, because it is one.
+  */
+  if (!changed)
+    return { message: `${marked} No change, so nobody was emailed.` };
+  if (!order.customer.email) return { message: `${marked} No email on file.` };
+
+  const sent = await sendEmail({
+    to: order.customer.email,
+    replyTo: site.contact.email,
+    ...orderStatusUpdate(order),
+  });
+
+  /*
+    The status is already saved. A mail failure is reported rather than thrown,
+    so the back office never has to guess whether the change went through.
+  */
+  return {
+    message: sent.ok
+      ? `${marked} ${order.customer.email} has been told.`
+      : `${marked} The customer could NOT be emailed — check the mail configuration.`,
+  };
 }
 
 export async function toggleOrderHidden(
   _previous: AdminState,
   form: FormData,
 ): Promise<AdminState> {
-  if (!(await requireAdmin())) return { message: "You are not signed in as an admin." };
+  if (!(await requireAdmin()))
+    return { message: "You are not signed in as an admin." };
 
   const parsed = HideSchema.safeParse({
     orderId: field(form, "orderId"),
@@ -114,13 +150,18 @@ export async function updateUserAdmin(
     return { message: "You cannot remove your own admin access." };
   }
   if (!granting && (await countAdmins()) <= 1) {
-    return { message: "That is the only admin left. Make somebody else an admin first." };
+    return {
+      message:
+        "That is the only admin left. Make somebody else an admin first.",
+    };
   }
 
   await setAdmin(parsed.data.userId, granting);
   revalidatePath("/manage-users");
 
-  return { message: granting ? "Admin access granted." : "Admin access removed." };
+  return {
+    message: granting ? "Admin access granted." : "Admin access removed.",
+  };
 }
 
 /**
@@ -175,7 +216,8 @@ export async function sendResetLink(
   }
 
   const email = field(form, "email").trim();
-  if (!email.includes("@")) return { message: "That account has no email address." };
+  if (!email.includes("@"))
+    return { message: "That account has no email address." };
 
   const token = await beginReset(email);
   if (!token) return { message: "No account with that address." };

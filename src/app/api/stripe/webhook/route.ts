@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { payments } from "@/lib/payments/stripe";
 import { findByPayment, markPaid } from "@/lib/orders/repository";
 import { sendEmail } from "@/lib/email";
-import { formatCents } from "@/lib/parts/price";
+import { orderConfirmation, orderForSales } from "@/lib/emails/orders";
 import { site } from "@/lib/site";
 
 /**
@@ -22,7 +22,9 @@ import { site } from "@/lib/site";
 export async function POST(request: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
-    console.error("[stripe] STRIPE_WEBHOOK_SECRET is not set; ignoring webhook.");
+    console.error(
+      "[stripe] STRIPE_WEBHOOK_SECRET is not set; ignoring webhook.",
+    );
     return new Response("Webhook not configured", { status: 503 });
   }
 
@@ -68,43 +70,20 @@ async function onPaid(paymentIntentId: string): Promise<void> {
   const order = await findByPayment(paymentIntentId);
   if (!order) return;
 
-  const lines = order.items
-    .map((item) => `${item.quantity} x ${item.name}`)
-    .join("\n");
-
-  const where = order.pickup
-    ? "Pickup from Berkeley Vale"
-    : `${order.customer.address}, ${order.customer.city} ${order.customer.zipcode}`;
+  const sales = orderForSales(order);
+  const customer = orderConfirmation(order);
 
   await Promise.all([
-    sendEmail({
-      to: site.contact.email,
-      subject: `New order, ${formatCents(order.amountCents)}, ${order.customer.name}`,
-      text: [
-        `${order.customer.name} has paid ${formatCents(order.amountCents)}.`,
-        "",
-        lines,
-        "",
-        where,
-        `${order.customer.phone} | ${order.customer.email}`,
-        "",
-        `Order ${order.id}`,
-      ].join("\n"),
-    }),
+    sendEmail({ to: site.contact.email, ...sales }),
+    /*
+      Replies go to sales rather than to the unmonitored sender. Somebody who
+      hits reply on their confirmation to change an address is writing to a
+      human either way.
+    */
     sendEmail({
       to: order.customer.email,
-      subject: `Your order from ${site.name}`,
-      text: [
-        `Thanks ${order.customer.name}, we have your payment of ${formatCents(order.amountCents)}.`,
-        "",
-        lines,
-        "",
-        order.pickup
-          ? `You have chosen to collect from ${site.address.displayLine}. We will call you when it is ready.`
-          : `We will send this to ${where}.`,
-        "",
-        `Any questions, call us on ${site.contact.phone}.`,
-      ].join("\n"),
+      replyTo: site.contact.email,
+      ...customer,
     }),
   ]);
 }

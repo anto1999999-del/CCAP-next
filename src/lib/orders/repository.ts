@@ -77,7 +77,9 @@ export async function listForUser(userId: string): Promise<Order[]> {
     return [];
   }
 
-  const documents = await (await orders())
+  const documents = await (
+    await orders()
+  )
     .find({ user: id })
     .sort({ createdAt: -1 })
     .toArray();
@@ -206,14 +208,34 @@ export async function getOrder(orderId: string): Promise<Order | null> {
   return document ? toOrder(document) : null;
 }
 
+/**
+ * Move an order to a new status, and say whether that was a real change.
+ *
+ * The caller emails the customer, so "already Delivered, set to Delivered
+ * again" has to be distinguishable from a genuine move. Without that, a
+ * mis-click in the back office sends somebody a second delivery notice.
+ *
+ * The updated order comes back with it, saving the caller a second read to
+ * build the email it is about to send.
+ */
 export async function setStatus(
   orderId: string,
   status: OrderStatus,
-): Promise<void> {
-  await (await orders()).updateOne(
+): Promise<{ changed: boolean; order: Order | null }> {
+  const before = await (
+    await orders()
+  ).findOneAndUpdate(
     { _id: new ObjectId(orderId) },
     { $set: { status, updatedAt: new Date() } },
+    { returnDocument: "before" },
   );
+
+  if (!before) return { changed: false, order: null };
+
+  return {
+    changed: before.status !== status,
+    order: toOrder({ ...before, status }),
+  };
 }
 
 /** Hide or restore an order. The document itself is never removed. */
@@ -221,7 +243,9 @@ export async function setHidden(
   orderId: string,
   hidden: boolean,
 ): Promise<void> {
-  await (await orders()).updateOne(
+  await (
+    await orders()
+  ).updateOne(
     { _id: new ObjectId(orderId) },
     hidden
       ? { $set: { hidden: true, hiddenAt: new Date() } }
@@ -238,7 +262,9 @@ export async function setHidden(
  * returns will not have to change.
  */
 export async function summarise(): Promise<OrderSummary> {
-  const documents = await (await orders())
+  const documents = await (
+    await orders()
+  )
     .find({ hidden: { $ne: true } })
     .toArray();
 
@@ -321,7 +347,9 @@ export async function createPending(order: {
 }): Promise<string> {
   const id = new ObjectId();
 
-  await (await orders()).insertOne({
+  await (
+    await orders()
+  ).insertOne({
     _id: id,
     user: order.userId ? new ObjectId(order.userId) : new ObjectId(),
     items: order.items,
@@ -352,7 +380,9 @@ export async function createPending(order: {
  * arriving twice must not produce two paid orders.
  */
 export async function markPaid(paymentIntentId: string): Promise<boolean> {
-  const result = await (await orders()).updateOne(
+  const result = await (
+    await orders()
+  ).updateOne(
     { paymentIntentId, status: "Awaiting payment" } as Record<string, unknown>,
     { $set: { status: "Pending", paidAt: new Date(), updatedAt: new Date() } },
   );
@@ -364,7 +394,9 @@ export async function markPaid(paymentIntentId: string): Promise<boolean> {
 export async function findByPayment(
   paymentIntentId: string,
 ): Promise<Order | null> {
-  const document = await (await orders()).findOne({
+  const document = await (
+    await orders()
+  ).findOne({
     paymentIntentId,
   } as Record<string, unknown>);
 

@@ -14,8 +14,7 @@ import { site } from "@/lib/site";
 const FROM = `${site.name} <noreply@centralcoastautoparts.com.au>`;
 
 export type SendResult =
-  | { ok: true }
-  | { ok: false; reason: "not-configured" | "failed" };
+  { ok: true } | { ok: false; reason: "not-configured" | "failed" };
 
 let client: Resend | null = null;
 
@@ -34,7 +33,17 @@ function resend(): Resend | null {
 export async function sendEmail(params: {
   to: string;
   subject: string;
+  /**
+   * The plain-text part. Required, never optional.
+   *
+   * A message with no text part scores worse with every spam filter, and some
+   * clients are set to show text in preference to HTML. For an order
+   * confirmation that means the difference between a customer knowing their
+   * money arrived and not.
+   */
   text: string;
+  /** The formatted part, when there is one. Clients that can render it will. */
+  html?: string;
   /** Where a human reply should go, when it differs from the sender. */
   replyTo?: string;
 }): Promise<SendResult> {
@@ -53,6 +62,7 @@ export async function sendEmail(params: {
       to: params.to,
       subject: params.subject,
       text: params.text,
+      ...(params.html ? { html: params.html } : {}),
       ...(params.replyTo ? { replyTo: params.replyTo } : {}),
     });
 
