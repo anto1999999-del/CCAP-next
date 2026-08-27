@@ -84,12 +84,21 @@ function toApacheConfig(rows) {
     "  RewriteEngine On",
     "",
     "  # Uploads keep their path, so old image URLs still resolve.",
-    `  RewriteRule ^wp-content/uploads/(.*)$ ${NEW_ORIGIN}/blog-media/$1 [R=301,L]`,
+    `  RewriteRule ^/?wp-content/uploads/(.*)$ ${NEW_ORIGIN}/blog-media/$1 [R=301,L]`,
     "",
   ];
 
   for (const row of rows) {
-    const pattern = row.from === "/" ? "^$" : `^${row.from.replace(/^\/|\/$/g, "")}/?$`;
+    /*
+      `^/?` rather than `^`, so the same rules work wherever they are installed.
+      Apache and LiteSpeed strip the leading slash in .htaccess context but keep
+      it in vhost context, and these ended up in the vhost: without the optional
+      slash every article rule silently failed to match and all 134 redirects
+      fell through to the catch-all, sending every ranking URL to the blog index
+      instead of to its article.
+    */
+    const pattern =
+      row.from === "/" ? "^/?$" : `^/?${row.from.replace(/^\/|\/$/g, "")}/?$`;
     lines.push(`  RewriteRule ${pattern} ${NEW_ORIGIN}${row.to} [R=301,L]`);
   }
 
@@ -97,7 +106,7 @@ function toApacheConfig(rows) {
     "",
     "  # Anything else on the old blog goes to the new index rather than 404ing,",
     "  # since every real URL is listed above.",
-    `  RewriteRule ^(.*)$ ${NEW_ORIGIN}/blog [R=301,L]`,
+    `  RewriteRule ^/?(.*)$ ${NEW_ORIGIN}/blog [R=301,L]`,
     "</IfModule>",
     "",
   );
