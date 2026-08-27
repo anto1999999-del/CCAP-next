@@ -38,7 +38,11 @@ const MAX_LENGTHS = {
 } as const;
 
 const ContactSchema = z.object({
-  name: z.string().trim().min(1, "Please enter your name.").max(MAX_LENGTHS.name),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Please enter your name.")
+    .max(MAX_LENGTHS.name),
   email: z
     .string()
     .trim()
@@ -68,7 +72,31 @@ export type ContactState = {
   message?: string;
   /** Field-level errors, keyed by field name. */
   errors?: Partial<Record<keyof z.infer<typeof ContactSchema>, string>>;
+  /**
+   * What was typed, sent back so a rejected form can be filled in again.
+   *
+   * React resets a form once its action has run, so without this a mistyped
+   * email address also threw away the message somebody had just written out.
+   *
+   * Absent on success, which is when emptying the form is right.
+   */
+  values?: Partial<Record<keyof z.infer<typeof ContactSchema>, string>>;
 };
+
+/** Whatever was submitted, as strings, for handing back to the form. */
+function submitted(
+  data: FormData,
+): Partial<Record<keyof z.infer<typeof ContactSchema>, string>> {
+  const values: Record<string, string> = {};
+
+  for (const [key, value] of data.entries()) {
+    // Regenerated on every attempt; not something anybody filled in.
+    if (key === "recaptchaToken") continue;
+    if (typeof value === "string") values[key] = value;
+  }
+
+  return values;
+}
 
 /**
  * Best-effort client identity for rate limiting.
@@ -107,6 +135,7 @@ export async function submitContactForm(
       status: "error",
       message: "Please check the highlighted fields and try again.",
       errors,
+      values: submitted(formData),
     };
   }
 
@@ -122,12 +151,17 @@ export async function submitContactForm(
     return {
       status: "error",
       message: `You have sent several messages already. Please try again in ${Math.ceil(limit.retryAfter / 60)} minutes, or call us on ${site.contact.phone}.`,
+      values: submitted(formData),
     };
   }
 
   const captcha = await verifyRecaptcha(recaptchaToken, "contact");
   if (!captcha.ok) {
-    return { status: "error", message: recaptchaMessage(captcha.reason) };
+    return {
+      status: "error",
+      message: recaptchaMessage(captcha.reason),
+      values: submitted(formData),
+    };
   }
 
   const enquiry = [
@@ -157,6 +191,7 @@ export async function submitContactForm(
     return {
       status: "error",
       message: `Sorry, we could not send your message just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
+      values: submitted(formData),
     };
   }
 

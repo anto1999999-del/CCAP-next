@@ -106,6 +106,15 @@ function SubmitButton() {
 
 export default function SellYourCarForm() {
   const [state, formAction] = useActionState(submitSaleOffer, INITIAL_STATE);
+
+  /*
+    What was typed last time, handed back by the action when it refused.
+
+    React empties a form once its action has run, so without this a single bad
+    year threw away the make, the model, the odometer and the phone number with
+    it. On success there are no values and the form empties, which is correct.
+  */
+  const values = state.values ?? {};
   const executeRecaptcha = useRecaptcha();
   const errors = state.errors ?? {};
 
@@ -137,6 +146,7 @@ export default function SellYourCarForm() {
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <Field
                 name="fullName"
+                defaultValue={values.fullName ?? ""}
                 label="Full Name"
                 type="text"
                 required
@@ -146,6 +156,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="location"
+                defaultValue={values.location ?? ""}
                 label="Location"
                 type="text"
                 required
@@ -154,6 +165,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="phone"
+                defaultValue={values.phone ?? ""}
                 label="Phone"
                 type="tel"
                 required
@@ -163,6 +175,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="vehicleModel"
+                defaultValue={values.vehicleModel ?? ""}
                 label="Vehicle Model"
                 type="text"
                 required
@@ -171,6 +184,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="email"
+                defaultValue={values.email ?? ""}
                 label="Email"
                 type="email"
                 required
@@ -180,6 +194,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="vehicleYear"
+                defaultValue={values.vehicleYear ?? ""}
                 label="Vehicle Year"
                 type="number"
                 required
@@ -188,6 +203,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="bodyCondition"
+                defaultValue={values.bodyCondition ?? ""}
                 label="Condition of Vehicle Body"
                 type="text"
                 required
@@ -196,6 +212,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="mechanicalCondition"
+                defaultValue={values.mechanicalCondition ?? ""}
                 label="Condition of Vehicle Mechanically"
                 type="text"
                 required
@@ -216,6 +233,7 @@ export default function SellYourCarForm() {
                       type="radio"
                       name="drivable"
                       value={value}
+                      defaultChecked={values.drivable === value}
                       required
                       className="accent-brand h-4 w-4"
                     />
@@ -229,6 +247,7 @@ export default function SellYourCarForm() {
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <Field
                 name="odometer"
+                defaultValue={values.odometer ?? ""}
                 label="Odometer"
                 type="number"
                 required
@@ -237,6 +256,7 @@ export default function SellYourCarForm() {
               />
               <Field
                 name="askingPrice"
+                defaultValue={values.askingPrice ?? ""}
                 label="Asking Price"
                 type="text"
                 required

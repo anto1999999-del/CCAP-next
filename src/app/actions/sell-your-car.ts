@@ -76,7 +76,34 @@ export type SaleOfferState = {
   status: "idle" | "success" | "error";
   message?: string;
   errors?: Partial<Record<keyof SaleOfferFields, string>>;
+  /**
+   * What was typed, sent back so a rejected form can be filled in again.
+   *
+   * React resets a form once its action has run, so without this every field
+   * emptied itself the moment one of them failed validation: somebody who
+   * mistyped a year lost the make, the model, the odometer and their phone
+   * number along with it.
+   *
+   * Absent on success, which is when emptying the form is the right thing.
+   */
+  values?: Partial<Record<keyof SaleOfferFields, string>>;
 };
+
+/** Whatever was submitted, as strings, for handing back to the form. */
+function submitted(
+  data: FormData,
+): Partial<Record<keyof SaleOfferFields, string>> {
+  const values: Record<string, string> = {};
+
+  for (const [key, value] of data.entries()) {
+    // The token is regenerated on every attempt and is not a field anybody
+    // filled in.
+    if (key === "recaptchaToken") continue;
+    if (typeof value === "string") values[key] = value;
+  }
+
+  return values;
+}
 
 async function clientKey(): Promise<string> {
   const headerList = await headers();
@@ -103,6 +130,7 @@ export async function submitSaleOffer(
       status: "error",
       message: "Please check the highlighted fields and try again.",
       errors,
+      values: submitted(formData),
     };
   }
 
@@ -116,12 +144,17 @@ export async function submitSaleOffer(
     return {
       status: "error",
       message: `You have sent several offers already. Please try again in ${Math.ceil(limit.retryAfter / 60)} minutes, or call us on ${site.contact.phone}.`,
+      values: submitted(formData),
     };
   }
 
   const captcha = await verifyRecaptcha(offer.recaptchaToken, "sellyourcar");
   if (!captcha.ok) {
-    return { status: "error", message: recaptchaMessage(captcha.reason) };
+    return {
+      status: "error",
+      message: recaptchaMessage(captcha.reason),
+      values: submitted(formData),
+    };
   }
 
   const summary = [
@@ -148,6 +181,7 @@ export async function submitSaleOffer(
     return {
       status: "error",
       message: `Sorry, we could not send your offer just now. Please call us on ${site.contact.phone} or email ${site.contact.email}.`,
+      values: submitted(formData),
     };
   }
 

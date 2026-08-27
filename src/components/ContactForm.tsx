@@ -80,6 +80,15 @@ function SubmitButton() {
 
 export default function ContactForm() {
   const [state, formAction] = useActionState(submitContactForm, INITIAL_STATE);
+
+  /*
+    What was typed last time, handed back by the action when it refused.
+
+    React empties a form once its action has run, so without this a mistyped
+    email address also threw away the message somebody had just written out.
+    On success there are no values and the form empties, which is correct.
+  */
+  const values = state.values ?? {};
   const executeRecaptcha = useRecaptcha();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -127,6 +136,7 @@ export default function ContactForm() {
                 <input
                   id="name"
                   name="name"
+                  defaultValue={values.name ?? ""}
                   type="text"
                   required
                   autoComplete="name"
@@ -145,6 +155,7 @@ export default function ContactForm() {
                 <input
                   id="subject"
                   name="subject"
+                  defaultValue={values.subject ?? ""}
                   type="text"
                   required
                   maxLength={150}
@@ -162,6 +173,7 @@ export default function ContactForm() {
                 <input
                   id="email"
                   name="email"
+                  defaultValue={values.email ?? ""}
                   type="email"
                   required
                   autoComplete="email"
@@ -180,6 +192,7 @@ export default function ContactForm() {
                 <input
                   id="phone"
                   name="phone"
+                  defaultValue={values.phone ?? ""}
                   type="tel"
                   required
                   autoComplete="tel"
@@ -199,6 +212,7 @@ export default function ContactForm() {
               <textarea
                 id="message"
                 name="message"
+                defaultValue={values.message ?? ""}
                 rows={6}
                 required
                 maxLength={4000}
