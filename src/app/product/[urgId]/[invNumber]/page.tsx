@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
 import AddToCartButton from "@/components/parts/AddToCartButton";
+import PriceRequestForm from "@/components/parts/PriceRequestForm";
 import PartCard from "@/components/parts/PartCard";
 import PartGallery from "@/components/parts/PartGallery";
 import { hasPrice } from "@/lib/parts/arrange";
@@ -91,9 +92,16 @@ function orderImages(images: readonly PartImage[]): PartImage[] {
 
   const looksPromotional = (image: PartImage) => {
     const text = `${image.img ?? ""}${image.thumb ?? ""}`.toLowerCase();
-    return ["centralcoast", "central_coast", "ccautoparts", "hereford", "business", "card", "contact", "logo"].some(
-      (marker) => text.includes(marker),
-    );
+    return [
+      "centralcoast",
+      "central_coast",
+      "ccautoparts",
+      "hereford",
+      "business",
+      "card",
+      "contact",
+      "logo",
+    ].some((marker) => text.includes(marker));
   };
 
   const photos = images.filter(isPartPhoto);
@@ -256,26 +264,45 @@ export default async function ProductPage({ params }: { params: Params }) {
                     model: part.model ?? undefined,
                     year: part.year == null ? undefined : String(part.year),
                     price: Number(part.price),
-                    thumbnail: coverImage(part) ? thumbnailUrl(part) : undefined,
+                    thumbnail: coverImage(part)
+                      ? thumbnailUrl(part)
+                      : undefined,
                   }}
                 />
               </>
             ) : (
               <>
                 <p className="text-2xl font-extrabold text-white md:text-3xl">
-                  Contact for price
+                  Price on request
                 </p>
+                {/*
+                  Says we have the part and how to ask. It used to explain that
+                  the supplier had not priced it, which is our business, not the
+                  customer's, and reads as a yard that does not know its own
+                  stock.
+                */}
                 <p className="mt-1 mb-5 text-xs text-gray-500">
-                  Not priced yet. Ring the yard with stock{" "}
-                  {part.stockNo ?? "number"} and we will price it while you wait.
+                  We have this one in the yard. Call us or send a request and we
+                  will price it for you, quoting stock{" "}
+                  {part.stockNo ?? "number"}.
                 </p>
 
                 <a
                   href={`tel:${site.contact.phoneE164}`}
-                  className="bg-brand hover:bg-brand-hover block w-full rounded-xl px-6 py-3.5 text-center text-base font-semibold text-white transition-colors"
+                  className="bg-brand hover:bg-brand-hover mb-3 block w-full rounded-xl px-6 py-3.5 text-center text-base font-semibold text-white transition-colors"
                 >
                   Call {site.contact.phone}
                 </a>
+
+                {/*
+                  For everyone who will not ring. The enquiry reaches sales
+                  already naming this part, so the first reply is the price.
+                */}
+                <PriceRequestForm
+                  urgId={String(part.urgId)}
+                  invNumber={String(part.invNumber)}
+                  itemName={name}
+                />
               </>
             )}
 
@@ -341,7 +368,11 @@ export default async function ProductPage({ params }: { params: Params }) {
           </section>
 
           <div className="space-y-4">
-            <Terms title="Warranty" intro={WARRANTY.intro} points={WARRANTY.points} />
+            <Terms
+              title="Warranty"
+              intro={WARRANTY.intro}
+              points={WARRANTY.points}
+            />
             <Terms
               title="Shipping and handling"
               intro={SHIPPING.intro}

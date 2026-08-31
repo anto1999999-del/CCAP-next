@@ -11,8 +11,10 @@ import type { CatalogPart } from "@/lib/parts/types";
  * One part in the grid.
  *
  * A part with no price is not hidden. The yard holds plenty of stock the
- * supplier has not priced, and a customer who can see it exists will ring up
- * about it, which is exactly what "contact for price" is for.
+ * supplier has not priced -- a quarter of the catalogue -- and a customer who
+ * can see it exists will ask about it, which is what "price on request" is
+ * for. The part page carries a form that reaches sales already naming the
+ * part, so asking costs a click rather than a phone call.
  */
 export default function PartCard({ part }: { part: CatalogPart }) {
   const href = partPath(part);
@@ -41,7 +43,10 @@ export default function PartCard({ part }: { part: CatalogPart }) {
           <Detail label="Manufacturer" value={part.manufacturer} />
           <Detail label="Item Type" value={part.itemTypeCode} />
           <Detail label="Model" value={part.model} />
-          <Detail label="Year" value={part.year == null ? null : String(part.year)} />
+          <Detail
+            label="Year"
+            value={part.year == null ? null : String(part.year)}
+          />
         </dl>
 
         {sellable ? (
@@ -50,7 +55,7 @@ export default function PartCard({ part }: { part: CatalogPart }) {
           </p>
         ) : (
           <p className="mt-auto text-base font-semibold text-gray-200">
-            Contact for price
+            Price on request
           </p>
         )}
       </div>
@@ -75,7 +80,7 @@ export default function PartCard({ part }: { part: CatalogPart }) {
             href={href}
             className="border-brand hover:bg-brand block rounded-xl border py-3 text-center font-semibold text-white transition-colors"
           >
-            Enquire
+            Ask for a price
           </Link>
         )}
       </div>

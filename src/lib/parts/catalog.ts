@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { dedupeParts } from "./identity";
+import { priceState } from "./price";
 import type { CatalogPart, PartImage } from "./types";
 
 /**
@@ -60,7 +61,11 @@ async function read(): Promise<CatalogSnapshot> {
     return snapshot;
   }
 
-  if (loadedFrom && loadedFrom.path === file && loadedFrom.mtimeMs === mtimeMs) {
+  if (
+    loadedFrom &&
+    loadedFrom.path === file &&
+    loadedFrom.mtimeMs === mtimeMs
+  ) {
     return snapshot;
   }
 
@@ -69,8 +74,18 @@ async function read(): Promise<CatalogSnapshot> {
     results?: CatalogPart[];
   };
 
+  /*
+    Withheld stock is dropped here, at the only door into the catalogue, so
+    every page inherits it without knowing about it: the grid, search, the
+    sitemap, generateStaticParams and the part page all read this array. A part
+    priced at exactly a dollar is the supplier saying "do not list this".
+  */
+  const listable = (parsed.results ?? []).filter(
+    (part) => priceState(part.price) !== "withheld",
+  );
+
   snapshot = {
-    parts: dedupeParts(parsed.results ?? []),
+    parts: dedupeParts(listable),
     syncedAt: parsed.syncedAt ?? null,
     available: true,
   };

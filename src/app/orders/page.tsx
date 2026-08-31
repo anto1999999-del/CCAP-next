@@ -5,6 +5,7 @@ import AccountShell, { StatCard } from "@/components/account/AccountShell";
 import PartThumbnail from "@/components/parts/PartThumbnail";
 import { currentAccount } from "@/lib/auth/accounts";
 import { isConfigured } from "@/lib/db/mongo";
+import { itemHref, listedItemKeys } from "@/lib/orders/listed";
 import { listForUser } from "@/lib/orders/repository";
 import { STATUS_TEXT } from "@/lib/orders/status";
 import { PART_IMAGE_PLACEHOLDER } from "@/lib/parts/images";
@@ -30,6 +31,8 @@ export default async function OrdersPage() {
   if (!account) redirect("/login?next=/orders");
 
   const orders = await listForUser(account.id);
+  // Asked once for the whole page rather than once per line.
+  const listed = await listedItemKeys(orders);
   const spentCents = orders.reduce(
     (total, order) => total + order.amountCents,
     0,
@@ -117,8 +120,22 @@ export default async function OrdersPage() {
                       className="h-16 w-20 flex-shrink-0 rounded-lg object-cover"
                     />
                     <div className="min-w-0 flex-1">
+                      {/*
+                        A link only while the part is still listed. Most bought
+                        parts have sold, and a link to a "not found" page reads
+                        as a broken site rather than as stock that moved.
+                      */}
                       <p className="truncate text-sm font-medium">
-                        {item.name}
+                        {itemHref(item, listed) ? (
+                          <Link
+                            href={itemHref(item, listed) as string}
+                            className="hover:text-brand-text underline-offset-4 transition-colors hover:underline"
+                          >
+                            {item.name}
+                          </Link>
+                        ) : (
+                          item.name
+                        )}
                       </p>
                       {item.vehicle && (
                         <p className="truncate text-xs text-gray-500">

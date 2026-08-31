@@ -1,3 +1,4 @@
+import { priceState } from "./price";
 import type { CatalogPart } from "./types";
 
 /**
@@ -18,11 +19,8 @@ import type { CatalogPart } from "./types";
  * page two.
  */
 
-/** Below this the supplier means "no price", not "a dollar". */
-const MINIMUM_REAL_PRICE = 1;
-
 export function hasPrice(part: CatalogPart): boolean {
-  return Number(part.price) > MINIMUM_REAL_PRICE;
+  return priceState(part.price) === "sellable";
 }
 
 function vehicleKey(part: CatalogPart): string {

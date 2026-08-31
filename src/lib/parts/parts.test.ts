@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { arrangeParts, hasPrice } from "./arrange";
+import { priceState, toCents } from "./price";
 import { deriveFilterOptions, filterParts } from "./filter";
 import { dedupeParts } from "./identity";
 import { matchesPartType } from "./part-type";
@@ -40,25 +41,38 @@ function part(overrides: Partial<CatalogPart> = {}): CatalogPart {
 }
 
 test("a part type filter matches the whole code, not a substring", () => {
-  expect(matchesPartType(part({ itemTypeCode: "ENGINE" }), "engine")).toEqual(true);
-  expect(matchesPartType(part({ itemTypeCode: "ENGINE_COVER" }), "engine")).toEqual(false);
+  expect(matchesPartType(part({ itemTypeCode: "ENGINE" }), "engine")).toEqual(
+    true,
+  );
+  expect(
+    matchesPartType(part({ itemTypeCode: "ENGINE_COVER" }), "engine"),
+  ).toEqual(false);
 });
 
 test("part type aliases map to the supplier's codes", () => {
-  expect(matchesPartType(part({ itemTypeCode: "ENGINE" }), "motor")).toEqual(true);
-  expect(matchesPartType(part({ itemTypeCode: "GEARBOX" }), "transmission")).toEqual(true);
+  expect(matchesPartType(part({ itemTypeCode: "ENGINE" }), "motor")).toEqual(
+    true,
+  );
+  expect(
+    matchesPartType(part({ itemTypeCode: "GEARBOX" }), "transmission"),
+  ).toEqual(true);
 });
 
 test("a gearbox search finds the code the catalogue actually uses", () => {
   // All 234 gearboxes are filed under TRANS_GEARBOX. The live site maps the
   // word to GEARBOX alone, so searching it there returns nothing.
-  const gearbox = part({ itemTypeCode: "TRANS_GEARBOX", itemName: "Trans/Gearbox" });
+  const gearbox = part({
+    itemTypeCode: "TRANS_GEARBOX",
+    itemName: "Trans/Gearbox",
+  });
   expect(matchesPartType(gearbox, "gearbox")).toEqual(true);
   expect(matchesPartType(gearbox, "transmission")).toEqual(true);
   expect(matchesQuery(gearbox, "gearbox")).toEqual(true);
 
   // Still not a transfer case or a diff, which are their own parts.
-  expect(matchesPartType(part({ itemTypeCode: "TRANSFER_CASE" }), "gearbox")).toEqual(false);
+  expect(
+    matchesPartType(part({ itemTypeCode: "TRANSFER_CASE" }), "gearbox"),
+  ).toEqual(false);
 });
 
 test("a year filter also matches the years a part interchanges into", () => {
@@ -72,10 +86,16 @@ test("a year filter also matches the years a part interchanges into", () => {
 
 test("make and model match in either direction", () => {
   const prado = part({ manufacturer: "TOYOTA", model: "LANDCRUISER PRADO" });
-  expect(filterParts([prado], { ...EMPTY_FILTERS, model: "PRADO" }).length).toEqual(1);
-  expect(filterParts([prado], { ...EMPTY_FILTERS, model: "LANDCRUISER PRADO 150" })
-      .length).toEqual(1);
-  expect(filterParts([prado], { ...EMPTY_FILTERS, model: "HILUX" }).length).toEqual(0);
+  expect(
+    filterParts([prado], { ...EMPTY_FILTERS, model: "PRADO" }).length,
+  ).toEqual(1);
+  expect(
+    filterParts([prado], { ...EMPTY_FILTERS, model: "LANDCRUISER PRADO 150" })
+      .length,
+  ).toEqual(1);
+  expect(
+    filterParts([prado], { ...EMPTY_FILTERS, model: "HILUX" }).length,
+  ).toEqual(0);
 });
 
 test("duplicate rows from the supplier's paging are dropped", () => {
@@ -155,8 +175,15 @@ test("every word in a search has to match something", () => {
 });
 
 test("searching for engine means engines, not engine covers", () => {
-  expect(matchesQuery(part({ itemTypeCode: "ENGINE_COVER", itemName: "Engine Cover" }), "engine")).toEqual(false);
-  expect(matchesQuery(part({ itemTypeCode: "ENGINE" }), "engine")).toEqual(true);
+  expect(
+    matchesQuery(
+      part({ itemTypeCode: "ENGINE_COVER", itemName: "Engine Cover" }),
+      "engine",
+    ),
+  ).toEqual(false);
+  expect(matchesQuery(part({ itemTypeCode: "ENGINE" }), "engine")).toEqual(
+    true,
+  );
 });
 
 test("a typed query is read as year, make and model", () => {
@@ -169,16 +196,36 @@ test("a typed query is read as year, make and model", () => {
 
 test("filter options cascade with what is already chosen", () => {
   const catalog = [
-    part({ year: "2015", manufacturer: "TOYOTA", model: "HILUX", itemTypeCode: "ENGINE" }),
-    part({ year: "2015", manufacturer: "MAZDA", model: "CX9", itemTypeCode: "GEARBOX" }),
-    part({ year: "2001", manufacturer: "HOLDEN", model: "COMMODORE", itemTypeCode: "ENGINE" }),
+    part({
+      year: "2015",
+      manufacturer: "TOYOTA",
+      model: "HILUX",
+      itemTypeCode: "ENGINE",
+    }),
+    part({
+      year: "2015",
+      manufacturer: "MAZDA",
+      model: "CX9",
+      itemTypeCode: "GEARBOX",
+    }),
+    part({
+      year: "2001",
+      manufacturer: "HOLDEN",
+      model: "COMMODORE",
+      itemTypeCode: "ENGINE",
+    }),
   ];
 
   const all = deriveFilterOptions(catalog, EMPTY_FILTERS);
-  expect(all.years).toEqual(["2015", "2015", "2001"].filter((y, i, a) => a.indexOf(y) === i));
+  expect(all.years).toEqual(
+    ["2015", "2015", "2001"].filter((y, i, a) => a.indexOf(y) === i),
+  );
   expect(all.makes).toEqual(["HOLDEN", "MAZDA", "TOYOTA"]);
 
-  const in2015 = deriveFilterOptions(catalog, { ...EMPTY_FILTERS, year: "2015" });
+  const in2015 = deriveFilterOptions(catalog, {
+    ...EMPTY_FILTERS,
+    year: "2015",
+  });
   expect(in2015.makes).toEqual(["MAZDA", "TOYOTA"]);
 
   const toyota = deriveFilterOptions(catalog, {
@@ -195,4 +242,51 @@ test("filter options cascade with what is already chosen", () => {
     model: "HILUX",
   });
   expect(hilux.partTypes).toEqual(["ENGINE"]);
+});
+
+/*
+  What the supplier means by a price, which is three different things.
+
+  These decide what the whole catalogue shows: a wrong boundary either hides
+  9,236 real parts or publishes 125 complete vehicles the yard does not sell
+  online. Both are visible on the site within a minute of a sync.
+*/
+
+test("anything above a dollar is a real price and can be sold", () => {
+  expect(priceState(450)).toBe("sellable");
+  expect(priceState("1.01")).toBe("sellable");
+  expect(priceState(3300)).toBe("sellable");
+});
+
+test("exactly zero means nobody has priced it yet, so it is shown and asked about", () => {
+  expect(priceState(0)).toBe("on-request");
+  expect(priceState("0.00")).toBe("on-request");
+});
+
+test("exactly a dollar is a whole vehicle, not a part, and is withheld", () => {
+  expect(priceState(1)).toBe("withheld");
+  expect(priceState("1.00")).toBe("withheld");
+});
+
+test("a missing or unreadable price is asked about rather than hidden", () => {
+  // Hiding stock the yard actually holds is the worse of the two mistakes.
+  expect(priceState(null)).toBe("on-request");
+  expect(priceState(undefined)).toBe("on-request");
+  expect(priceState("not a number")).toBe("on-request");
+});
+
+test("neither unsellable state can ever produce a charge", () => {
+  // toCents is what money is computed from. Zero and a dollar must come back
+  // null, not 0, so the caller has to handle it rather than charging nothing.
+  expect(toCents(0)).toBeNull();
+  expect(toCents(1)).toBeNull();
+  expect(toCents(450)).toBe(45000);
+});
+
+test("only sellable parts count as priced when the grid orders them", () => {
+  const part = (price: number) =>
+    ({ urgId: "x", invNumber: "1", price }) as never;
+  expect(hasPrice(part(450))).toBe(true);
+  expect(hasPrice(part(0))).toBe(false);
+  expect(hasPrice(part(1))).toBe(false);
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import PartThumbnail from "@/components/parts/PartThumbnail";
@@ -40,7 +41,14 @@ const AU_DATETIME = new Intl.DateTimeFormat("en-AU", {
   minute: "2-digit",
 });
 
-export default function OrderRow({ order }: { order: Order }) {
+export default function OrderRow({
+  order,
+  itemLinks,
+}: {
+  order: Order;
+  /** Part page per item, aligned with `order.items`; null once it has sold. */
+  itemLinks: (string | null)[];
+}) {
   const [open, setOpen] = useState(false);
   const [statusState, changeStatus] = useActionState(updateOrderStatus, EMPTY);
   const [hiddenState, toggleHidden] = useActionState(toggleOrderHidden, EMPTY);
@@ -64,7 +72,10 @@ export default function OrderRow({ order }: { order: Order }) {
           <span className="hover:text-brand-text block truncate font-semibold text-white transition-colors">
             {lead?.name ?? "Order"}
             {order.items.length > 1 && (
-              <span className="text-gray-400"> +{order.items.length - 1} more</span>
+              <span className="text-gray-400">
+                {" "}
+                +{order.items.length - 1} more
+              </span>
             )}
           </span>
           {lead?.vehicle && (
@@ -95,7 +106,10 @@ export default function OrderRow({ order }: { order: Order }) {
           {order.status}
         </span>
 
-        <form action={changeStatus} className="justify-self-start md:justify-self-end">
+        <form
+          action={changeStatus}
+          className="justify-self-start md:justify-self-end"
+        >
           <input type="hidden" name="orderId" value={order.id} />
           <label htmlFor={`status-${order.id}`} className="sr-only">
             Status for this order
@@ -123,7 +137,11 @@ export default function OrderRow({ order }: { order: Order }) {
                 />
 
                 <div className="grid min-w-0 flex-1 gap-x-8 gap-y-1.5 text-sm sm:grid-cols-2">
-                  <Detail label="Item" value={item.name} />
+                  <Detail
+                    label="Item"
+                    value={item.name}
+                    href={itemLinks[index]}
+                  />
                   <Detail label="Manufacturer" value={item.manufacturer} />
                   <Detail label="Model" value={item.model} />
                   <Detail label="Year" value={item.year} />
@@ -189,11 +207,31 @@ export default function OrderRow({ order }: { order: Order }) {
   );
 }
 
-function Detail({ label, value }: { label: string; value?: string }) {
+function Detail({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value?: string;
+  /** Given only where there is a page to go to; sold parts have none. */
+  href?: string | null;
+}) {
   return (
     <p className="flex gap-2 truncate">
       <span className="w-28 flex-shrink-0 text-gray-500">{label}</span>
-      <span className="truncate text-gray-200">{value || "Not recorded"}</span>
+      {href ? (
+        <Link
+          href={href}
+          className="hover:text-brand-text truncate text-gray-200 underline-offset-4 transition-colors hover:underline"
+        >
+          {value || "Not recorded"}
+        </Link>
+      ) : (
+        <span className="truncate text-gray-200">
+          {value || "Not recorded"}
+        </span>
+      )}
     </p>
   );
 }

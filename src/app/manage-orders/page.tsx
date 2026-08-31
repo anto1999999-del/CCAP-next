@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AccountShell, { StatCard } from "@/components/account/AccountShell";
 import OrderRow from "@/components/admin/OrderRow";
+import { itemHref, listedItemKeys } from "@/lib/orders/listed";
 import { adminOnly } from "@/lib/auth/guard";
-import {
-  countByStatus,
-  listOrders,
-  summarise,
-} from "@/lib/orders/repository";
+import { countByStatus, listOrders, summarise } from "@/lib/orders/repository";
 import { ORDER_STATUSES } from "@/lib/orders/types";
 import { formatCents } from "@/lib/parts/price";
 
@@ -66,6 +63,9 @@ export default async function ManageOrdersPage({
     countByStatus(),
     summarise(),
   ]);
+
+  // One catalogue pass for the whole page, not one per line item.
+  const listed = await listedItemKeys(page.orders);
 
   const filters = ["All", ...ORDER_STATUSES, "Hidden"];
 
@@ -182,7 +182,16 @@ export default async function ManageOrdersPage({
         ) : (
           <ul>
             {page.orders.map((order) => (
-              <OrderRow key={order.id} order={order} />
+              <OrderRow
+                key={order.id}
+                order={order}
+                /*
+                  Worked out here because the row is a client component and the
+                  catalogue is server-only. One href per item, aligned with
+                  order.items, null where the part has sold.
+                */
+                itemLinks={order.items.map((item) => itemHref(item, listed))}
+              />
             ))}
           </ul>
         )}
