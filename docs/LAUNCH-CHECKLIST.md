@@ -36,6 +36,27 @@ gone; the 134 rules live in the `blog.` vhost's own rewrite block. They use
 strips -- with plain `^`, every rule silently falls through to the catch-all and
 all 152 ranking URLs land on the blog index instead of their article.
 
+## TLS renewal was broken and is now fixed
+
+Certbot on this box was set up with `authenticator = nginx` and
+`installer = nginx`, for **both** certificates. Nginx is installed but dead --
+OpenLiteSpeed serves everything -- so every renewal aborted with "nginx restart
+failed" and nobody noticed until the blog certificate expired on 29 August 2026
+and took the redirects offline over HTTPS.
+
+The main site's certificate would have failed exactly the same way on 17
+November.
+
+Both now renew by `webroot` against `/usr/local/lsws/Example/html`, which is
+where the vhosts' `/.well-known/acme-challenge` context points, with a deploy
+hook at `/etc/letsencrypt/renewal-hooks/deploy/reload-litespeed.sh` to reload
+LiteSpeed afterwards. `certbot renew --dry-run` succeeds for both.
+
+The blog's redirect map exempts `/.well-known/` before its catch-all, or the
+challenge would be redirected to the new blog and validation could never
+succeed again. That guard is emitted by `scripts/build-redirect-map.mjs`, so
+regenerating the map keeps it.
+
 ## Still outstanding
 
 - **Roll the Stripe secret key.** It is live, it sat on a droplet that was
