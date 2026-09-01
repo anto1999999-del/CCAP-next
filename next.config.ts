@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/ProductsPage", destination: "/products", permanent: true },
+      { source: "/MyAccount", destination: "/my-account", permanent: true },
       /*
         /sitemap.xml is the address every crawler and every SEO tool tries
         first, and the one the current live site answers. Next reserves it for
