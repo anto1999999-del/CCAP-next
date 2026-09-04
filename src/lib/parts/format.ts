@@ -16,9 +16,29 @@ export const NOT_RECORDED = "N/A";
  * alone. Without this the page offers a "Cd Player" and an "Abs Module".
  */
 const INITIALISMS = new Set([
-  "cd", "dvd", "sat", "tv", "ecu", "bcm", "abs", "ac",
-  "4wd", "awd", "fwd", "rwd", "oem", "lhd", "rhd", "led",
-  "hid", "usb", "aux", "am", "fm", "gps", "hev",
+  "cd",
+  "dvd",
+  "sat",
+  "tv",
+  "ecu",
+  "bcm",
+  "abs",
+  "ac",
+  "4wd",
+  "awd",
+  "fwd",
+  "rwd",
+  "oem",
+  "lhd",
+  "rhd",
+  "led",
+  "hid",
+  "usb",
+  "aux",
+  "am",
+  "fm",
+  "gps",
+  "hev",
 ]);
 
 export function orNotRecorded(value: unknown): string {
@@ -64,21 +84,30 @@ export function descriptionText(part: CatalogPart): string {
 }
 
 /**
- * "2015 Toyota Hilux", the way somebody would search for it.
+ * "2019 Ford Ranger" -- the vehicle the part actually came off.
  *
- * The year is the first of the fitment range rather than the build year: a
- * gearbox off a 2021 Cerato fits a 2018 and is worth finding under both.
+ * The year is the donor vehicle's build year (`part.year`), not the start of
+ * the fitment range. It used to be `longIcYear[0]`, on the theory that a part
+ * fitting 2011-2022 was worth finding under the earliest year -- until the
+ * owner saw a door off his 2019 Ranger headlined "2011 FORD RANGER" and asked,
+ * reasonably, why the site was aging his stock by eight years (1 Sep 2026).
+ * The fitment range is still on the page and still searchable; the headline
+ * now tells the truth about the donor.
  *
  * This lives here, beside `formatItemName`, because the page title is built
- * from the two of them and so is the check for pages whose titles collide. When
- * they were in different files the check compared the raw fields instead, and
- * missed every pair that differed in build year but shared a fitment range.
+ * from the two of them AND so is the duplicate-listing identity in
+ * `identity.ts`. They must move together: the identity being the rendered
+ * title is what guarantees no two sitemap pages share a title. Changing one
+ * without the other quietly breaks that. (Same-name parts off different-year
+ * donors now get separate pages -- measured +6,627 canonical pages -- which is
+ * correct: they are different physical vehicles with different photographs.)
  */
 export function vehicleLabel(part: CatalogPart): string {
   const make = part.manufacturer?.trim();
   const model = part.model?.trim();
+  const donor = part.year == null ? "" : String(part.year).trim();
   const years = part.longIcYear ?? [];
-  const year = years.length > 0 ? String(years[0]) : (part.year ?? "");
+  const year = donor || (years.length > 0 ? String(years[0]) : "");
 
   return [year, make, model].filter(Boolean).join(" ");
 }

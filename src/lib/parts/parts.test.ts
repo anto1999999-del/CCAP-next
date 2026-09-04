@@ -2,7 +2,8 @@ import { expect, test } from "vitest";
 import { arrangeParts, hasPrice } from "./arrange";
 import { priceState, toCents } from "./price";
 import { deriveFilterOptions, filterParts } from "./filter";
-import { dedupeParts } from "./identity";
+import { canonicalPathFor, dedupeParts, isCanonicalListing } from "./identity";
+import { vehicleLabel } from "./format";
 import { matchesPartType } from "./part-type";
 import { queryParts } from "./query";
 import { matchesQuery, parseSearchQuery } from "./search";
@@ -289,4 +290,64 @@ test("only sellable parts count as priced when the grid orders them", () => {
   expect(hasPrice(part(450))).toBe(true);
   expect(hasPrice(part(0))).toBe(false);
   expect(hasPrice(part(1))).toBe(false);
+});
+
+/*
+  The headline year is the donor vehicle, not the start of the fitment range.
+
+  A door off a 2019 Ranger fits 2011-2022, and the site used to headline it
+  "2011 FORD RANGER" -- until the owner asked why it was aging his stock by
+  eight years (1 Sep 2026). Search by any fitment year still works: the year
+  filter above matches longIcYear.
+*/
+
+test("the headline year is the donor vehicle, not the oldest year it fits", () => {
+  const door = part({
+    manufacturer: "FORD",
+    model: "RANGER",
+    year: "2019",
+    longIcYear: ["2011", "2012", "2019", "2022"],
+  });
+
+  expect(vehicleLabel(door)).toEqual("2019 FORD RANGER");
+});
+
+test("with no donor year recorded, the fitment range still supplies one", () => {
+  const orphan = part({
+    manufacturer: "KIA",
+    model: "CERATO",
+    year: null,
+    longIcYear: ["2018", "2019"],
+  });
+
+  expect(vehicleLabel(orphan)).toEqual("2018 KIA CERATO");
+});
+
+test("same part off different-year donors is two listings, same donor is one", () => {
+  const base = {
+    itemName: "Door Trim",
+    manufacturer: "FORD",
+    model: "RANGER",
+    longIcYear: ["2018", "2019", "2020", "2021", "2022"],
+  };
+  const off2019 = part({ ...base, year: "2019", invNumber: "1" });
+  const off2021 = part({ ...base, year: "2021", invNumber: "2" });
+  const off2021b = part({ ...base, year: "2021", invNumber: "3" });
+  const yard = [off2019, off2021, off2021b];
+
+  // Different donors are different physical vehicles: each holds its own page.
+  expect(isCanonicalListing(off2019, yard)).toEqual(true);
+
+  // The two trims off 2021 donors are the duplicate case: one page between
+  // them, and the loser's canonical points at the winner.
+  const winners = [off2021, off2021b].filter((trim) =>
+    isCanonicalListing(trim, yard),
+  );
+  expect(winners.length).toEqual(1);
+  expect(canonicalPathFor(off2021, yard)).toEqual(
+    canonicalPathFor(off2021b, yard),
+  );
+  expect(canonicalPathFor(off2019, yard)).not.toEqual(
+    canonicalPathFor(off2021, yard),
+  );
 });
