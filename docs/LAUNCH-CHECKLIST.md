@@ -57,6 +57,29 @@ challenge would be redirected to the new blog and validation could never
 succeed again. That guard is emitted by `scripts/build-redirect-map.mjs`, so
 regenerating the map keeps it.
 
+## Part photo galleries
+
+The part page reads photo galleries from `<catalog dir>/galleries/<xx>.ndjson`.
+That directory was never created on the server, so from launch until 4 Sep 2026
+every part showed only its single cover image -- the yard's own photographs did
+not appear.
+
+The app's own `sync-parts-catalog.mjs` builds those shards, but it fetches all
+34k parts from the supplier, which rate-limited the server's IP within a minute
+of the first run. So galleries are instead built from the legacy
+`gallerycache/` already on the box (full photo sets, refreshed nightly by the
+old parts cron) via `scripts/build-galleries-from-cache.mjs` -- ~21 seconds,
+34,866 parts, no supplier call.
+
+The nightly cron now runs, in order: the parts refresh, then that gallery
+build, then `systemctl restart ccap-next`. The restart is required: the app
+caches gallery shards in memory with no mtime check, so it will not pick up a
+rebuilt set until it restarts.
+
+If the catalogue ever moves off the legacy box, this bridge goes away and
+`sync-parts-catalog.mjs` becomes the single source -- run with a high
+`PARTS_SYNC_DELAY_MS` to stay under the supplier's rate limit.
+
 ## Still outstanding
 
 - **Roll the Stripe secret key.** It is live, it sat on a droplet that was
