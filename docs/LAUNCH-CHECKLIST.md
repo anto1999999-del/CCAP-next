@@ -80,6 +80,29 @@ If the catalogue ever moves off the legacy box, this bridge goes away and
 `sync-parts-catalog.mjs` becomes the single source -- run with a high
 `PARTS_SYNC_DELAY_MS` to stay under the supplier's rate limit.
 
+## Sitemaps: deploy with a clean build
+
+On 6 Sep 2026 all three `/sitemap/N.xml` were returning 500: `Cannot find
+module .../sitemap/[__metadata_id__]/route.js`. The source was fine -- an
+incremental `npm run build` on the server had dropped the `generateSitemaps`
+route from `.next` (the same class of stale-build fragility the Tailwind note
+below describes). A clean build (`rm -rf .next && npm run build`) restored it.
+
+**Deploy the app on the droplet with `rm -rf .next` before `npm run build`.**
+The incremental build is faster but has silently dropped a route once; the few
+extra minutes of a clean build are worth it.
+
+The sitemap now carries `export const revalidate = 86400`, so each file
+regenerates daily on demand from the catalogue the nightly sync writes, rather
+than freezing at the last deploy. Content stays fresh without a rebuild.
+
+One edge remains: `generateSitemaps` fixes the NUMBER of files at build time,
+while `sitemap_index.xml` counts them at request time. The catalogue is ~15k
+sellable parts against a 10k-per-file split (3 files, ~5k headroom before a 4th
+is needed). If sellable stock ever exceeds 20k, the index would list a
+`/sitemap/3.xml` that was not prerendered until the next deploy. Rebuild if that
+threshold is crossed.
+
 ## Still outstanding
 
 - **Roll the Stripe secret key.** It is live, it sat on a droplet that was

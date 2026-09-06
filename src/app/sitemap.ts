@@ -24,6 +24,18 @@ import { site } from "@/lib/site";
  * on, with an index at /sitemap.xml.
  */
 
+/*
+  Regenerate at most once a day, on demand, rather than freezing at build time.
+
+  These files are prerendered, and the server is only rebuilt on a deploy -- but
+  the catalogue behind them is refreshed by the nightly parts sync. Without this
+  the sitemap drifts: parts sold weeks ago stay listed and parts added since the
+  last deploy are missing. A day-old sitemap is fine for a crawler; a
+  month-stale one is not. The first request after the window rebuilds the file
+  from the catalogue the nightly sync just wrote.
+*/
+export const revalidate = 86400;
+
 export async function generateSitemaps() {
   // File 0 is the site itself; the rest are catalogue pages.
   const count = await sitemapFileCount();
