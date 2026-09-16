@@ -7,6 +7,7 @@ import {
   sellableParts,
   sitemapFileCount,
 } from "@/lib/seo/sitemap-files";
+import { MAKE_PAGES } from "@/lib/content/make-pages";
 import { PART_CATEGORIES } from "@/lib/content/part-categories";
 import { site } from "@/lib/site";
 
@@ -69,7 +70,11 @@ export default async function sitemap(props: {
     { url: `${site.url}/parts`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${site.url}/about`, changeFrequency: "yearly", priority: 0.6 },
     { url: `${site.url}/contact`, changeFrequency: "yearly", priority: 0.6 },
-    { url: `${site.url}/sellyourcar`, changeFrequency: "yearly", priority: 0.7 },
+    {
+      url: `${site.url}/sellyourcar`,
+      changeFrequency: "yearly",
+      priority: 0.7,
+    },
     {
       url: `${site.url}/terms-conditions`,
       changeFrequency: "yearly",
@@ -77,11 +82,18 @@ export default async function sitemap(props: {
     },
     { url: `${site.url}/blog`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/gallery`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${site.url}/wreckers`, changeFrequency: "weekly", priority: 0.8 },
   ];
 
   const categories = PART_CATEGORIES.map((category) => ({
     url: `${site.url}/parts/${category.slug}`,
     changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  const makes = MAKE_PAGES.map((page) => ({
+    url: `${site.url}/wreckers/${page.slug}`,
+    changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
@@ -99,5 +111,5 @@ export default async function sitemap(props: {
     priority: 0.5,
   }));
 
-  return [...pages, ...categories, ...articles, ...vehicles];
+  return [...pages, ...categories, ...makes, ...articles, ...vehicles];
 }

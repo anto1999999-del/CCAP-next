@@ -23,6 +23,8 @@ import HelpBand from "./HelpBand";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Parts" },
+  // A crawlable path to the ten make pages so they are never orphaned.
+  { href: "/wreckers", label: "Wreckers by Make" },
   { href: "/sellyourcar", label: "Sell Your Car" },
   { href: "/contact", label: "Contact" },
   { href: "/blog", label: "Blog" },
@@ -33,10 +35,20 @@ const NAV_LINKS = [
 
 const PAYMENT_METHODS = [
   { src: "/images/maestro.webp", alt: "Maestro", width: 48, className: "w-12" },
-  { src: "/images/mastercard.webp", alt: "Mastercard", width: 48, className: "w-12" },
+  {
+    src: "/images/mastercard.webp",
+    alt: "Mastercard",
+    width: 48,
+    className: "w-12",
+  },
   { src: "/images/paypal.webp", alt: "PayPal", width: 48, className: "w-12" },
   { src: "/images/visa.webp", alt: "Visa", width: 48, className: "w-12" },
-  { src: "/images/express.webp", alt: "American Express", width: 48, className: "w-12" },
+  {
+    src: "/images/express.webp",
+    alt: "American Express",
+    width: 48,
+    className: "w-12",
+  },
 ] as const;
 
 const PROFILES = [
@@ -104,24 +116,48 @@ function ContactDetails() {
       />
 
       <p className="mb-2 flex items-center justify-center lg:justify-start">
-        <Image src="/icons/map.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
+        <Image
+          src="/icons/map.svg"
+          alt=""
+          width={20}
+          height={20}
+          className="mr-2 h-5 w-5"
+        />
         {address.displayLine}
       </p>
 
       <p className="mb-2 flex items-center justify-center lg:justify-start">
-        <Image src="/icons/clock.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
+        <Image
+          src="/icons/clock.svg"
+          alt=""
+          width={20}
+          height={20}
+          className="mr-2 h-5 w-5"
+        />
         {hours.displayLine}
       </p>
 
       <p className="mb-2 flex items-center justify-center lg:justify-start">
-        <Image src="/icons/call.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
+        <Image
+          src="/icons/call.svg"
+          alt=""
+          width={20}
+          height={20}
+          className="mr-2 h-5 w-5"
+        />
         <a href={`tel:${contact.phone}`} className="hover:text-brand-text">
           {contact.phone}
         </a>
       </p>
 
       <p className="flex items-center justify-center lg:justify-start">
-        <Image src="/icons/email.svg" alt="" width={20} height={20} className="mr-2 h-5 w-5" />
+        <Image
+          src="/icons/email.svg"
+          alt=""
+          width={20}
+          height={20}
+          className="mr-2 h-5 w-5"
+        />
         <a href={`mailto:${contact.email}`} className="hover:text-brand-text">
           {contact.email}
         </a>
@@ -146,7 +182,9 @@ export default function Footer() {
 
           <div className="flex flex-col items-center space-y-4">
             <div className="text-center lg:text-left">
-              <h4 className="mb-6 text-lg font-semibold lg:text-left">Navigation</h4>
+              <h4 className="mb-6 text-lg font-semibold lg:text-left">
+                Navigation
+              </h4>
               <ul className="space-y-2">
                 {NAV_LINKS.map(({ href, label }) => (
                   <li key={href}>
@@ -161,7 +199,9 @@ export default function Footer() {
 
           <div className="flex flex-col items-center space-y-10">
             <div>
-              <h4 className="mb-6 text-center text-lg font-semibold">We Accept</h4>
+              <h4 className="mb-6 text-center text-lg font-semibold">
+                We Accept
+              </h4>
               <div className="flex justify-center space-x-6">
                 {PAYMENT_METHODS.map(({ src, alt, width, className }) => (
                   <Image
@@ -177,19 +217,23 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="mb-6 text-center text-lg font-semibold">Join Us</h4>
+              <h4 className="mb-6 text-center text-lg font-semibold">
+                Join Us
+              </h4>
               <div className="flex items-center justify-center space-x-6">
-                {PROFILES.map(({ href, src, alt, width, height, className }) => (
-                  <a key={href} href={href} target="_blank" rel="noreferrer">
-                    <Image
-                      src={src}
-                      alt={alt}
-                      width={width}
-                      height={height}
-                      className={className}
-                    />
-                  </a>
-                ))}
+                {PROFILES.map(
+                  ({ href, src, alt, width, height, className }) => (
+                    <a key={href} href={href} target="_blank" rel="noreferrer">
+                      <Image
+                        src={src}
+                        alt={alt}
+                        width={width}
+                        height={height}
+                        className={className}
+                      />
+                    </a>
+                  ),
+                )}
               </div>
             </div>
           </div>
