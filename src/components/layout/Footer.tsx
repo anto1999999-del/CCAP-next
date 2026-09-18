@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { MAKE_PAGES } from "@/lib/content/make-pages";
 import { site } from "@/lib/site";
 import Container from "./Container";
 import HelpBand from "./HelpBand";
@@ -23,8 +24,6 @@ import HelpBand from "./HelpBand";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Parts" },
-  // A crawlable path to the ten make pages so they are never orphaned.
-  { href: "/wreckers", label: "Wreckers by Make" },
   { href: "/sellyourcar", label: "Sell Your Car" },
   { href: "/contact", label: "Contact" },
   { href: "/blog", label: "Blog" },
@@ -177,27 +176,53 @@ export default function Footer() {
       <HelpBand />
 
       <Container className="py-8 text-sm">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <ContactDetails />
 
-          <div className="flex flex-col items-center space-y-4">
-            <div className="text-center lg:text-left">
-              <h4 className="mb-6 text-lg font-semibold lg:text-left">
-                Navigation
-              </h4>
-              <ul className="space-y-2">
-                {NAV_LINKS.map(({ href, label }) => (
-                  <li key={href}>
-                    <Link href={href} className="block hover:text-brand-text">
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="text-center lg:text-left">
+            <h4 className="mb-6 text-lg font-semibold">Navigation</h4>
+            <ul className="space-y-2">
+              {NAV_LINKS.map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="block hover:text-brand-text">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="flex flex-col items-center space-y-10">
+          {/*
+            The ten make pages, given their own footer column rather than one
+            buried nav row. Every page then links to all ten, which is the point
+            of them: it hands search engines a crawl path to each and spreads
+            internal link weight across the set instead of orphaning them.
+          */}
+          <div className="text-center lg:text-left">
+            <h4 className="mb-6 text-lg font-semibold">Wreckers by Make</h4>
+            <ul className="space-y-2">
+              {MAKE_PAGES.map((page) => (
+                <li key={page.slug}>
+                  <Link
+                    href={`/wreckers/${page.slug}`}
+                    className="block hover:text-brand-text"
+                  >
+                    {page.label} Wreckers
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/wreckers"
+                  className="text-brand-text block font-semibold underline-offset-4 hover:underline"
+                >
+                  All makes &rarr;
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col items-center space-y-10 lg:items-start">
             <div>
               <h4 className="mb-6 text-center text-lg font-semibold">
                 We Accept
