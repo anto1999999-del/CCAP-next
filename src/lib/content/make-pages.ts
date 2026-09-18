@@ -80,6 +80,7 @@ export const MAKE_PAGES: MakePage[] = [
           "Major components carry our parts warranty, and Australian Consumer Law protections apply because you are buying from a licensed business, not a private seller. Warranty terms are on our terms page and on every invoice.",
       },
     ],
+    blogSlug: "hyundai-tucson-common-problems-australia",
   },
 
   {
@@ -425,7 +426,7 @@ export const MAKE_PAGES: MakePage[] = [
           "Yes. We buy Holdens for parts across the Central Coast, collect the car and handle the paperwork. Use the Sell Your Car page or call us with the details.",
       },
     ],
-    blogSlug: "holden-wreckers-parts-guide",
+    blogSlug: "holden-colorado-common-problems-australia",
   },
 ];
 
