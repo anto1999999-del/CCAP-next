@@ -80,6 +80,7 @@ export default async function sitemap(props: {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    { url: `${site.url}/privacy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${site.url}/blog`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/gallery`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/wreckers`, changeFrequency: "weekly", priority: 0.8 },

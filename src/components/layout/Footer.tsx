@@ -36,6 +36,7 @@ const COMPANY_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
+  { href: "/privacy", label: "Privacy & Cookies" },
   { href: "/terms-conditions", label: "Terms & Conditions" },
 ] as const;
 

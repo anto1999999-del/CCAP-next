@@ -3,6 +3,7 @@ import { site, absoluteUrl } from "@/lib/site";
 import { CartProvider } from "@/lib/cart/CartProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CookieConsent from "@/components/layout/CookieConsent";
 import ThirdPartyGate from "@/components/layout/ThirdPartyGate";
 import "./globals.css";
 
@@ -151,6 +152,7 @@ export default function RootLayout({
           <Footer />
         </CartProvider>
         <ThirdPartyGate />
+        <CookieConsent />
         <script
           type="application/ld+json"
           // Serialised server-side from a literal defined above; no user input
