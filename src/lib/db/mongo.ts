@@ -52,6 +52,9 @@ export type OrderItemDocument = {
   productUrl?: string;
 };
 
+/** The two emails a paid order owes: the yard's copy and the customer's. */
+export type OrderEmail = "sales" | "customer";
+
 export type OrderDocument = {
   _id: ObjectId;
   user: ObjectId;
@@ -76,6 +79,12 @@ export type OrderDocument = {
   /** Stripe's id for the payment, so a webhook can find the order it belongs to. */
   paymentIntentId?: string;
   paidAt?: Date;
+  /**
+   * The payment emails not yet delivered. Set when the order is marked paid and
+   * emptied as each one goes out, so a failed send is remembered and retried
+   * on Stripe's next delivery instead of being lost. Absent on older orders.
+   */
+  emailsPending?: OrderEmail[];
   createdAt?: Date;
   updatedAt?: Date;
 };

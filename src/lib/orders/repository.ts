@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import {
   orders,
   type OrderDocument,
+  type OrderEmail,
   type OrderItemDocument,
 } from "../db/mongo";
 import { NEEDS_ACTION, ORDER_STATUSES } from "./types";
@@ -380,14 +381,49 @@ export async function createPending(order: {
  * arriving twice must not produce two paid orders.
  */
 export async function markPaid(paymentIntentId: string): Promise<boolean> {
+  const emailsPending: OrderEmail[] = ["sales", "customer"];
   const result = await (
     await orders()
   ).updateOne(
     { paymentIntentId, status: "Awaiting payment" } as Record<string, unknown>,
-    { $set: { status: "Pending", paidAt: new Date(), updatedAt: new Date() } },
+    {
+      $set: {
+        status: "Pending",
+        paidAt: new Date(),
+        updatedAt: new Date(),
+        // In the same write as the status, so there is no moment where the
+        // order is paid but nothing records that its emails are owed.
+        emailsPending,
+      },
+    },
   );
 
   return result.modifiedCount === 1;
+}
+
+/** Which of an order's payment emails have not gone out yet. */
+export async function emailsOwed(
+  paymentIntentId: string,
+): Promise<OrderEmail[]> {
+  const document = await (
+    await orders()
+  ).findOne({ paymentIntentId } as Record<string, unknown>, {
+    projection: { emailsPending: 1 },
+  });
+
+  return document?.emailsPending ?? [];
+}
+
+/** Record that one of an order's payment emails has been delivered. */
+export async function markEmailSent(
+  paymentIntentId: string,
+  email: OrderEmail,
+): Promise<void> {
+  await (
+    await orders()
+  ).updateOne({ paymentIntentId } as Record<string, unknown>, {
+    $pull: { emailsPending: email },
+  });
 }
 
 /** Find an order by its payment, for the page a customer lands on afterwards. */

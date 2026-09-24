@@ -1,6 +1,11 @@
 import type { NextRequest } from "next/server";
 import { payments } from "@/lib/payments/stripe";
-import { findByPayment, markPaid } from "@/lib/orders/repository";
+import {
+  emailsOwed,
+  findByPayment,
+  markEmailSent,
+  markPaid,
+} from "@/lib/orders/repository";
 import { sendEmail } from "@/lib/email";
 import { orderConfirmation, orderForSales } from "@/lib/emails/orders";
 import { site } from "@/lib/site";
@@ -52,7 +57,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     /*
       A 500 tells Stripe to retry, which is what we want if the database was
-      briefly unavailable: the order is still sitting there awaiting payment.
+      briefly unavailable or an email could not be sent: the next delivery
+      picks up whatever is still undone.
     */
     console.error(`[stripe] handling ${event.type} failed:`, error);
     return new Response("Handler failed", { status: 500 });
@@ -62,28 +68,54 @@ export async function POST(request: NextRequest) {
 }
 
 async function onPaid(paymentIntentId: string): Promise<void> {
-  // False when this payment has already been handled: Stripe retries anything
-  // it did not get a clean answer to, and an order must not be paid twice.
-  const changed = await markPaid(paymentIntentId);
-  if (!changed) return;
+  /*
+    Idempotent: false when this payment was already handled. That no longer
+    ends the job, because a delivery can also be Stripe retrying an event whose
+    emails did not all go out; whatever is still owed is sent below either way.
+  */
+  await markPaid(paymentIntentId);
+
+  const owed = await emailsOwed(paymentIntentId);
+  if (owed.length === 0) return;
 
   const order = await findByPayment(paymentIntentId);
   if (!order) return;
 
-  const sales = orderForSales(order);
-  const customer = orderConfirmation(order);
-
-  await Promise.all([
-    sendEmail({ to: site.contact.email, ...sales }),
+  const messages = {
+    sales: { to: site.contact.email, ...orderForSales(order) },
     /*
       Replies go to sales rather than to the unmonitored sender. Somebody who
       hits reply on their confirmation to change an address is writing to a
       human either way.
     */
-    sendEmail({
+    customer: {
       to: order.customer.email,
       replyTo: site.contact.email,
-      ...customer,
+      ...orderConfirmation(order),
+    },
+  };
+
+  const results = await Promise.all(
+    owed.map(async (which) => {
+      const sent = await sendEmail({
+        ...messages[which],
+        // Two overlapping deliveries of the same event send one email, not two.
+        idempotencyKey: `order-${order.id}-${which}`,
+      });
+      if (sent.ok) await markEmailSent(paymentIntentId, which);
+      return sent.ok ? null : which;
     }),
-  ]);
+  );
+
+  const failed = results.filter(Boolean);
+  if (failed.length > 0) {
+    /*
+      Thrown so the handler answers 500 and Stripe delivers the event again,
+      which it keeps doing for up to three days. The order is already paid and
+      the emails that did go out are ticked off, so the retry sends only these.
+    */
+    throw new Error(
+      `order ${order.id}: ${failed.join(" and ")} email not sent, asking Stripe to retry`,
+    );
+  }
 }
