@@ -5,6 +5,7 @@ import { hasPrice } from "@/lib/parts/arrange";
 import { partPath } from "@/lib/parts/identity";
 import { gridImageUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
+import { partTypeLabel } from "@/lib/parts/part-type-names";
 import type { CatalogPart } from "@/lib/parts/types";
 
 /**
@@ -41,7 +42,10 @@ export default function PartCard({ part }: { part: CatalogPart }) {
 
         <dl className="mb-3 space-y-1 text-sm text-gray-400">
           <Detail label="Manufacturer" value={part.manufacturer} />
-          <Detail label="Item Type" value={part.itemTypeCode} />
+          <Detail
+            label="Item Type"
+            value={part.itemTypeCode ? partTypeLabel(part.itemTypeCode) : null}
+          />
           <Detail label="Model" value={part.model} />
           <Detail
             label="Year"

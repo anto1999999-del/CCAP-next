@@ -20,6 +20,7 @@ import {
 import { canonicalPathFor, partKey } from "@/lib/parts/identity";
 import { coverImage, fullImageUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
+import { partTypeLabel } from "@/lib/parts/part-type-names";
 import { findPart } from "@/lib/parts/query";
 import { SHIPPING, WARRANTY } from "@/lib/content/part-terms";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
@@ -330,7 +331,12 @@ export default async function ProductPage({ params }: { params: Params }) {
             <Row label="Stock number" value={orNotRecorded(part.stockNo)} />
             <Row label="Tag number" value={orNotRecorded(part.tag)} />
             <Row label="Odometer" value={formatOdometer(part.odoReading)} />
-            <Row label="Item type" value={orNotRecorded(part.itemTypeCode)} />
+            <Row
+              label="Item type"
+              value={orNotRecorded(
+                part.itemTypeCode ? partTypeLabel(part.itemTypeCode) : null,
+              )}
+            />
           </dl>
         </div>
       </Container>

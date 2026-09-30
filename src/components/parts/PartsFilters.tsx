@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import type { FilterOptions, PartFilters } from "@/lib/parts/types";
+import PartTypePicker from "./PartTypePicker";
 
 /** Widest choice first. Everything after a changed control is cleared. */
 const CASCADE = ["year", "make", "model", "part_type"] as const;
@@ -45,15 +46,26 @@ export default function PartsFilters({
     if (!element) return;
 
     for (const name of CASCADE.slice(CASCADE.indexOf(changed) + 1)) {
-      const select = element.elements.namedItem(name);
-      if (select instanceof HTMLSelectElement) select.value = "";
+      // Part type is a hidden input behind the search box, the rest selects.
+      const field = element.elements.namedItem(name);
+      if (
+        field instanceof HTMLSelectElement ||
+        field instanceof HTMLInputElement
+      ) {
+        field.value = "";
+      }
     }
 
     element.requestSubmit();
   };
 
   return (
-    <form ref={form} action="/products" method="GET" className="w-full text-white">
+    <form
+      ref={form}
+      action="/products"
+      method="GET"
+      className="w-full text-white"
+    >
       {query && <input type="hidden" name="q" value={query} />}
 
       <h2 className="mb-6 flex items-center gap-2 text-xl font-bold text-white">
@@ -86,13 +98,10 @@ export default function PartsFilters({
           options={options.models}
           onChange={() => submit("model")}
         />
-        <Select
-          name="part_type"
-          label="Part Type"
-          placeholder="Select Part Type"
+        <PartTypePicker
           value={filters.partType}
-          options={options.partTypes}
-          onChange={() => submit("part_type")}
+          codes={options.partTypes}
+          onPick={() => submit("part_type")}
         />
       </div>
 
