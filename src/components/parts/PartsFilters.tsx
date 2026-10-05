@@ -5,8 +5,14 @@ import { useRef } from "react";
 import type { FilterOptions, PartFilters } from "@/lib/parts/types";
 import PartTypePicker from "./PartTypePicker";
 
-/** Widest choice first. Everything after a changed control is cleared. */
-const CASCADE = ["year", "make", "model", "part_type"] as const;
+/**
+ * Widest choice first. Everything after a changed control is cleared.
+ *
+ * Part type is not in this list. It is not narrower than a model, it is a
+ * different question: "door mirror" then "Holden" then "Colorado" should narrow
+ * step by step, not throw the part away each time the vehicle changes.
+ */
+const CASCADE = ["year", "make", "model"] as const;
 
 /**
  * The year, make, model and part type controls.
@@ -41,18 +47,14 @@ export default function PartsFilters({
    * `page` is not in this form at all, so changing a filter always lands on
    * page one, which is where the results now start.
    */
-  const submit = (changed: (typeof CASCADE)[number]) => {
+  const submit = (changed?: (typeof CASCADE)[number]) => {
     const element = form.current;
     if (!element) return;
 
-    for (const name of CASCADE.slice(CASCADE.indexOf(changed) + 1)) {
-      // Part type is a hidden input behind the search box, the rest selects.
-      const field = element.elements.namedItem(name);
-      if (
-        field instanceof HTMLSelectElement ||
-        field instanceof HTMLInputElement
-      ) {
-        field.value = "";
+    if (changed) {
+      for (const name of CASCADE.slice(CASCADE.indexOf(changed) + 1)) {
+        const select = element.elements.namedItem(name);
+        if (select instanceof HTMLSelectElement) select.value = "";
       }
     }
 
@@ -61,6 +63,18 @@ export default function PartsFilters({
 
   return (
     <form
+      /*
+        Remounted whenever the filters in the URL change. The selects are
+        uncontrolled and "Reset Filters" is a client-side link, so without this
+        the results reset while the boxes went on showing the old make.
+      */
+      key={[
+        filters.year,
+        filters.make,
+        filters.model,
+        filters.partType,
+        query,
+      ].join("|")}
       ref={form}
       action="/products"
       method="GET"
@@ -101,7 +115,7 @@ export default function PartsFilters({
         <PartTypePicker
           value={filters.partType}
           codes={options.partTypes}
-          onPick={() => submit("part_type")}
+          onPick={() => submit()}
         />
       </div>
 

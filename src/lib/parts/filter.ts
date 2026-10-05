@@ -82,7 +82,7 @@ function sortedUnique(values: (string | null)[]): string[] {
  * The choices to offer, narrowed by what has already been chosen.
  *
  * The controls cascade: makes are those with parts in the chosen year, models
- * those within the chosen make, part types what those models actually have.
+ * those within the chosen make, part types what that selection actually has.
  * Offering every value at every step lets a customer build a combination the
  * yard has nothing for, which is how the old site produced empty pages.
  */
@@ -115,11 +115,14 @@ export function deriveFilterOptions(
     : [];
   const models = sortedUnique(forModels.map((part) => part.model));
 
-  const forTypes = model
-    ? filterParts(parts, { year, make, model, partType: "" })
-    : year || make
-      ? []
-      : parts;
+  /*
+    Part types follow whatever has been chosen so far, at every step. They used
+    to appear only once a model was picked, so choosing a make left the control
+    disabled: a customer after a Holden door mirror had to pick a model before
+    they could say what part they wanted. The list is still only what the
+    selection actually has in stock.
+  */
+  const forTypes = filterParts(parts, { year, make, model, partType: "" });
   const partTypes = sortedUnique(forTypes.map((part) => part.itemTypeCode));
 
   return { years, makes, models, partTypes };

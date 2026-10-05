@@ -106,7 +106,9 @@ export default function PartTypePicker({
           spellCheck={false}
           disabled={disabled}
           placeholder={
-            disabled ? "Choose a model first" : "Search, e.g. door mirror"
+            disabled
+              ? "No part types for this selection"
+              : "Search, e.g. door mirror"
           }
           value={text}
           onFocus={(event) => {

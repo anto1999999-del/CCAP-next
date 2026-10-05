@@ -437,3 +437,46 @@ test("a part named with an assembly word is still found by its name", () => {
   expect(matchesQuery(cover, "hilux engine")).toEqual(false);
   expect(matchesQuery(wiper, "motor")).toEqual(false);
 });
+
+/*
+  Part types used to be offered only after a model was chosen, so picking a
+  make left the control disabled (reported 5 Oct 2026).
+*/
+test("part types are offered for whatever has been chosen so far", () => {
+  const stock = [
+    part({
+      manufacturer: "HOLDEN",
+      model: "COLORADO",
+      year: "2016",
+      itemTypeCode: "LEFT_DOOR_MIRROR",
+    }),
+    part({
+      manufacturer: "HOLDEN",
+      model: "CRUZE",
+      year: "2014",
+      itemTypeCode: "ENGINE",
+    }),
+    part({
+      manufacturer: "MAZDA",
+      model: "BT50",
+      year: "2016",
+      itemTypeCode: "INTERCOOLER",
+    }),
+  ];
+
+  const holden = deriveFilterOptions(stock, {
+    ...EMPTY_FILTERS,
+    make: "HOLDEN",
+  });
+  expect(holden.partTypes).toEqual(["ENGINE", "LEFT_DOOR_MIRROR"]);
+
+  const in2016 = deriveFilterOptions(stock, { ...EMPTY_FILTERS, year: "2016" });
+  expect(in2016.partTypes).toEqual(["INTERCOOLER", "LEFT_DOOR_MIRROR"]);
+
+  const colorado = deriveFilterOptions(stock, {
+    ...EMPTY_FILTERS,
+    make: "HOLDEN",
+    model: "COLORADO",
+  });
+  expect(colorado.partTypes).toEqual(["LEFT_DOOR_MIRROR"]);
+});

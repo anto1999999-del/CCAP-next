@@ -33,7 +33,12 @@ export default function PartsSearch({
 
   return (
     <div className="w-full sm:max-w-md">
-      <form action="/products" method="GET" role="search" className="flex gap-2">
+      <form
+        action="/products"
+        method="GET"
+        role="search"
+        className="flex gap-2"
+      >
         {hidden.map(([name, value]) =>
           value ? (
             <input key={name} type="hidden" name={name} value={value} />
@@ -44,6 +49,9 @@ export default function PartsSearch({
           Search parts by name, make or model
         </label>
         <input
+          // Uncontrolled, and "Clear" is a client-side link: without the key
+          // the results cleared while the box kept the old search in it.
+          key={query}
           id="parts-search"
           name="q"
           type="search"
