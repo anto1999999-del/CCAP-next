@@ -235,6 +235,7 @@ export const MAKE_PAGES: MakePage[] = [
           "Every part is removed, inspected and photographed individually and listed against its donor vehicle with the kilometres recorded. Major components are sold with our warranty.",
       },
     ],
+    blogSlug: "mitsubishi-triton-common-problems-australia",
   },
 
   {
@@ -273,6 +274,7 @@ export const MAKE_PAGES: MakePage[] = [
           "Major components carry our parts warranty, and because you buy from a licensed business, Australian Consumer Law protections apply. Terms are on our terms page and every invoice.",
       },
     ],
+    blogSlug: "mazda-bt-50-common-problems-australia",
   },
 
   {
