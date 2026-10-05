@@ -351,3 +351,89 @@ test("same part off different-year donors is two listings, same donor is one", (
     canonicalPathFor(off2021, yard),
   );
 });
+
+/*
+  How a search is written should not decide whether it works. The feed files
+  the Mazda ute as "BT50"; on 5 Oct 2026 "mazda bt-50" found nothing on the
+  live site while "mazda bt 50" found 671 parts.
+*/
+test("a search ignores dashes and spacing inside a model name", () => {
+  const bt50 = part({
+    manufacturer: "MAZDA",
+    model: "BT50",
+    itemName: "Intercooler",
+    itemTypeCode: "INTERCOOLER",
+  });
+  for (const typed of [
+    "mazda bt-50",
+    "mazda bt 50",
+    "mazda bt50",
+    "BT-50, intercooler",
+  ]) {
+    expect(matchesQuery(bt50, typed)).toEqual(true);
+  }
+
+  const santaFe = part({
+    manufacturer: "HYUNDAI",
+    model: "SANTA FE",
+    itemName: "Left Headlamp",
+    itemTypeCode: "LEFT_HEADLAMP",
+  });
+  expect(matchesQuery(santaFe, "santafe")).toEqual(true);
+  expect(matchesQuery(santaFe, "santa-fe")).toEqual(true);
+});
+
+test("joined words only match from the start of a word", () => {
+  // "xtrail" must not be found across "flex trailing".
+  const arm = part({
+    manufacturer: "SUBARU",
+    model: "CROSSTREK",
+    itemName: "Left Rear Trailing Arm",
+    itemTypeCode: "LEFT_REAR_TRAILING_ARM",
+    icDesc: "flex trailing arm",
+  });
+  expect(matchesQuery(arm, "xtrail")).toEqual(false);
+  expect(matchesQuery(arm, "x-trail")).toEqual(false);
+});
+
+test("a plural finds the singular", () => {
+  const mirror = part({
+    itemName: "Right Door Mirror",
+    itemTypeCode: "RIGHT_DOOR_MIRROR",
+  });
+  expect(matchesQuery(mirror, "door mirrors")).toEqual(true);
+});
+
+test("a search understands the words people use for a part", () => {
+  const lamp = part({
+    itemName: "Left Headlamp",
+    itemTypeCode: "LEFT_HEADLAMP",
+  });
+  expect(matchesQuery(lamp, "headlight")).toEqual(true);
+  expect(matchesQuery(lamp, "passenger headlights")).toEqual(true);
+  expect(matchesQuery(lamp, "driver headlight")).toEqual(false);
+
+  const compressor = part({
+    itemName: "A/C Compressor",
+    itemTypeCode: "A_C_COMPRESSOR",
+  });
+  expect(matchesQuery(compressor, "aircon compressor")).toEqual(true);
+});
+
+test("a part named with an assembly word is still found by its name", () => {
+  const cover = part({
+    itemName: "Engine Cover",
+    itemTypeCode: "ENGINE_COVER",
+    manufacturer: "TOYOTA",
+    model: "HILUX",
+  });
+  const wiper = part({ itemName: "Wiper Motor", itemTypeCode: "WIPER_MOTOR" });
+
+  expect(matchesQuery(cover, "engine cover")).toEqual(true);
+  expect(matchesQuery(wiper, "wiper motor")).toEqual(true);
+
+  // ...but the assembly word still means the assembly when nothing else in
+  // the search names this part.
+  expect(matchesQuery(cover, "hilux engine")).toEqual(false);
+  expect(matchesQuery(wiper, "motor")).toEqual(false);
+});
