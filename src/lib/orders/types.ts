@@ -35,6 +35,11 @@ export type Order = {
   paymentMethod: string;
   pickup: boolean;
   hidden: boolean;
+  /**
+   * Where the order stands with the yard's Pinnacle Pro. Absent on orders paid
+   * before sending was switched on, which were entered there by hand.
+   */
+  supplier?: { state: "pending" | "sent" | "failed"; message?: string };
   customer: {
     name: string;
     email: string;

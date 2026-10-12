@@ -4,6 +4,7 @@ import {
   orders,
   type OrderDocument,
   type OrderEmail,
+  type SupplierOrderState,
   type OrderItemDocument,
 } from "../db/mongo";
 import { NEEDS_ACTION, ORDER_STATUSES } from "./types";
@@ -43,6 +44,14 @@ function toOrder(document: OrderDocument): Order {
     paymentMethod: document.paymentMethod ?? "",
     pickup: document.pickup === true,
     hidden: document.hidden === true,
+    ...(document.supplierOrder
+      ? {
+          supplier: {
+            state: document.supplierOrder.state,
+            message: document.supplierOrder.message,
+          },
+        }
+      : {}),
     customer: {
       name: document.name ?? "",
       email: document.email ?? "",
@@ -380,8 +389,17 @@ export async function createPending(order: {
  * retries anything it did not get a clean answer to, and the same payment
  * arriving twice must not produce two paid orders.
  */
-export async function markPaid(paymentIntentId: string): Promise<boolean> {
+export async function markPaid(
+  paymentIntentId: string,
+  /** Whether this order is also owed to the supplier's system. */
+  { sendToSupplier = false }: { sendToSupplier?: boolean } = {},
+): Promise<boolean> {
   const emailsPending: OrderEmail[] = ["sales", "customer"];
+  const supplierOrder: SupplierOrderState = {
+    state: "pending",
+    attempts: 0,
+    updatedAt: new Date(),
+  };
   const result = await (
     await orders()
   ).updateOne(
@@ -394,11 +412,38 @@ export async function markPaid(paymentIntentId: string): Promise<boolean> {
         // In the same write as the status, so there is no moment where the
         // order is paid but nothing records that its emails are owed.
         emailsPending,
+        // Likewise for the supplier: owed from the moment the order is paid.
+        ...(sendToSupplier ? { supplierOrder } : {}),
       },
     },
   );
 
   return result.modifiedCount === 1;
+}
+
+/** Where an order stands with the supplier's system, if it is owed there. */
+export async function supplierOrderState(
+  paymentIntentId: string,
+): Promise<SupplierOrderState | null> {
+  const document = await (
+    await orders()
+  ).findOne({ paymentIntentId } as Record<string, unknown>, {
+    projection: { supplierOrder: 1 },
+  });
+
+  return document?.supplierOrder ?? null;
+}
+
+/** Record the result of trying to send an order to the supplier. */
+export async function recordSupplierOrder(
+  paymentIntentId: string,
+  update: Pick<SupplierOrderState, "state" | "attempts" | "message">,
+): Promise<void> {
+  await (
+    await orders()
+  ).updateOne({ paymentIntentId } as Record<string, unknown>, {
+    $set: { supplierOrder: { ...update, updatedAt: new Date() } },
+  });
 }
 
 /** Which of an order's payment emails have not gone out yet. */

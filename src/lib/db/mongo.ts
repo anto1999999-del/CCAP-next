@@ -52,6 +52,17 @@ export type OrderItemDocument = {
   productUrl?: string;
 };
 
+/** An order's progress into the supplier's system. */
+export type SupplierOrderState = {
+  /** pending: still to send. sent: accepted. failed: needs entering by hand. */
+  state: "pending" | "sent" | "failed";
+  /** Sends that got no usable answer, so the next can decide to give up. */
+  attempts: number;
+  /** What the API said last, or why the order could not be sent. */
+  message?: string;
+  updatedAt: Date;
+};
+
 /** The two emails a paid order owes: the yard's copy and the customer's. */
 export type OrderEmail = "sales" | "customer";
 
@@ -85,6 +96,13 @@ export type OrderDocument = {
    * on Stripe's next delivery instead of being lost. Absent on older orders.
    */
   emailsPending?: OrderEmail[];
+  /**
+   * Where this order stands with the yard's Pinnacle Pro. Set to pending when
+   * the order is paid and sending is switched on; absent on every order paid
+   * before that, which is what stops an old order being pushed by a stray
+   * redelivery.
+   */
+  supplierOrder?: SupplierOrderState;
   createdAt?: Date;
   updatedAt?: Date;
 };

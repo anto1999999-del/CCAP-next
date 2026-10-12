@@ -176,6 +176,23 @@ export default function OrderRow({
                   : undefined
               }
             />
+            {/*
+              Only on orders paid since sending to Pinnacle was switched on.
+              "Not sent" is the one that needs somebody: that order has to be
+              entered in Pinnacle by hand.
+            */}
+            {order.supplier && (
+              <Detail
+                label="Pinnacle"
+                value={
+                  order.supplier.state === "sent"
+                    ? "Sent"
+                    : order.supplier.state === "pending"
+                      ? "Sending"
+                      : `Not sent, enter by hand (${order.supplier.message ?? "no reason recorded"})`
+                }
+              />
+            )}
           </div>
 
           <form
