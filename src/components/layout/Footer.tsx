@@ -190,6 +190,7 @@ function BrandBlock() {
           />
           <a
             href={`tel:${contact.phoneE164}`}
+            data-phone-location="footer"
             className="font-semibold text-white hover:text-brand-text"
           >
             {contact.phone}

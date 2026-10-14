@@ -52,6 +52,7 @@ export default function HelpBand() {
         <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row">
           <a
             href={`tel:${site.contact.phoneE164}`}
+            data-phone-location="help_band"
             className="rounded-full bg-white px-7 py-3 text-sm font-bold tracking-wide text-black uppercase transition-colors hover:bg-gray-100"
           >
             Call {site.contact.phone}

@@ -7,6 +7,7 @@ import {
   type SaleOfferState,
 } from "@/app/actions/sell-your-car";
 import { useRecaptcha } from "@/lib/useRecaptcha";
+import { useLeadOnSuccess } from "@/lib/analytics/useLeadOnSuccess";
 
 /**
  * "Sell your car" offer form.
@@ -106,6 +107,7 @@ function SubmitButton() {
 
 export default function SellYourCarForm() {
   const [state, formAction] = useActionState(submitSaleOffer, INITIAL_STATE);
+  useLeadOnSuccess(state, "sell_car");
 
   /*
     What was typed last time, handed back by the action when it refused.

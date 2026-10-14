@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ClearCartOnOrder from "@/components/cart/ClearCartOnOrder";
+import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 import { findByPayment } from "@/lib/orders/repository";
 import { isConfigured } from "@/lib/db/mongo";
 import { formatCents } from "@/lib/parts/price";
@@ -25,11 +26,26 @@ export const metadata: Metadata = {
 export default async function OrderSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ payment_intent?: string }>;
+  searchParams: Promise<{ payment_intent?: string; redirect_status?: string }>;
 }) {
-  const { payment_intent: paymentIntent } = await searchParams;
+  const { payment_intent: paymentIntent, redirect_status: redirectStatus } =
+    await searchParams;
   const order =
     paymentIntent && isConfigured() ? await findByPayment(paymentIntent) : null;
+
+  /*
+    A sale is recorded only for money that moved: Stripe says the payment
+    succeeded when it sends the customer here, or the webhook has already
+    marked the order paid. A customer whose card was declined can land on this
+    page too, and is not a conversion.
+  */
+  const paid =
+    order !== null &&
+    paymentIntent !== undefined &&
+    // The stored status is wider than OrderStatus: an unpaid order carries
+    // "Awaiting payment", which the type leaves out because pages never show it.
+    (redirectStatus === "succeeded" ||
+      String(order.status) !== "Awaiting payment");
 
   return (
     <div className="bg-admin flex min-h-[70vh] items-center justify-center px-4 py-16 text-white">
@@ -47,6 +63,20 @@ export default async function OrderSuccessPage({
               so landing here with an id that matches nothing leaves it alone.
             */}
             <ClearCartOnOrder orderId={order.id} />
+            {paid && (
+              <PurchaseTracker
+                purchase={{
+                  transactionId: paymentIntent,
+                  value: order.amountCents / 100,
+                  items: order.items.map((item) => ({
+                    item_id: `${item.urgId ?? "part"}-${item.invNumber ?? ""}`,
+                    item_name: item.name,
+                    price: item.priceCents / 100,
+                    quantity: item.quantity,
+                  })),
+                }}
+              />
+            )}
             <p className="mb-6 text-gray-300">
               {formatCents(order.amountCents)} for {order.items.length}{" "}
               {order.items.length === 1 ? "part" : "parts"}.

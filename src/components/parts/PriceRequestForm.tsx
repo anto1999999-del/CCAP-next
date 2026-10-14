@@ -7,6 +7,7 @@ import {
   type PriceRequestState,
 } from "@/app/actions/price-request";
 import { useRecaptcha } from "@/lib/useRecaptcha";
+import { useLeadOnSuccess } from "@/lib/analytics/useLeadOnSuccess";
 
 /**
  * Asking what an uncosted part is worth, from the page the part is on.
@@ -61,6 +62,7 @@ export default function PriceRequestForm({
   itemName: string;
 }) {
   const [state, formAction] = useActionState(requestPartPrice, INITIAL_STATE);
+  useLeadOnSuccess(state, "part_enquiry");
   const [open, setOpen] = useState(false);
   const executeRecaptcha = useRecaptcha();
 

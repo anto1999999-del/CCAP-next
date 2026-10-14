@@ -4,6 +4,7 @@ import { useActionState, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { submitContactForm, type ContactState } from "@/app/actions/contact";
 import { useRecaptcha } from "@/lib/useRecaptcha";
+import { useLeadOnSuccess } from "@/lib/analytics/useLeadOnSuccess";
 
 /**
  * Contact form.
@@ -80,6 +81,7 @@ function SubmitButton() {
 
 export default function ContactForm() {
   const [state, formAction] = useActionState(submitContactForm, INITIAL_STATE);
+  useLeadOnSuccess(state, "contact");
 
   /*
     What was typed last time, handed back by the action when it refused.

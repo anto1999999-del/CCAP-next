@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Script from "next/script";
 import { site } from "@/lib/site";
+import { WAKE_EVENT, ensureGtag, track } from "@/lib/analytics/gtag";
+import { phoneLinkLocation } from "@/lib/analytics/locations";
 
 /**
  * Analytics and the chat widget.
@@ -24,7 +26,17 @@ import { site } from "@/lib/site";
  * None of this runs on the admin. Measuring the yard's own staff working
  * through the morning's orders pollutes the numbers the owner reads, and there
  * is nobody to chat to on a dashboard.
+ *
+ * A conversion (lib/analytics/gtag) does not wait for any of that: it queues
+ * its event and dispatches WAKE_EVENT, which brings the script in at once.
  */
+
+declare global {
+  interface Window {
+    /** Podium's webchat calls this with the name of whatever just happened. */
+    PodiumEventsCallback?: (event: string, properties?: unknown) => void;
+  }
+}
 
 /** The events that mean somebody is actually here. */
 const WAKE = ["scroll", "pointerdown", "keydown", "touchstart"] as const;
@@ -39,6 +51,42 @@ export default function ThirdParty({ enabled }: { enabled: boolean }) {
     for (const event of WAKE) {
       window.addEventListener(event, wake, { once: true, passive: true });
     }
+    window.addEventListener(WAKE_EVENT, wake);
+
+    /*
+      Every tap on a phone number, wherever it is. One listener on the page
+      rather than a handler on each of the dozen tel: links, so a link added
+      next month is counted without anybody remembering to wire it.
+    */
+    const onClick = (event: MouseEvent) => {
+      const link =
+        event.target instanceof Element
+          ? event.target.closest<HTMLAnchorElement>('a[href^="tel:"]')
+          : null;
+      if (!link) return;
+      track(
+        "phone_click",
+        {
+          link_location: phoneLinkLocation(
+            window.location.pathname,
+            link.closest<HTMLElement>("[data-phone-location]")?.dataset
+              .phoneLocation,
+          ),
+        },
+        { conversion: "call" },
+      );
+    };
+    document.addEventListener("click", onClick, { capture: true });
+
+    /*
+      Podium calls this when something happens in the chat. "Conversation
+      Started" is a visitor sending their first message. The name comes from
+      Podium's community documentation rather than an official reference, so
+      it is matched exactly and anything else is ignored.
+    */
+    window.PodiumEventsCallback = (name) => {
+      if (name === "Conversation Started") track("chat_start", {});
+    };
 
     /*
       And a backstop, for somebody who reads without touching anything. Long
@@ -48,9 +96,14 @@ export default function ThirdParty({ enabled }: { enabled: boolean }) {
 
     return () => {
       for (const event of WAKE) window.removeEventListener(event, wake);
+      window.removeEventListener(WAKE_EVENT, wake);
+      document.removeEventListener("click", onClick, { capture: true });
       window.clearTimeout(timer);
     };
   }, [enabled]);
+
+  // The queue and its configuration, ahead of the script that will read them.
+  if (enabled && awake) ensureGtag();
 
   if (!enabled || !awake) return null;
 
@@ -63,9 +116,6 @@ export default function ThirdParty({ enabled }: { enabled: boolean }) {
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`}
       />
-      <Script id="ga4-init" strategy="afterInteractive">
-        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4}');`}
-      </Script>
 
       <Script id="clarity" strategy="afterInteractive">
         {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarity}");`}
