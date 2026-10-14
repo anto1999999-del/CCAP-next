@@ -18,6 +18,12 @@ import {
   yearLabel,
 } from "@/lib/parts/format";
 import { canonicalPathFor, partKey } from "@/lib/parts/identity";
+import {
+  STILL_FITTED_NOTICE,
+  VEHICLE_PHOTOS_NOTICE,
+  onlyVehiclePhotos,
+  stillOnDonorVehicle,
+} from "@/lib/parts/donor";
 import { coverImage, fullImageUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
 import { partTypeLabel } from "@/lib/parts/part-type-names";
@@ -135,6 +141,8 @@ export default async function ProductPage({ params }: { params: Params }) {
   const sellable = hasPrice(part);
   const description = descriptionText(part);
   const vehicle = vehicleLabel(part);
+  const stillFitted = stillOnDonorVehicle(part);
+  const vehiclePhotos = onlyVehiclePhotos(images);
 
   const related = parts
     .filter(
@@ -225,6 +233,14 @@ export default async function ProductPage({ params }: { params: Params }) {
       <Container className="flex flex-col gap-8 py-10 lg:flex-row lg:gap-10">
         <div className="min-w-0 flex-1">
           <PartGallery images={images} name={name} />
+          {/*
+            Said under the photos because that is where the question comes up:
+            somebody who opened a page for a mirror and is looking at a whole
+            car needs to know that is deliberate.
+          */}
+          {vehiclePhotos && (
+            <Notice icon="camera">{VEHICLE_PHOTOS_NOTICE}</Notice>
+          )}
         </div>
 
         <div className="w-full self-start lg:sticky lg:top-24 lg:w-[24rem] lg:shrink-0">
@@ -246,6 +262,16 @@ export default async function ProductPage({ params }: { params: Params }) {
           </h1>
 
           <div className="border-line bg-card rounded-2xl border p-6">
+            {/*
+              First in the box, before the price and the button, so nobody
+              pays expecting a part to leave today that is still on the car.
+            */}
+            {stillFitted && (
+              <div className="mb-5">
+                <Notice icon="car">{STILL_FITTED_NOTICE}</Notice>
+              </div>
+            )}
+
             {sellable ? (
               <>
                 <p className="text-3xl font-extrabold tabular-nums text-white md:text-4xl">
@@ -466,6 +492,43 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 /** One reassurance in the buy panel: a tick, then the words. */
+/** A short, quiet note about this particular listing. */
+function Notice({
+  icon,
+  children,
+}: {
+  icon: "car" | "camera";
+  children: React.ReactNode;
+}) {
+  return (
+    <p className="border-line bg-tile mt-3 flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-relaxed text-gray-300">
+      <svg
+        viewBox="0 0 24 24"
+        className="text-brand-text mt-0.5 h-4 w-4 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {icon === "car" ? (
+          <>
+            <path d="M5 17h14M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17v-4l2-5h14l2 5v4" />
+            <path d="M3 13h18" />
+          </>
+        ) : (
+          <>
+            <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+            <circle cx="12" cy="13" r="3.5" />
+          </>
+        )}
+      </svg>
+      <span>{children}</span>
+    </p>
+  );
+}
+
 function Assurance({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2.5">
