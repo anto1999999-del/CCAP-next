@@ -268,7 +268,19 @@ export default async function ProductPage({ params }: { params: Params }) {
             */}
             {stillFitted && (
               <div className="mb-5">
-                <Notice icon="car">{STILL_FITTED_NOTICE}</Notice>
+                <Notice icon="car">
+                  {STILL_FITTED_NOTICE}
+                  {/*
+                    Both of the owner's lines together, as he wrote them: a
+                    part still on the car only ever has photos of the car.
+                  */}
+                  {vehiclePhotos && (
+                    <>
+                      <br />
+                      {VEHICLE_PHOTOS_NOTICE}
+                    </>
+                  )}
+                </Notice>
               </div>
             )}
 
