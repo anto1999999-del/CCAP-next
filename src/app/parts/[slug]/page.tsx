@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import CategoryHero from "@/components/parts/CategoryHero";
+import InStockParts from "@/components/parts/InStockParts";
 import Container from "@/components/layout/Container";
 import {
   PART_CATEGORIES,
@@ -15,6 +16,14 @@ import { site } from "@/lib/site";
 type Params = Promise<{ slug: string }>;
 
 /** Seven pages, all known at build time. */
+/*
+  Rebuilt daily rather than once per deploy. The page shows live stock (a count,
+  and a grid of parts that link into the catalogue), and parts sell every day:
+  frozen at build time, the count drifts and the grid starts linking to parts
+  that are gone. Daily matches the nightly catalogue sync and the sitemap.
+*/
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return PART_CATEGORIES.map((category) => ({ slug: category.slug }));
 }
@@ -169,6 +178,15 @@ export default async function PartCategoryPage({ params }: { params: Params }) {
           </div>
         </Container>
       </section>
+
+      {category.partType ? (
+        <InStockParts
+          filters={{ partType: category.partType }}
+          heading={`Shop ${category.label}`}
+          viewAllHref={`/products?part_type=${encodeURIComponent(category.partType)}`}
+          viewAllLabel={`See all ${category.label.toLowerCase()}`}
+        />
+      ) : null}
 
       <section className="bg-admin pb-14 text-white md:pb-20">
         <Container>

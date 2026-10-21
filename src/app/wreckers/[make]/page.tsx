@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import CategoryHero from "@/components/parts/CategoryHero";
+import InStockParts from "@/components/parts/InStockParts";
 import Container from "@/components/layout/Container";
 import { MAKE_PAGES, makePageBySlug } from "@/lib/content/make-pages";
 import { PART_CATEGORIES } from "@/lib/content/part-categories";
@@ -13,6 +14,14 @@ import { site } from "@/lib/site";
 type Params = Promise<{ make: string }>;
 
 /** Ten pages, all known at build time. Cheap to prerender, unlike the catalogue. */
+/*
+  Rebuilt daily rather than once per deploy. The page shows live stock (a count,
+  and a grid of parts that link into the catalogue), and parts sell every day:
+  frozen at build time, the count drifts and the grid starts linking to parts
+  that are gone. Daily matches the nightly catalogue sync and the sitemap.
+*/
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return MAKE_PAGES.map((page) => ({ make: page.slug }));
 }
@@ -194,6 +203,13 @@ export default async function MakeWreckerPage({ params }: { params: Params }) {
           </div>
         </Container>
       </section>
+
+      <InStockParts
+        filters={{ make: page.make }}
+        heading={`Shop ${page.label} Parts`}
+        viewAllHref={catalogueHref}
+        viewAllLabel={`See all ${page.label} parts`}
+      />
 
       <section className="bg-admin pb-14 text-white md:pb-20">
         <Container>
