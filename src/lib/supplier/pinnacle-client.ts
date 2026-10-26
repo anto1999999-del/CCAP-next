@@ -2,7 +2,6 @@ import "server-only";
 import {
   readPinnacleReply,
   type PinnacleOrder,
-  type PinnacleOrderType,
   type PinnacleOutcome,
   type PinnacleSettings,
 } from "./pinnacle-order";
@@ -28,12 +27,6 @@ const DEFAULT_URL = "http://api.carparts-au.com/orderapi";
  */
 const TIMEOUT_MS = 10_000;
 
-const ORDER_TYPES: readonly PinnacleOrderType[] = [
-  "QUOTE",
-  "WORKORDER",
-  "INVOICE",
-];
-
 export type PinnacleConfig = {
   url: string;
   user: string;
@@ -55,8 +48,6 @@ export function pinnacleConfig(): PinnacleConfig | null {
     return null;
   }
 
-  const orderType = process.env.ORDER_API_ORDER_TYPE?.trim().toUpperCase();
-
   return {
     url: (process.env.ORDER_API_URL?.trim() || DEFAULT_URL).replace(/\/+$/, ""),
     user,
@@ -65,7 +56,6 @@ export function pinnacleConfig(): PinnacleConfig | null {
     settings: {
       // An unknown name is filed under "guest" by Pinnacle, not refused.
       salesPerson: process.env.ORDER_API_SALESPERSON?.trim() || "WEBSITE",
-      orderType: ORDER_TYPES.find((type) => type === orderType),
       defaultUrgId: process.env.ORDER_API_URG_ID?.trim() || "nw42",
     },
   };

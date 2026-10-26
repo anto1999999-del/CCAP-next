@@ -19,16 +19,12 @@ import { site } from "@/lib/site";
  * The constraints below are the API's, quoted from that document, not ours.
  */
 
-export type PinnacleOrderType = "QUOTE" | "WORKORDER" | "INVOICE";
-
 export type PinnacleSettings = {
   /**
    * The Pinnacle Pro sales person the order is recorded against. An unknown
    * name is not an error there: Pinnacle files it under "guest".
    */
   salesPerson: string;
-  /** Left out of the document when unset, which leaves Pinnacle's default. */
-  orderType?: PinnacleOrderType;
   /** The yard's site id, for an item that does not carry its own. */
   defaultUrgId: string;
   /** Stripe's id for the payment, shown in Pinnacle's accounts screen. */
@@ -53,7 +49,6 @@ type Comment = { commentType: "PUBLIC" | "PRIVATE"; comment: string };
 export type PinnacleOrder = {
   externalOrderReference: string;
   orderCreated?: string;
-  orderType?: PinnacleOrderType;
   site: { name: string; urgId: string };
   salesPerson: { userName: string };
   customer: {
@@ -269,7 +264,15 @@ export function buildPinnacleOrder(
       */
       externalOrderReference: order.id,
       ...(order.placedAt ? { orderCreated: order.placedAt } : {}),
-      ...(settings.orderType ? { orderType: settings.orderType } : {}),
+      /*
+        No order type. The specification describes QUOTE, WORKORDER and
+        INVOICE, but the live API refuses the field outright: the first real
+        order (24 Oct 2026) came back "Unrecognized field orderType ... 14
+        known properties: salesPerson, claimNumber, site,
+        externalOrderReference, repairOrderNumber, payments, shipping,
+        orderItems, comments, taxExemptOverride, orderCreated, customerPO,
+        customer, charges". Pinnacle decides the type itself.
+      */
       site: { name: site.name, urgId },
       salesPerson: { userName: settings.salesPerson },
       customer: {

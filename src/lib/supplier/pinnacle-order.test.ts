@@ -137,9 +137,28 @@ describe("the order document", () => {
     expect(commentsOf(doc)).toContain("Deliver to: 10 Example Street");
   });
 
-  it("only sets an order type when one has been chosen", () => {
-    expect(built()).not.toHaveProperty("orderType");
-    expect(built({}, { orderType: "INVOICE" }).orderType).toBe("INVOICE");
+  it("sends only fields the live API accepts", () => {
+    // The API's own list, from its refusal of the first real order (24 Oct
+    // 2026). Anything else, such as orderType, gets the whole order refused.
+    const known = [
+      "salesPerson",
+      "claimNumber",
+      "site",
+      "externalOrderReference",
+      "repairOrderNumber",
+      "payments",
+      "shipping",
+      "orderItems",
+      "comments",
+      "taxExemptOverride",
+      "orderCreated",
+      "customerPO",
+      "customer",
+      "charges",
+    ];
+    for (const doc of [built(), built({ pickup: true, amountCents: 8500 })]) {
+      for (const field of Object.keys(doc)) expect(known).toContain(field);
+    }
   });
 
   it("keeps every address field inside the API's limits", () => {
