@@ -468,3 +468,47 @@ from the address bar.
 The first tag is shown instead, where there is one, which on the Kia article
 reads "Cerato". Related articles are chosen by shared tags for the same reason:
 sorting by a category that every article shares sorts nothing.
+
+## 32. Freight waits for the carrier, and says why when it refuses
+
+Valid addresses were being told "Call us for a price". The carrier's test system
+goes cold when nobody has asked it anything for a while: after 20 and 45 minutes
+idle, the first quote took 23 and 19 seconds (measured 3 November 2026), and the
+next took about 1.5. The checkout gave up at 8 seconds and asked again with the
+same message identifier, which the carrier refuses as a duplicate, so the first
+customer after a quiet spell could not be priced. Over 23 October to 2 November,
+7 of 19 quotes for genuine addresses failed, five of them with exactly this
+ten-second signature.
+
+The quote now waits up to 28 seconds (the carrier's own limit is 29) and uses a
+new identifier on every attempt. Three things on the page changed with it, and
+they are changes of wording, not of look. Each uses styles already on the page.
+
+- **While a quote takes more than five seconds**, a grey line under the totals
+  says "Still getting a price from the carrier. After a quiet spell its first
+  answer can take up to half a minute." Without it, twenty seconds of
+  "Calculating..." reads as a hung page, and the customer edits the postcode
+  and starts the wait again.
+- **When the carrier refuses the suburb and postcode together**, Delivery reads
+  "Check suburb and postcode" instead of "Call us for a price", and the box below
+  asks them to spell the suburb as Australia Post does ("St Ives", not "Saint
+  Ives"), with the phone number still there. The carrier is strict: "Nth Sydney",
+  "Entrance" and "Gosford NSW" are refused too. The payment step says the same.
+- Nothing else in the copy changed. "Call us for a price" still appears when the
+  carrier cannot answer at all.
+
+Behind the page, without changing it:
+
+- Parts with a fractional measurement (coil packs at 7.13 cm, fuel doors at
+  70.5 cm, 39 priced parts in all) could not be quoted to anywhere, because the
+  carrier refuses decimals. Dimensions now go out rounded up to the next whole
+  centimetre.
+- Tharwa and the other ACT suburbs in 2620 were sent as NSW and refused. A 2620
+  address the carrier refuses as NSW is now tried as ACT.
+- The pickup date skips NSW public holidays through December 2027. The list has
+  to be extended each year.
+- The journal logs every quote, priced or not, with the carrier's reason, the
+  attempt count and how long it took. Search for `freight quote` to see both.
+
+Still open, for a decision: a suburb picker driven by the postcode would remove
+most of the refused addresses, but it is a new control on the form.

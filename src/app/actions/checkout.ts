@@ -4,7 +4,12 @@ import { z } from "zod";
 import { loadCatalog } from "@/lib/parts/catalog";
 import { formatCents } from "@/lib/parts/price";
 import { orderTotal, priceOrder, type PricedLine } from "@/lib/orders/pricing";
-import { quoteFreight, type ShipmentItem } from "@/lib/shipping/carrier";
+import {
+  isAddressRejection,
+  quoteFreight,
+  type FreightQuote,
+  type ShipmentItem,
+} from "@/lib/shipping/carrier";
 import { shippingProfileFor, volumeM3 } from "@/lib/shipping/dimensions";
 import { rateLimit } from "@/lib/rate-limit";
 import type { LineProblem } from "@/lib/orders/pricing";
@@ -67,6 +72,14 @@ export type CheckoutQuote =
       problems: LineProblem[];
       /** True when freight was asked for but the carrier could not answer. */
       freightUnavailable: boolean;
+      /**
+       * True when what the carrier refused was the suburb and postcode.
+       *
+       * Told apart because the customer can fix this one: "Saint Ives" is
+       * refused where "St Ives" prices. Sending them to the phone for a typo
+       * loses the sale for no reason.
+       */
+      freightAddressRejected: boolean;
       /** True when a part in the order has never been weighed and measured. */
       freightEstimated: boolean;
       /**
@@ -172,7 +185,6 @@ export async function quoteCheckout(
 
   const destination = { suburb, postcode };
   const quotable = !pickup && suburb !== "" && postcode !== "";
-  const itemise = quotable && order.lines.length <= MAX_LINES_TO_ITEMISE;
 
   /*
     The consignment first, on its own, and only then the parts within it.
@@ -186,22 +198,37 @@ export async function quoteCheckout(
     So the number they actually pay is asked for alone, where it is fast and
     reliable, and the per-part figures follow a few at a time.
   */
-  const whole = quotable
-    ? await quoteFreight({
+  let whole: FreightQuote | null = null;
+  let addressRejected = false;
+
+  if (quotable) {
+    try {
+      // quoteFreight logs the failure, with the carrier's reason.
+      whole = await quoteFreight({
         destination,
         items: order.lines.map(shipmentItem),
-      }).catch((error) => {
-        console.error(
-          `[checkout] freight quote failed for ${suburb} ${postcode}:`,
-          error instanceof Error ? error.message : error,
-        );
-        return null;
-      })
-    : null;
+        context: "checkout",
+      });
+    } catch (error) {
+      addressRejected = isAddressRejection(error);
+    }
+  }
+
+  /*
+    Parts are priced separately only once the consignment has been. If the
+    whole order could not be priced, each part on its own fails the same way,
+    and a carrier that is down would make the customer wait out every one.
+  */
+  const itemise =
+    whole !== null && order.lines.length <= MAX_LINES_TO_ITEMISE;
 
   const alone = itemise
     ? await inBatches(order.lines, PARALLEL_ITEM_QUOTES, (line) =>
-        quoteFreight({ destination, items: [shipmentItem(line)] })
+        quoteFreight({
+          destination,
+          items: [shipmentItem(line)],
+          context: "checkout part",
+        })
           .then((quote) => quote.totalCents)
           // A missing per-part figure is a gap in an explanation, not a
           // failure. What the customer pays is the consignment price.
@@ -240,7 +267,9 @@ export async function quoteCheckout(
     freight: pickup
       ? "Pickup"
       : freightUnpriced
-        ? "Call us for a price"
+        ? addressRejected
+          ? "Check suburb and postcode"
+          : "Call us for a price"
         : formatCents(totals.freightCents),
     // Parts only while the freight is unknown, and the page says so rather
     // than presenting it as the amount due.
@@ -250,7 +279,9 @@ export async function quoteCheckout(
     totalCents: totals.totalCents,
     problems: order.problems,
     freightUnavailable: freightUnpriced,
+    freightAddressRejected: freightUnpriced && addressRejected,
     freightEstimated: !pickup && quotedLines.some((line) => !line.measured),
-    breakdownOmitted: quotable && !itemise,
+    breakdownOmitted:
+      whole !== null && order.lines.length > MAX_LINES_TO_ITEMISE,
   };
 }

@@ -1,5 +1,12 @@
-import { expect, test } from "vitest";
-import { readCharges } from "./carrier";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import {
+  classifyRefusal,
+  isAddressRejection,
+  itemNodes,
+  quoteFreight,
+  readCharges,
+  type FreightQuoteError,
+} from "./carrier";
 import {
   ASSUMED_PROFILE,
   lookupShippingProfile,
@@ -8,7 +15,7 @@ import {
   volumeM3,
 } from "./dimensions";
 import { nextPickupTime } from "./pickup";
-import { stateFromPostcode } from "./postcode";
+import { stateFromPostcode, statesForPostcode } from "./postcode";
 
 /**
  * The freight rules.
@@ -167,4 +174,281 @@ test("an unmeasured part is assumed heavy, not light", () => {
   expect(profile).toEqual(ASSUMED_PROFILE);
   // The error has to fall on the yard's side of the ledger, not the customer's.
   expect(profile.weightKg).toBeGreaterThanOrEqual(15);
+});
+
+test("a postcode shared across a border is tried in both states", () => {
+  // Tharwa ACT and Queanbeyan NSW are both 2620; the carrier checks the pair.
+  expect(statesForPostcode("2620")).toEqual(["NSW", "ACT"]);
+  // The carrier prices Wallaroo NSW 2618 as ACT, so it needs no second try.
+  expect(statesForPostcode("2618")).toEqual(["ACT"]);
+  expect(statesForPostcode("2250")).toEqual(["NSW"]);
+  // Unknown postcodes go as NSW, as they always have, for the carrier to judge.
+  expect(statesForPostcode("")).toEqual(["NSW"]);
+});
+
+test("pickup skips the NSW public holidays", () => {
+  // Christmas Eve 2026 is a Thursday; Christmas, the weekend and the Boxing
+  // Day holiday follow it.
+  expect(nextPickupTime(new Date("2026-12-24T23:00:00Z")).slice(0, 10)).toEqual(
+    "2026-12-29",
+  );
+  // The Thursday before Good Friday 2027 lands on Easter Tuesday.
+  expect(nextPickupTime(new Date("2027-03-25T23:00:00Z")).slice(0, 10)).toEqual(
+    "2027-03-30",
+  );
+});
+
+test("dimensions go to the carrier in whole centimetres, rounded up", () => {
+  // A coil pack: the carrier refuses 7.13 as a height (E-ENQ-00069).
+  const [node] = itemNodes([
+    {
+      quantity: 1,
+      weightKg: 2.5,
+      lengthCm: 25,
+      widthCm: 24.2,
+      heightCm: 7.13,
+      volumeM3: 0.004,
+    },
+  ]);
+
+  expect(node.Dimensions).toMatchObject({
+    Length: "25",
+    Width: "25",
+    Height: "8",
+    Weight: "2.5",
+  });
+});
+
+const carrierError = (code: string, message: string) =>
+  JSON.stringify({
+    TollMessage: {
+      ErrorMessages: {
+        ErrorMessage: [{ ErrorNumber: { Value: code }, ErrorMessage: message }],
+      },
+    },
+  });
+
+test("the carrier's refusals are told apart by their code", () => {
+  const address = classifyRefusal(
+    500,
+    carrierError(
+      "E-ENQ-00053",
+      "Suburb,post code and state combination is invalid.",
+    ),
+  );
+  expect(address.failure).toEqual("address");
+  expect(address.code).toEqual("E-ENQ-00053");
+  expect(address.message).toContain("combination is invalid");
+
+  expect(
+    classifyRefusal(
+      500,
+      carrierError("E-ENQ-00069", "Length/Height cannot be in decimal."),
+    ).failure,
+  ).toEqual("refused");
+
+  // The carrier's own upstream not answering is worth asking again.
+  expect(
+    classifyRefusal(
+      500,
+      carrierError("E-ENQ-00006", "UPS response is null."),
+    ).failure,
+  ).toEqual("unavailable");
+});
+
+test("a refusal with no code is worth asking again", () => {
+  // A gateway page, not the carrier's JSON.
+  expect(
+    classifyRefusal(504, "Server Error: Gateway Timeout").failure,
+  ).toEqual("unavailable");
+
+  // A reused message identifier, which a fresh one cures.
+  expect(
+    classifyRefusal(
+      500,
+      JSON.stringify({
+        TollMessage: {
+          ErrorMessages: {
+            ErrorMessage: [
+              { ErrorMessage: "MessengeIdentifier(x) already exists" },
+            ],
+          },
+        },
+      }),
+    ).failure,
+  ).toEqual("unavailable");
+
+  // Bad credentials do not get better by repetition.
+  expect(classifyRefusal(401, "Unauthorized").failure).toEqual("refused");
+});
+
+test("a stack trace from the carrier is cut to its first line", () => {
+  const error = classifyRefusal(
+    500,
+    carrierError(
+      "E-ENQ-00013",
+      "java.lang.NullPointerException\n\tat com.mytoll.Validator.getServiceCode",
+    ),
+  );
+  expect(error.message).toEqual(
+    "HTTP 500 E-ENQ-00013: java.lang.NullPointerException",
+  );
+});
+
+/*
+  quoteFreight against a stand-in carrier. Each test uses its own suburb,
+  because quotes are cached by destination for two minutes.
+*/
+
+const priced = (total: number) =>
+  new Response(
+    JSON.stringify({
+      TollMessage: {
+        RateEnquiry: {
+          Response: {
+            TotalChargeAmount: { Value: total },
+            GSTAmount: { Value: total > 0 ? 1 : 0 },
+          },
+        },
+      },
+    }),
+    { status: 200 },
+  );
+
+const box = {
+  quantity: 1,
+  weightKg: 15,
+  lengthCm: 60,
+  widthCm: 45,
+  heightCm: 40,
+  volumeM3: 0.108,
+};
+
+type SentEnquiry = {
+  TollMessage: {
+    Header: { MessageIdentifier: string };
+    RateEnquiry: {
+      Request: {
+        ConsigneeParty: { PhysicalAddress: { StateCode: string } };
+      };
+    };
+  };
+};
+
+function carrier(...answers: (() => Response)[]) {
+  const sent: SentEnquiry[] = [];
+  const fetch = vi.fn(async (_url: string, init: RequestInit) => {
+    sent.push(JSON.parse(String(init.body)) as SentEnquiry);
+    const next = answers[sent.length - 1];
+    if (!next) throw new Error("the carrier was asked more often than expected");
+    return next();
+  });
+  vi.stubGlobal("fetch", fetch);
+  return sent;
+}
+
+beforeEach(() => {
+  vi.stubEnv("TGE_USERNAME", "test");
+  vi.stubEnv("TGE_PASSWORD", "test");
+  vi.spyOn(console, "info").mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+  vi.restoreAllMocks();
+});
+
+test("every attempt carries its own message identifier", async () => {
+  // The carrier refuses an identifier it has seen; reusing one made every
+  // retry fail, which is what turned one slow answer into "call us".
+  const sent = carrier(
+    () => new Response("Gateway Timeout", { status: 504 }),
+    () => new Response("Gateway Timeout", { status: 504 }),
+    () => priced(25.02),
+  );
+
+  const quote = await quoteFreight({
+    destination: { suburb: "Newcastle", postcode: "2300" },
+    items: [box],
+  });
+
+  expect(quote.totalCents).toEqual(2502);
+  const ids = sent.map((enquiry) => enquiry.TollMessage.Header.MessageIdentifier);
+  expect(ids).toHaveLength(3);
+  expect(new Set(ids).size).toEqual(3);
+});
+
+test("a refused address is not asked about again", async () => {
+  const sent = carrier(
+    () =>
+      new Response(carrierError("E-ENQ-00053", "combination is invalid"), {
+        status: 500,
+      }),
+  );
+
+  const error = await quoteFreight({
+    destination: { suburb: "Saint Ives", postcode: "2075" },
+    items: [box],
+  }).catch((caught: FreightQuoteError) => caught);
+
+  expect(sent).toHaveLength(1);
+  expect(isAddressRejection(error)).toEqual(true);
+});
+
+test("a refusal that would only repeat is not retried", async () => {
+  const sent = carrier(
+    () =>
+      new Response(carrierError("E-ENQ-00069", "cannot be in decimal"), {
+        status: 500,
+      }),
+  );
+
+  const error = await quoteFreight({
+    destination: { suburb: "Wyong", postcode: "2259" },
+    items: [box],
+  }).catch((caught: FreightQuoteError) => caught);
+
+  expect(sent).toHaveLength(1);
+  expect((error as FreightQuoteError).failure).toEqual("refused");
+});
+
+test("a border postcode is tried in its other state before it is refused", async () => {
+  const sent = carrier(
+    () =>
+      new Response(carrierError("E-ENQ-00053", "combination is invalid"), {
+        status: 500,
+      }),
+    () => priced(48.76),
+  );
+
+  const quote = await quoteFreight({
+    destination: { suburb: "Tharwa", postcode: "2620" },
+    items: [box],
+  });
+
+  expect(quote.totalCents).toEqual(4876);
+  expect(
+    sent.map(
+      (enquiry) =>
+        enquiry.TollMessage.RateEnquiry.Request.ConsigneeParty.PhysicalAddress
+          .StateCode,
+    ),
+  ).toEqual(["NSW", "ACT"]);
+});
+
+test("an answer of zero is asked again rather than charged", async () => {
+  const sent = carrier(
+    () => priced(0),
+    () => priced(30.15),
+  );
+
+  const quote = await quoteFreight({
+    destination: { suburb: "Banksmeadow", postcode: "2019" },
+    items: [box],
+  });
+
+  expect(sent).toHaveLength(2);
+  expect(quote.totalCents).toEqual(3015);
 });
