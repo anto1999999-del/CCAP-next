@@ -4,7 +4,12 @@ import { z } from "zod";
 import { loadCatalog } from "@/lib/parts/catalog";
 import { formatCents } from "@/lib/parts/price";
 import { orderTotal, priceOrder, type PricedLine } from "@/lib/orders/pricing";
-import { quoteFreight, type ShipmentItem } from "@/lib/shipping/carrier";
+import {
+  isAddressRejection,
+  quoteFreight,
+  type FreightQuote,
+  type ShipmentItem,
+} from "@/lib/shipping/carrier";
 import { shippingProfileFor, volumeM3 } from "@/lib/shipping/dimensions";
 import { rateLimit } from "@/lib/rate-limit";
 import type { LineProblem } from "@/lib/orders/pricing";
@@ -56,6 +61,14 @@ export type CheckoutQuote =
       problems: LineProblem[];
       /** True when freight was asked for but the carrier could not answer. */
       freightUnavailable: boolean;
+      /**
+       * True when what the carrier refused was the suburb and postcode.
+       *
+       * Told apart because the customer can fix this one: "Saint Ives" is
+       * refused where "St Ives" prices. Sending them to the phone for a typo
+       * loses the sale for no reason.
+       */
+      freightAddressRejected: boolean;
       /** True when a part in the order has never been weighed and measured. */
       freightEstimated: boolean;
     }
@@ -114,18 +127,21 @@ export async function quoteCheckout(
   const destination = { suburb, postcode };
   const quotable = !pickup && suburb !== "" && postcode !== "";
 
-  const whole = quotable
-    ? await quoteFreight({
+  let whole: FreightQuote | null = null;
+  let addressRejected = false;
+
+  if (quotable) {
+    try {
+      // quoteFreight logs the failure, with the carrier's reason.
+      whole = await quoteFreight({
         destination,
         items: order.lines.map(shipmentItem),
-      }).catch((error) => {
-        console.error(
-          `[checkout] freight quote failed for ${suburb} ${postcode}:`,
-          error instanceof Error ? error.message : error,
-        );
-        return null;
-      })
-    : null;
+        context: "checkout",
+      });
+    } catch (error) {
+      addressRejected = isAddressRejection(error);
+    }
+  }
 
   /*
     A failed carrier call and a genuine zero are not the same thing, and the
@@ -147,7 +163,9 @@ export async function quoteCheckout(
     freight: pickup
       ? "Pickup"
       : freightUnpriced
-        ? "Call us for a price"
+        ? addressRejected
+          ? "Check suburb and postcode"
+          : "Call us for a price"
         : formatCents(totals.freightCents),
     // Parts only while the freight is unknown, and the page says so rather
     // than presenting it as the amount due.
@@ -157,6 +175,7 @@ export async function quoteCheckout(
     totalCents: totals.totalCents,
     problems: order.problems,
     freightUnavailable: freightUnpriced,
+    freightAddressRejected: freightUnpriced && addressRejected,
     freightEstimated:
       !pickup &&
       order.lines.some((line) => !shippingProfileFor(line.part).measured),

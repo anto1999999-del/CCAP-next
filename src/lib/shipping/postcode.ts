@@ -44,3 +44,30 @@ export function stateFromPostcode(postcode: string | number): AuState | null {
     RANGES.find(({ from, to }) => number >= from && number <= to)?.state ?? null
   );
 }
+
+/**
+ * Postcodes used on both sides of a border, and the other state they are in.
+ *
+ * The ranges give one state per number, but the carrier checks suburb,
+ * postcode and state together. Tharwa ACT 2620 was refused as NSW and priced
+ * as ACT (3 November 2026), and the same number covers Queanbeyan, NSW. Only
+ * pairs the carrier actually refuses belong here: Barooga 3644, Jennings 4383
+ * and Mungindi 2406 also cross a border, and the carrier priced each of them
+ * under either state, as it did Wallaroo NSW 2618 sent as ACT.
+ */
+const ALSO_IN: Partial<Record<string, AuState>> = {
+  "2620": "ACT",
+};
+
+/**
+ * The states to try for a postcode, most likely first.
+ *
+ * Never empty: an unrecognised postcode is sent as NSW, as it always has been,
+ * so the carrier is the one to say it is wrong.
+ */
+export function statesForPostcode(postcode: string | number): AuState[] {
+  const primary = stateFromPostcode(postcode) ?? "NSW";
+  const code = String(postcode ?? "").trim();
+  const other = ALSO_IN[code];
+  return other && other !== primary ? [primary, other] : [primary];
+}

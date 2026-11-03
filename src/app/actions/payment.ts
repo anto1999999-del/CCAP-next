@@ -7,7 +7,7 @@ import { thumbnailUrl } from "@/lib/parts/images";
 import { orderTotal, priceOrder } from "@/lib/orders/pricing";
 import { createPending } from "@/lib/orders/repository";
 import { isPaymentConfigured, payments } from "@/lib/payments/stripe";
-import { quoteFreight } from "@/lib/shipping/carrier";
+import { isAddressRejection, quoteFreight } from "@/lib/shipping/carrier";
 import { shippingProfileFor, volumeM3 } from "@/lib/shipping/dimensions";
 import { rateLimit } from "@/lib/rate-limit";
 import { isConfigured } from "@/lib/db/mongo";
@@ -125,10 +125,11 @@ export async function startPayment(
               volumeM3: volumeM3(profile),
             };
           }),
+          // quoteFreight logs the failure, with the carrier's reason.
+          context: "payment",
         })
       ).totalCents;
     } catch (error) {
-      console.error("[payment] freight quote failed:", error);
       /*
         Deliberately refuses rather than charging for the parts alone. Taking
         payment without freight on it leaves the yard to either absorb the cost
@@ -136,8 +137,9 @@ export async function startPayment(
       */
       return {
         ok: false,
-        message:
-          "We could not price the freight for that address just now. Please call the yard and we will quote it for you.",
+        message: isAddressRejection(error)
+          ? "The carrier does not recognise that suburb and postcode together. Please check them and try again."
+          : "We could not price the freight for that address just now. Please call the yard and we will quote it for you.",
       };
     }
   }

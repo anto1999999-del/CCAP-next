@@ -130,6 +130,9 @@ type Payment = {
   totalCents: number;
 };
 
+/** A warm carrier answers in about two seconds; past this, say why it is slow. */
+const SLOW_QUOTE_MS = 5_000;
+
 export default function Checkout({
   initialDetails,
 }: {
@@ -281,6 +284,24 @@ export default function Checkout({
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [inPayment]);
+
+  /*
+    Which request has been waiting long enough to explain the wait.
+
+    The carrier's first answer after a quiet spell takes about twenty seconds,
+    and "Calculating..." alone for that long reads as a page that has hung, so
+    the customer edits the postcode and starts the wait again. Keyed to the
+    request, so a new address starts a new count rather than inheriting one.
+  */
+  const [slowKey, setSlowKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!waiting) return;
+    const timer = setTimeout(() => setSlowKey(requestKey), SLOW_QUOTE_MS);
+    return () => clearTimeout(timer);
+  }, [waiting, requestKey]);
+
+  const slow = waiting && slowKey === requestKey;
 
   if (lines.length === 0) {
     return (
@@ -504,6 +525,13 @@ export default function Checkout({
                 </div>
               </div>
 
+              {slow && (
+                <p className="mb-4 text-xs leading-relaxed text-gray-500">
+                  Still getting a price from the carrier. After a quiet spell
+                  its first answer can take up to half a minute.
+                </p>
+              )}
+
               {quote?.ok && quote.problems.length > 0 && (
                 <ul className="mb-4 space-y-2 rounded-lg border border-yellow-700/40 bg-yellow-900/10 p-4 text-sm text-yellow-200">
                   {quote.problems.map((problem) => (
@@ -526,8 +554,19 @@ export default function Checkout({
 
               {quote?.ok && quote.freightUnavailable && (
                 <p className="mb-4 rounded-xl border-line border bg-field p-4 text-sm text-gray-300">
-                  We could not price the freight automatically for that address.
-                  Call us on{" "}
+                  {quote.freightAddressRejected ? (
+                    <>
+                      The carrier does not recognise that suburb and postcode
+                      together. Check the suburb is spelt the way Australia Post
+                      spells it (&ldquo;St Ives&rdquo;, not &ldquo;Saint
+                      Ives&rdquo;), or call us on{" "}
+                    </>
+                  ) : (
+                    <>
+                      We could not price the freight automatically for that
+                      address. Call us on{" "}
+                    </>
+                  )}
                   <a
                     href={`tel:${site.contact.phoneE164}`}
                     className="text-brand-text font-semibold"
