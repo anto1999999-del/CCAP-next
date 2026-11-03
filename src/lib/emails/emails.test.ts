@@ -46,6 +46,35 @@ function order(overrides: Partial<Order> = {}): Order {
   };
 }
 
+describe("the new checkout fields", () => {
+  const detailed = order({
+    customer: {
+      ...order().customer,
+      company: "Smith Panels",
+      address2: "Unit 3",
+      state: "NSW",
+    },
+    notes: "Leave at the <back> gate",
+  });
+
+  it("shows the whole address on the customer's confirmation", () => {
+    expect(orderConfirmation(detailed).text).toContain(
+      "Smith Panels, 10 Example Street, Unit 3, Newcastle NSW 2300",
+    );
+  });
+
+  it("gives the yard the customer's notes, escaped", () => {
+    const message = orderForSales(detailed);
+    expect(message.text).toContain("Order notes: Leave at the <back> gate");
+    expect(message.html).toContain("Leave at the &lt;back&gt; gate");
+    expect(message.html).not.toContain("<back>");
+  });
+
+  it("says nothing about notes when there are none", () => {
+    expect(orderForSales(order()).text).not.toContain("Order notes");
+  });
+});
+
 describe("order reference", () => {
   it("is the last six of the id, which is what the admin list shows", () => {
     expect(reference(order())).toBe("4CF96E");

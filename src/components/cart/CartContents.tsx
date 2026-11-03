@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import {
+  LockClosedIcon,
+  MapPinIcon,
+  TruckIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import CheckoutSteps from "@/components/checkout/CheckoutSteps";
 import Container from "@/components/layout/Container";
 import PartThumbnail from "@/components/parts/PartThumbnail";
 import { useCart } from "@/lib/cart/CartProvider";
+import { lineVehicle } from "@/lib/cart/types";
 import { PART_IMAGE_PLACEHOLDER } from "@/lib/parts/images";
 import { formatCents } from "@/lib/parts/price";
-import type { CartLine } from "@/lib/cart/types";
 
 /**
  * The cart.
@@ -19,13 +26,13 @@ import type { CartLine } from "@/lib/cart/types";
  * had when each part was added, and the server re-prices the whole order from
  * the catalogue before anything is charged. A total that arrives from a browser
  * is a total a customer can edit.
+ *
+ * There are no quantity buttons, at the owner's request. A listing is one part
+ * off one car, so "+" only ever offered a second part that does not exist.
  */
 
-/** The supplier's cap, and more of one part than the yard is likely to hold. */
-const MAX_QUANTITY = 20;
-
 export default function CartContents() {
-  const { lines, count, subtotal, remove, setQuantity, clear } = useCart();
+  const { lines, count, subtotal, remove, clear } = useCart();
 
   if (lines.length === 0) {
     return (
@@ -49,83 +56,116 @@ export default function CartContents() {
     <div className="bg-admin py-10 pb-16 text-white md:pb-24">
       <Container>
         <header className="mb-8">
+          <CheckoutSteps current={1} />
           {/* One colour, like every other heading on the site. */}
           <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
             Your cart
           </h1>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-gray-400 md:text-base">
             {count} {count === 1 ? "item" : "items"}. Delivery is priced at
             checkout, once we know where it is going.
           </p>
         </header>
 
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          <ul className="flex-1 space-y-4">
-            {lines.map((line) => (
-              <li
-                key={`${line.urgId}-${line.invNumber}`}
-                className="border-line bg-card flex flex-col items-start gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:gap-5"
-              >
-                <Link
-                  href={`/product/${line.urgId}/${line.invNumber}`}
-                  className="shrink-0"
-                  aria-label={line.itemName}
-                >
-                  <PartThumbnail
-                    src={line.thumbnail ?? PART_IMAGE_PLACEHOLDER}
-                    alt={line.itemName}
-                    className="bg-field border-line h-24 w-24 rounded-xl border object-cover transition hover:opacity-90"
-                  />
-                </Link>
+          <div className="min-w-0 flex-1">
+            <div className="border-line bg-card rounded-2xl border">
+              <div className="border-line hidden grid-cols-[1fr_6rem_2rem] gap-4 border-b px-6 py-4 text-xs font-bold tracking-wide text-gray-400 uppercase sm:grid">
+                <span>Part</span>
+                <span className="text-right">Price</span>
+                <span />
+              </div>
 
-                <div className="min-w-0 flex-1">
-                  <h2 className="mb-1 text-base font-semibold md:text-lg">
-                    <Link
-                      href={`/product/${line.urgId}/${line.invNumber}`}
-                      className="hover:text-brand-text transition-colors"
+              <ul>
+                {lines.map((line, index) => {
+                  const href = `/product/${line.urgId}/${line.invNumber}`;
+                  const vehicle = lineVehicle(line);
+
+                  return (
+                    <li
+                      key={`${line.urgId}-${line.invNumber}`}
+                      className={`grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 p-5 sm:grid-cols-[1fr_6rem_2rem] sm:px-6 ${
+                        index > 0 ? "border-line border-t" : ""
+                      }`}
                     >
-                      {line.itemName}
-                    </Link>
-                  </h2>
-                  <Detail label="Manufacturer" value={line.manufacturer} />
-                  <Detail label="Model" value={line.model} />
-                  <p className="mt-2 text-base font-bold tabular-nums text-white md:text-lg">
-                    {formatCents(Math.round(line.price * 100))}
-                    {line.quantity > 1 && (
-                      <span className="ml-2 text-xs font-medium text-gray-500">
-                        each
-                      </span>
-                    )}
-                  </p>
-                </div>
+                      <div className="col-span-2 flex min-w-0 items-center gap-4 sm:col-span-1">
+                        <Link
+                          href={href}
+                          className="shrink-0"
+                          aria-label={line.itemName}
+                        >
+                          <PartThumbnail
+                            src={line.thumbnail ?? PART_IMAGE_PLACEHOLDER}
+                            alt={line.itemName}
+                            className="bg-field border-line h-20 w-20 rounded-xl border object-cover transition hover:opacity-90"
+                          />
+                        </Link>
+                        <div className="min-w-0">
+                          <h2 className="font-semibold md:text-lg">
+                            <Link
+                              href={href}
+                              className="hover:text-brand-text transition-colors"
+                            >
+                              {line.itemName}
+                            </Link>
+                          </h2>
+                          {vehicle && (
+                            <p className="text-sm text-gray-400">{vehicle}</p>
+                          )}
+                          {line.stockNo && (
+                            <p className="text-xs text-gray-500">
+                              Stock no. {line.stockNo}
+                            </p>
+                          )}
+                        </div>
+                      </div>
 
-                <div className="flex items-center gap-4 self-stretch sm:ml-auto sm:self-auto">
-                  <div className="text-right">
-                    <Quantity line={line} onChange={setQuantity} />
-                    {line.quantity > 1 && (
-                      <p className="mt-2 text-sm font-bold tabular-nums">
-                        {formatCents(
-                          Math.round(line.price * 100) * line.quantity,
-                        )}
+                      <p className="font-bold tabular-nums sm:text-right">
+                        {formatCents(Math.round(line.price * 100))}
                       </p>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => remove(line)}
-                    className="hover:text-brand-text rounded-lg px-2 py-2 text-xs font-semibold text-gray-500 transition-colors hover:bg-white/5"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+
+                      <button
+                        type="button"
+                        onClick={() => remove(line)}
+                        aria-label={`Remove ${line.itemName}`}
+                        className="hover:text-brand-text flex justify-end text-gray-500 transition-colors"
+                      >
+                        <XMarkIcon className="h-5 w-5" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-4 text-sm">
+              <Link
+                href="/products"
+                className="font-semibold text-gray-300 transition-colors hover:text-white"
+              >
+                &larr; Continue shopping
+              </Link>
+              {/*
+                Quiet, and it asks first. Emptying the cart had the same weight
+                as the button people are meant to press, and did it on one
+                click.
+              */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("Empty your cart? This cannot be undone.")) clear();
+                }}
+                className="font-semibold text-gray-500 transition-colors hover:text-gray-300"
+              >
+                Empty cart
+              </button>
+            </div>
+          </div>
 
           <aside className="w-full lg:w-96 lg:shrink-0">
-            <div className="border-line bg-card rounded-2xl border p-6 lg:sticky lg:top-24">
+            <div className="border-line bg-card rounded-2xl border p-6 md:p-7 lg:sticky lg:top-24">
               <h2 className="mb-5 text-sm font-bold tracking-wide text-white uppercase">
-                Summary
+                Cart totals
               </h2>
 
               <div className="space-y-3">
@@ -147,7 +187,7 @@ export default function CartContents() {
               */}
               <div className="border-line mt-4 flex items-center justify-between border-t pt-4">
                 <p className="text-base font-semibold">Total so far</p>
-                <p className="text-xl font-extrabold tabular-nums text-white">
+                <p className="text-2xl font-extrabold tabular-nums text-white">
                   {formatCents(Math.round(subtotal * 100))}
                 </p>
               </div>
@@ -159,20 +199,15 @@ export default function CartContents() {
                 Proceed to Checkout
               </Link>
 
-              {/*
-                Quiet, and it asks first. Emptying the cart had the same weight
-                as the button people are meant to press, and did it on one
-                click.
-              */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm("Empty your cart? This cannot be undone.")) clear();
-                }}
-                className="mt-3 w-full rounded-lg px-4 py-2 text-xs font-semibold text-gray-500 transition-colors hover:bg-white/5 hover:text-gray-300"
-              >
-                Empty cart
-              </button>
+              <ul className="border-line mt-5 space-y-2.5 border-t pt-5 text-sm text-gray-400">
+                <Assurance icon={TruckIcon}>Nationwide delivery</Assurance>
+                <Assurance icon={MapPinIcon}>
+                  Or pick up from Berkeley Vale
+                </Assurance>
+                <Assurance icon={LockClosedIcon}>
+                  Secure card payment by Stripe
+                </Assurance>
+              </ul>
             </div>
           </aside>
         </div>
@@ -181,12 +216,18 @@ export default function CartContents() {
   );
 }
 
-function Detail({ label, value }: { label: string; value?: string }) {
-  if (!value) return null;
+function Assurance({
+  icon: Icon,
+  children,
+}: {
+  icon: typeof TruckIcon;
+  children: React.ReactNode;
+}) {
   return (
-    <p className="text-xs text-gray-400 md:text-sm">
-      {label}: <span className="text-gray-200">{value}</span>
-    </p>
+    <li className="flex items-center gap-2.5">
+      <Icon className="text-brand-text h-4 w-4 shrink-0" aria-hidden="true" />
+      {children}
+    </li>
   );
 }
 
@@ -200,71 +241,11 @@ function Row({
   hint?: string;
 }) {
   return (
-    <div className="flex justify-between gap-4 text-sm">
+    <div className="flex justify-between gap-4 text-sm md:text-base">
       <p className="text-gray-400">{label}</p>
-      <p
-        className="max-w-[60%] text-right font-semibold tabular-nums"
-        title={hint}
-      >
+      <p className="max-w-[60%] text-right tabular-nums" title={hint}>
         {value}
       </p>
     </div>
-  );
-}
-
-function Quantity({
-  line,
-  onChange,
-}: {
-  line: CartLine;
-  onChange: (line: CartLine, quantity: number) => void;
-}) {
-  return (
-    <div className="flex items-center overflow-hidden rounded-full border-line border bg-field">
-      <Step
-        label={`Fewer ${line.itemName}`}
-        disabled={line.quantity <= 1}
-        onClick={() => onChange(line, line.quantity - 1)}
-      >
-        &minus;
-      </Step>
-      <span
-        aria-live="polite"
-        className="px-4 text-sm font-semibold md:text-base"
-      >
-        {line.quantity}
-      </span>
-      <Step
-        label={`More ${line.itemName}`}
-        disabled={line.quantity >= MAX_QUANTITY}
-        onClick={() => onChange(line, line.quantity + 1)}
-      >
-        +
-      </Step>
-    </div>
-  );
-}
-
-function Step({
-  label,
-  disabled,
-  onClick,
-  children,
-}: {
-  label: string;
-  disabled: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="px-3 py-2 text-lg font-bold text-white transition-colors hover:bg-gray-700 disabled:opacity-40"
-    >
-      {children}
-    </button>
   );
 }

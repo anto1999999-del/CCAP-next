@@ -11,6 +11,7 @@ import { quoteFreight } from "@/lib/shipping/carrier";
 import { shippingProfileFor, volumeM3 } from "@/lib/shipping/dimensions";
 import { rateLimit } from "@/lib/rate-limit";
 import { isConfigured } from "@/lib/db/mongo";
+import { AU_STATES, MAX_NOTES, fullName } from "@/lib/checkout/details";
 
 /**
  * Start a payment.
@@ -36,16 +37,29 @@ const LineSchema = z.object({
 const CheckoutSchema = z.object({
   lines: z.array(LineSchema).min(1).max(50),
   pickup: z.boolean(),
-  name: z.string().trim().min(2).max(80),
+  firstName: z.string().trim().min(1).max(40),
+  lastName: z.string().trim().min(1).max(40),
+  company: z.string().trim().max(80).default(""),
   email: z.string().trim().email().max(254),
   phone: z.string().trim().min(6).max(40),
   address: z.string().trim().min(4).max(160),
+  address2: z.string().trim().max(80).default(""),
   suburb: z.string().trim().min(2).max(80),
+  state: z.enum(AU_STATES),
   postcode: z.string().trim().regex(/^\d{3,4}$/, "Enter a valid postcode."),
+  notes: z.string().trim().max(MAX_NOTES).default(""),
 });
 
 export type StartPayment =
-  | { ok: true; clientSecret: string; orderId: string; totalCents: number }
+  | {
+      ok: true;
+      clientSecret: string;
+      orderId: string;
+      /* What the payment was created for, so the page cannot show anything else. */
+      partsCents: number;
+      freightCents: number;
+      totalCents: number;
+    }
   | { ok: false; message: string };
 
 /** Stripe will not take less than this, and nothing the yard sells is near it. */
@@ -134,6 +148,7 @@ export async function startPayment(
   }
 
   const account = await currentAccount();
+  const name = fullName(details);
 
   const intent = await payments().paymentIntents.create({
     amount: totals.totalCents,
@@ -172,13 +187,17 @@ export async function startPayment(
     })),
     amountCents: totals.totalCents,
     customer: {
-      name: details.name,
+      name,
       email: details.email,
       phone: details.phone,
       address: details.address,
+      address2: details.address2,
+      company: details.company,
+      state: details.state,
       city: details.suburb,
       zipcode: details.postcode,
     },
+    notes: details.notes,
     pickup: details.pickup,
     paymentIntentId: intent.id,
   });
@@ -193,7 +212,7 @@ export async function startPayment(
   */
   if (account) {
     await fillBlankDetails(account.id, {
-      name: details.name,
+      name,
       phone: details.phone,
       address: details.address,
       city: details.suburb,
@@ -207,6 +226,8 @@ export async function startPayment(
     ok: true,
     clientSecret: intent.client_secret,
     orderId,
+    partsCents: totals.subtotalCents,
+    freightCents: totals.freightCents,
     totalCents: totals.totalCents,
   };
 }

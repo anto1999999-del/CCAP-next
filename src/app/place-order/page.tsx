@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Checkout from "@/components/checkout/Checkout";
 import { currentAccount } from "@/lib/auth/accounts";
 import { isConfigured } from "@/lib/db/mongo";
+import { NO_DETAILS, splitName } from "@/lib/checkout/details";
 
 export const metadata: Metadata = {
   title: "Checkout | Central Coast Auto Parts",
@@ -31,7 +32,8 @@ export default async function PlaceOrderPage() {
     <Checkout
       initialDetails={
         account && {
-          name: account.name,
+          ...NO_DETAILS,
+          ...splitName(account.name),
           email: account.email,
           phone: account.phone,
           address: account.address,

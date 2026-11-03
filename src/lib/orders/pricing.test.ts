@@ -73,7 +73,7 @@ test("quantities are clamped rather than trusted", () => {
   const silly = priceOrder(catalog, [
     { urgId: "nw42", invNumber: "1000", quantity: 5000 },
   ]);
-  expect(silly.lines[0].quantity).toEqual(20);
+  expect(silly.lines[0].quantity).toEqual(1);
 
   const negative = priceOrder(catalog, [
     { urgId: "nw42", invNumber: "1000", quantity: -3 },
@@ -83,10 +83,10 @@ test("quantities are clamped rather than trusted", () => {
   const fractional = priceOrder(catalog, [
     { urgId: "nw42", invNumber: "1000", quantity: 2.7 },
   ]);
-  expect(fractional.lines[0].quantity).toEqual(2);
+  expect(fractional.lines[0].quantity).toEqual(1);
 });
 
-test("a line is quantity times the catalogue price, in whole cents", () => {
+test("a line is the catalogue price, in whole cents, however many are asked for", () => {
   const catalog = [part({ invNumber: "1000", price: 199.99 })];
 
   const order = priceOrder(catalog, [
@@ -94,20 +94,20 @@ test("a line is quantity times the catalogue price, in whole cents", () => {
   ]);
 
   expect(order.lines[0].unitCents).toEqual(19999);
-  expect(order.lines[0].lineCents).toEqual(59997);
-  expect(order.subtotalCents).toEqual(59997);
+  expect(order.lines[0].lineCents).toEqual(19999);
+  expect(order.subtotalCents).toEqual(19999);
 });
 
 test("freight is added to the parts, not folded into them", () => {
   const catalog = [part({ invNumber: "1000", price: 500 })];
   const order = priceOrder(catalog, [
-    { urgId: "nw42", invNumber: "1000", quantity: 2 },
+    { urgId: "nw42", invNumber: "1000", quantity: 1 },
   ]);
 
   expect(orderTotal(order, 12155)).toEqual({
-    subtotalCents: 100000,
+    subtotalCents: 50000,
     freightCents: 12155,
-    totalCents: 112155,
+    totalCents: 62155,
   });
 });
 

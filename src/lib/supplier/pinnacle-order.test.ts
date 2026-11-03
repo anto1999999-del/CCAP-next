@@ -296,3 +296,66 @@ describe("reading the API's reply", () => {
     expect(readPinnacleReply("[]").kind).toBe("unclear");
   });
 });
+
+describe("the new checkout fields", () => {
+  const withDetails = (customer: Partial<Order["customer"]>, notes?: string) =>
+    buildPinnacleOrder(
+      order({ customer: { ...order().customer, ...customer }, notes }),
+      settings,
+    );
+
+  const billing = (result: ReturnType<typeof withDetails>) => {
+    if (!result.ok) throw new Error(result.reason);
+    return result.order.customer.address;
+  };
+
+  it("carries the state inside the city, the API having no field for it", () => {
+    const address = billing(withDetails({ city: "Gosford", state: "NSW" }));
+    expect(address.city).toBe("Gosford NSW");
+    expect(address).not.toHaveProperty("state");
+  });
+
+  it("puts the company above the street, and the unit below it", () => {
+    const address = billing(
+      withDetails({
+        company: "Smith Panels",
+        address: "12 Sample Street",
+        address2: "Unit 3",
+      }),
+    );
+    expect(address.address1).toBe("Smith Panels");
+    expect(address.address2).toBe("12 Sample Street");
+    expect(address.address3).toBe("Unit 3");
+    expect(address).not.toHaveProperty("company");
+  });
+
+  it("drops the company, not the unit, when the lines run out", () => {
+    const address = billing(
+      withDetails({
+        company: "Smith Panels",
+        address:
+          "Building Seven Riverside Industrial Estate 1200 Pacific Highway",
+        address2: "Unit 3",
+      }),
+    );
+    expect(address.address1).not.toBe("Smith Panels");
+    expect(address.address3).toBe("Unit 3");
+  });
+
+  it("sends the customer's notes as a comment the yard can read", () => {
+    const result = withDetails({}, "Leave at the back gate");
+    if (!result.ok) throw new Error(result.reason);
+    expect(result.order.comments).toContainEqual({
+      commentType: "PUBLIC",
+      comment: "Customer notes: Leave at the back gate",
+    });
+  });
+
+  it("adds no comment when there are no notes", () => {
+    const result = withDetails({}, "   ");
+    if (!result.ok) throw new Error(result.reason);
+    expect(
+      result.order.comments.some((c) => c.comment.includes("Customer notes")),
+    ).toBe(false);
+  });
+});

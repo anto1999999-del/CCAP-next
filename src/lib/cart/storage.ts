@@ -28,7 +28,8 @@ export function readCart(): CartLine[] {
   try {
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isCartLine);
+    // Carts saved while the quantity buttons existed can still hold a 2.
+    return parsed.filter(isCartLine).map((line) => ({ ...line, quantity: 1 }));
   } catch {
     return [];
   }

@@ -162,10 +162,19 @@ export default function OrderRow({
 
           <div className="border-line bg-card mb-6 grid gap-x-8 gap-y-1.5 rounded-xl border p-4 text-sm sm:grid-cols-2">
             <Detail label="Name" value={order.customer.name} />
+            {order.customer.company && (
+              <Detail label="Company" value={order.customer.company} />
+            )}
             <Detail label="Phone" value={order.customer.phone} />
             <Detail label="Email" value={order.customer.email} />
             <Detail label="Suburb" value={order.customer.city} />
             <Detail label="Address" value={order.customer.address} />
+            {order.customer.address2 && (
+              <Detail label="Unit" value={order.customer.address2} />
+            )}
+            {order.customer.state && (
+              <Detail label="State" value={order.customer.state} />
+            )}
             <Detail label="Postcode" value={order.customer.zipcode} />
             <Detail label="Type" value={order.pickup ? "Pickup" : "Delivery"} />
             <Detail
@@ -194,6 +203,17 @@ export default function OrderRow({
               />
             )}
           </div>
+
+          {/*
+            On its own rather than among the details above: those rows truncate
+            to one line, and a note is the one thing here worth reading in full.
+          */}
+          {order.notes && (
+            <div className="border-line bg-card mb-6 rounded-xl border p-4 text-sm">
+              <p className="mb-1 text-gray-500">Order notes</p>
+              <p className="whitespace-pre-wrap text-gray-200">{order.notes}</p>
+            </div>
+          )}
 
           <form
             action={toggleHidden}

@@ -73,11 +73,17 @@ export type OrderDocument = {
   /** Dollars, as the current site stores them. */
   amount: number;
   address: string;
+  /** Apartment, suite or unit. Absent on orders before November 2026. */
+  address2?: string;
   city: string;
+  state?: string;
   zipcode: string;
   phone: string;
   email: string;
   name: string;
+  company?: string;
+  /** What the customer typed under "Order notes". */
+  notes?: string;
   paymentMethod: string;
   pickup?: boolean;
   status?: string;

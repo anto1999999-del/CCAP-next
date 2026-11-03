@@ -75,6 +75,7 @@ export default function PartCard({ part }: { part: CatalogPart }) {
               manufacturer: part.manufacturer ?? undefined,
               model: part.model ?? undefined,
               year: part.year == null ? undefined : String(part.year),
+              stockNo: part.stockNo ?? undefined,
               price: Number(part.price),
               thumbnail: thumbnailUrl(part),
             }}

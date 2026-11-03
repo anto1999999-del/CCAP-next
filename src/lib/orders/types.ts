@@ -45,9 +45,15 @@ export type Order = {
     email: string;
     phone: string;
     address: string;
+    /** These three are absent on orders before November 2026. */
+    address2?: string;
+    company?: string;
+    state?: string;
     city: string;
     zipcode: string;
   };
+  /** What the customer typed under "Order notes". */
+  notes?: string;
   items: {
     name: string;
     quantity: number;

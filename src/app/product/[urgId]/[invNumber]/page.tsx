@@ -317,6 +317,7 @@ export default async function ProductPage({ params }: { params: Params }) {
                     manufacturer: part.manufacturer ?? undefined,
                     model: part.model ?? undefined,
                     year: part.year == null ? undefined : String(part.year),
+                    stockNo: part.stockNo ?? undefined,
                     price: Number(part.price),
                     thumbnail: coverImage(part)
                       ? thumbnailUrl(part)

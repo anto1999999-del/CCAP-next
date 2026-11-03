@@ -15,9 +15,8 @@ type CartContextValue = {
   count: number;
   /** Indicative total in dollars. The server re-prices before charging. */
   subtotal: number;
-  add: (line: Omit<CartLine, "quantity">, quantity?: number) => void;
+  add: (line: Omit<CartLine, "quantity">) => void;
   remove: (ref: PartRef) => void;
-  setQuantity: (ref: PartRef, quantity: number) => void;
   clear: () => void;
 };
 
@@ -29,29 +28,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // and React can hydrate without a mismatch, then re-render with the real cart.
   const lines = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const add = useCallback(
-    (line: Omit<CartLine, "quantity">, quantity = 1) => {
-      updateCart((current) => {
-        const existing = current.find((l) => isSameLine(l, line));
-        if (!existing) return [...current, { ...line, quantity }];
-        return current.map((l) =>
-          isSameLine(l, line) ? { ...l, quantity: l.quantity + quantity } : l,
-        );
-      });
-    },
-    [],
-  );
+  // Adding a part twice changes nothing: there is only the one to sell.
+  const add = useCallback((line: Omit<CartLine, "quantity">) => {
+    updateCart((current) =>
+      current.some((l) => isSameLine(l, line))
+        ? current
+        : [...current, { ...line, quantity: 1 }],
+    );
+  }, []);
 
   const remove = useCallback((ref: PartRef) => {
     updateCart((current) => current.filter((l) => !isSameLine(l, ref)));
-  }, []);
-
-  const setQuantity = useCallback((ref: PartRef, quantity: number) => {
-    updateCart((current) =>
-      current.map((l) =>
-        isSameLine(l, ref) ? { ...l, quantity: Math.max(1, quantity) } : l,
-      ),
-    );
   }, []);
 
   const clear = useCallback(() => updateCart(() => []), []);
@@ -59,8 +46,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     const count = lines.reduce((total, l) => total + l.quantity, 0);
     const subtotal = lines.reduce((total, l) => total + l.price * l.quantity, 0);
-    return { lines, count, subtotal, add, remove, setQuantity, clear };
-  }, [lines, add, remove, setQuantity, clear]);
+    return { lines, count, subtotal, add, remove, clear };
+  }, [lines, add, remove, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

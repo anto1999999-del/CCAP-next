@@ -57,9 +57,13 @@ function toOrder(document: OrderDocument): Order {
       email: document.email ?? "",
       phone: document.phone ?? "",
       address: document.address ?? "",
+      address2: document.address2,
+      company: document.company,
+      state: document.state,
       city: document.city ?? "",
       zipcode: document.zipcode ?? "",
     },
+    notes: document.notes,
     items: (document.items ?? []).map((item) => ({
       name: item.name,
       quantity: Number(item.quantity ?? 1),
@@ -352,6 +356,7 @@ export async function createPending(order: {
   items: OrderItemDocument[];
   amountCents: number;
   customer: Order["customer"];
+  notes?: string;
   pickup: boolean;
   paymentIntentId: string;
 }): Promise<string> {
@@ -365,6 +370,11 @@ export async function createPending(order: {
     items: order.items,
     amount: order.amountCents / 100,
     address: order.customer.address,
+    // Left off when blank, so an order only carries what was actually given.
+    ...(order.customer.address2 ? { address2: order.customer.address2 } : {}),
+    ...(order.customer.company ? { company: order.customer.company } : {}),
+    ...(order.customer.state ? { state: order.customer.state } : {}),
+    ...(order.notes ? { notes: order.notes } : {}),
     city: order.customer.city,
     zipcode: order.customer.zipcode,
     phone: order.customer.phone,

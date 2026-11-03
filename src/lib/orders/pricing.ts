@@ -15,8 +15,11 @@ import type { CatalogPart } from "../parts/types";
  * input, and nothing above it should either.
  */
 
-/** More of one part than the yard is likely to hold, and Stripe's sanity limit. */
-const MAX_QUANTITY = 20;
+/**
+ * One. A listing is one physical part off one car, so a quantity above this is
+ * a charge for a part that does not exist, and Pinnacle refuses the order.
+ */
+const MAX_QUANTITY = 1;
 
 /** What a customer asks for. Note there is no price in here. */
 export type RequestedLine = {

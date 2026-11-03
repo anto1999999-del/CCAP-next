@@ -89,6 +89,8 @@ const MAX = {
   zip: 10,
   phone: 20,
   contact: 50,
+  /** The API gives no limit for a comment; this is well inside any sane one. */
+  comment: 500,
 } as const;
 
 const dollars = (cents: number) => Math.round(cents) / 100;
@@ -123,17 +125,48 @@ export function addressLines(address: string): string[] {
   return lines.slice(0, 3);
 }
 
+/**
+ * The company, street and unit across those same three lines.
+ *
+ * The API has no field for a company, so it goes on the line above the street,
+ * where it sits on a delivery label anyway. If there is no room for it, it is
+ * the one left out: a parcel can arrive without a company name, not a unit.
+ */
+function deliveryLines(customer: Order["customer"]): string[] {
+  const place = [
+    ...addressLines(customer.address),
+    ...addressLines(customer.address2 ?? ""),
+  ].slice(0, 3);
+  const company = customer.company?.trim();
+
+  return company && place.length < 3
+    ? [clip(company, MAX.line), ...place]
+    : place;
+}
+
+/**
+ * "Gosford NSW". Their address has no field for a state either, and the live
+ * API refuses a whole order over a field it does not recognise, which there is
+ * no test mode to try. So it travels inside the city rather than beside it.
+ */
+function cityWithState(customer: Order["customer"]): string {
+  return [customer.city.trim(), customer.state?.trim()]
+    .filter(Boolean)
+    .join(" ");
+}
+
 function addressOf(order: Order): Address {
   const { customer } = order;
-  const [address1, address2, address3] = addressLines(customer.address);
+  const [address1, address2, address3] = deliveryLines(customer);
   const name = customer.name.trim() || "Website customer";
+  const city = cityWithState(customer);
 
   return {
     name: clip(name, MAX.name),
     ...(address1 ? { address1 } : {}),
     ...(address2 ? { address2 } : {}),
     ...(address3 ? { address3 } : {}),
-    ...(customer.city.trim() ? { city: clip(customer.city, MAX.city) } : {}),
+    ...(city ? { city: clip(city, MAX.city) } : {}),
     ...(customer.zipcode.trim()
       ? { zip: clip(customer.zipcode, MAX.zip) }
       : {}),
@@ -250,7 +283,15 @@ export function buildPinnacleOrder(
     */
     comments.push({
       commentType: "PUBLIC",
-      comment: `Deliver to: ${[order.customer.address, order.customer.city, order.customer.zipcode].filter(Boolean).join(", ")}. No freight charged.`,
+      comment: `Deliver to: ${[order.customer.company, order.customer.address, order.customer.address2, cityWithState(order.customer), order.customer.zipcode].filter(Boolean).join(", ")}. No freight charged.`,
+    });
+  }
+
+  const notes = order.notes?.trim();
+  if (notes) {
+    comments.push({
+      commentType: "PUBLIC",
+      comment: clip(`Customer notes: ${notes}`, MAX.comment),
     });
   }
 

@@ -57,11 +57,15 @@ function deliveryCents(order: Order): number {
 }
 
 function whereItIsGoing(order: Order): string {
+  const { company, address, address2, city, state, zipcode } = order.customer;
+
   return order.pickup
     ? site.address.displayLine
     : [
-        order.customer.address,
-        `${order.customer.city} ${order.customer.zipcode}`.trim(),
+        company,
+        address,
+        address2,
+        [city, state, zipcode].filter(Boolean).join(" "),
       ]
         .filter(Boolean)
         .join(", ");
@@ -117,6 +121,7 @@ function summaryPanel(order: Order): string {
     order.pickup ? "Collect from" : "Delivering to",
     whereItIsGoing(order),
   ]);
+  if (order.notes) rows.push(["Order notes", order.notes]);
 
   const cells = rows
     .map(
@@ -177,6 +182,7 @@ export function orderConfirmation(order: Order): Message {
     `Order reference: ${ref}`,
     ...(order.placedAt ? [`Placed: ${auDate(order.placedAt)}`] : []),
     `${order.pickup ? "Collect from" : "Delivering to"}: ${whereItIsGoing(order)}`,
+    ...(order.notes ? [`Order notes: ${order.notes}`] : []),
     "",
     ...order.items.map(
       (item) =>
@@ -326,6 +332,7 @@ export function orderForSales(order: Order): Message {
       heading("Customer"),
       `      <p style="margin:0 0 26px 0;font-size:14px;line-height:22px;color:${MUTED};">
         ${esc(order.customer.name)}<br>
+        ${order.customer.company ? `${esc(order.customer.company)}<br>` : ""}
         <a href="tel:${esc(order.customer.phone)}" style="color:${BRAND};text-decoration:none;">${esc(order.customer.phone)}</a><br>
         <a href="mailto:${esc(order.customer.email)}" style="color:${BRAND};text-decoration:none;">${esc(order.customer.email)}</a>
       </p>`,
@@ -341,6 +348,7 @@ export function orderForSales(order: Order): Message {
     ),
     "",
     order.pickup ? "Pickup from the yard" : whereItIsGoing(order),
+    ...(order.notes ? [`Order notes: ${order.notes}`] : []),
     `${order.customer.phone} | ${order.customer.email}`,
     "",
     `Order ${reference(order)} (${order.id})`,

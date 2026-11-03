@@ -16,12 +16,26 @@ export type CartLine = PartRef & {
   manufacturer?: string;
   model?: string;
   year?: string;
+  /** The yard's stock number. Absent on carts saved before it was recorded. */
+  stockNo?: string;
   /** Dollars, as supplied by the catalogue. Never trusted for charging. */
   price: number;
+  /**
+   * Always 1. A listing is one physical part off one car, so there is never a
+   * second to add, and Pinnacle refuses an order with any other quantity. Kept
+   * so a cart saved in a browser still reads and the order keeps its shape.
+   */
   quantity: number;
   /** Pre-resolved image so the cart does not have to re-derive proxy paths. */
   thumbnail?: string;
 };
+
+/** "2015 TOYOTA COROLLA", in the catalogue's own wording, as parts are titled. */
+export function lineVehicle(
+  line: Pick<CartLine, "year" | "manufacturer" | "model">,
+): string {
+  return [line.year, line.manufacturer, line.model].filter(Boolean).join(" ");
+}
 
 /** Stable key for a cart line. */
 export function lineKey(ref: PartRef): string {
