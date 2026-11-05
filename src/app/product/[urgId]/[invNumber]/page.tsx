@@ -28,6 +28,7 @@ import { coverImage, fullImageUrl, thumbnailUrl } from "@/lib/parts/images";
 import { formatPrice } from "@/lib/parts/price";
 import { partTypeLabel } from "@/lib/parts/part-type-names";
 import { findPart } from "@/lib/parts/query";
+import { relatedParts } from "@/lib/parts/related";
 import { SHIPPING, WARRANTY } from "@/lib/content/part-terms";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { absoluteUrl, site } from "@/lib/site";
@@ -144,14 +145,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   const stillFitted = stillOnDonorVehicle(part);
   const vehiclePhotos = onlyVehiclePhotos(images);
 
-  const related = parts
-    .filter(
-      (other) =>
-        partKey(other) !== key &&
-        other.manufacturer === part.manufacturer &&
-        other.model === part.model,
-    )
-    .slice(0, 4);
+  const related = relatedParts(part, parts);
 
   return (
     <div className="bg-admin min-h-screen text-white">

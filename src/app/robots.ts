@@ -36,6 +36,30 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         // Carried from the live robots.txt. The page no longer exists, and the
         // line stays because removing it invites a crawler to try the address.
         "/manage-slider-images",
+        /*
+          Next's page-data requests. A link that scrolls into view prefetches
+          the page it points at as a `?_rsc=` request, and Googlebot follows
+          them: on 5 Nov 2026 Search Console's crawl stats showed they were 26%
+          of every request Google made to the site. They are not pages, are
+          never indexed, and every one is a crawl not spent on a part. The real
+          page is served as HTML at the same address without the parameter.
+        */
+        "/*_rsc=",
+        /*
+          The filtered catalogue. Every view is already noindex, and there is
+          one for every make, model, year, part type and search, each with its
+          own pagination. Google was fetching them deep into the pagination
+          (make plus model plus page 40) instead of the parts themselves.
+          Plain pagination, /products?page=N, stays open: it reaches every part
+          in the catalogue, with no duplication. The filter order is fixed by
+          `viewQuery` in the products page, so a filtered link always starts
+          with one of these.
+        */
+        "/products?year=",
+        "/products?make=",
+        "/products?model=",
+        "/products?part_type=",
+        "/products?q=",
       ],
       allow: "/",
     },
