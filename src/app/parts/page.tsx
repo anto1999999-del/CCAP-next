@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import SectionHeading from "@/components/layout/SectionHeading";
@@ -11,7 +12,7 @@ import { faqSchema } from "@/lib/faqs";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Used Car Parts by Category NSW | Central Coast Auto Parts",
   description:
     "Used car parts by category in Berkeley Vale NSW. Engines, gearboxes, body panels, electrical, suspension and more, all inspected and warranted.",
@@ -115,4 +116,9 @@ export default function PartsHubPage() {
       />
     </>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/parts", BASE_METADATA);
 }

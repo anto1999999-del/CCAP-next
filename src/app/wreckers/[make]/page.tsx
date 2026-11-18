@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
@@ -35,7 +36,7 @@ export async function generateMetadata({
   const page = makePageBySlug(make);
   if (!page) return {};
 
-  return {
+  return withSeoOverride(`/wreckers/${page.slug}`, {
     title: page.title,
     description: page.description,
     alternates: { canonical: `/wreckers/${page.slug}` },
@@ -47,7 +48,7 @@ export async function generateMetadata({
       // Repeated, not inherited: setting openGraph replaces the parent object.
       images: [{ url: site.logo }],
     },
-  };
+  });
 }
 
 /** The four reasons, worded the same as the part-category pages for consistency. */

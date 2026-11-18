@@ -29,6 +29,8 @@ import { formatPrice } from "@/lib/parts/price";
 import { partTypeLabel } from "@/lib/parts/part-type-names";
 import { findPart } from "@/lib/parts/query";
 import { relatedParts } from "@/lib/parts/related";
+import { partTemplate } from "@/lib/seo/override-store";
+import { partMeta } from "@/lib/seo/overrides";
 import { SHIPPING, WARRANTY } from "@/lib/content/part-terms";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { absoluteUrl, site } from "@/lib/site";
@@ -53,7 +55,7 @@ export async function generateMetadata({
   const name = formatItemName(part.itemName);
   const vehicle = vehicleLabel(part);
 
-  const title = vehicle
+  const builtInTitle = vehicle
     ? `Used ${name} for ${vehicle} | ${site.name}`
     : `Used ${name} | ${site.name} Berkeley Vale NSW`;
 
@@ -66,7 +68,7 @@ export async function generateMetadata({
   const { parts: catalogue } = await loadCatalog();
   const canonical = canonicalPathFor(part, catalogue);
 
-  const description = [
+  const builtInDescription = [
     `Quality used ${name}`,
     vehicle ? `for ${vehicle}` : null,
     part.stockNo ? `, stock ${part.stockNo}.` : ".",
@@ -75,6 +77,17 @@ export async function generateMetadata({
     .filter(Boolean)
     .join(" ")
     .replace(" ,", ",");
+
+  /*
+    One pattern for every part page, set by the title agent. It applies only
+    where the part has everything the pattern names: a part with no vehicle
+    keeps the wording above, which has a form of its own for that case.
+  */
+  const { title, description } = partMeta(
+    await partTemplate(),
+    { part: name, vehicle, stockNo: part.stockNo ?? "" },
+    { title: builtInTitle, description: builtInDescription },
+  );
 
   return {
     title,

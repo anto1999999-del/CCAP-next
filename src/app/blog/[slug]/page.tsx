@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -41,7 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = post.seo.metaTitle ?? post.title;
   const description = post.seo.metaDescription ?? post.excerpt;
 
-  return {
+  // The title agent's override, when there is one, wins over the post's own
+  // SEO fields: it is the newer decision and the one being measured.
+  return withSeoOverride(`/blog/${post.slug}`, {
     title,
     description,
     alternates: { canonical: `/blog/${post.slug}` },
@@ -62,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
     },
-  };
+  });
 }
 
 function formatDate(iso: string | null): string {

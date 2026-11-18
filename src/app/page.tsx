@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
@@ -12,7 +13,7 @@ import {
 import { HOMEPAGE_FAQS, faqSchema } from "@/lib/faqs";
 import { homeBusinessSchema } from "@/lib/schema/business";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   /*
     Set here rather than inherited from the layout. A canonical on the layout
     is handed to every page that does not set its own, and four of them did
@@ -119,4 +120,9 @@ export default function HomePage() {
       <ContactFormSection />
     </div>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/", BASE_METADATA);
 }

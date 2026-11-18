@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import JsonLd from "@/components/JsonLd";
@@ -9,7 +10,7 @@ import { CONTACT_FAQS, faqSchema } from "@/lib/faqs";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Contact Us | Central Coast Auto Parts Berkeley Vale",
   description:
     "Get in touch with Central Coast Auto Parts in Berkeley Vale NSW. Call 02 4388 1818, request a part quote, or visit us Mon, Fri 8am, 5pm, Sat 9am, 2pm.",
@@ -177,4 +178,9 @@ export default function ContactPage() {
       />
     </div>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/contact", BASE_METADATA);
 }

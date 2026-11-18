@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
@@ -38,8 +39,9 @@ export async function generateMetadata({
   if (!category) return {};
 
   // Carried from the live page unchanged: these titles and descriptions are
-  // what rank, and are not to be rewritten as part of a rebuild.
-  return {
+  // what rank, and are not to be rewritten as part of a rebuild. The title
+  // agent may lay a measured change over them; removing it restores these.
+  return withSeoOverride(`/parts/${category.slug}`, {
     title: category.title,
     description: category.description,
     alternates: { canonical: `/parts/${category.slug}` },
@@ -56,7 +58,7 @@ export async function generateMetadata({
       */
       images: [{ url: site.logo }],
     },
-  };
+  });
 }
 
 /** Reasons to buy here, the same four on every category page. */

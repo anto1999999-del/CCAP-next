@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
@@ -38,7 +39,7 @@ export async function generateMetadata({
   const title = `${vehicle.title} | Used Parts | ${site.name}`;
   const description = `Used parts from a ${vehicle.title} dismantled at our Berkeley Vale yard. Call ${site.contact.phone} and we will check the part you need.`;
 
-  return {
+  return withSeoOverride(`/gallery/${vehicle.slug}`, {
     title,
     description,
     alternates: { canonical: `/gallery/${vehicle.slug}` },
@@ -49,7 +50,7 @@ export async function generateMetadata({
       url: `${site.url}/gallery/${vehicle.slug}`,
       images: vehicle.photos[0] ? [{ url: vehicle.photos[0].url }] : undefined,
     },
-  };
+  });
 }
 
 export default async function VehiclePage({

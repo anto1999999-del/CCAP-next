@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import JsonLd from "@/components/JsonLd";
 import Container from "@/components/layout/Container";
 import PageHero from "@/components/layout/PageHero";
@@ -8,7 +9,7 @@ import { listMakes, listVehicles } from "@/lib/blog/gallery";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Vehicle Gallery | Central Coast Auto Parts Berkeley Vale NSW",
   description:
     "A look at cars we have dismantled at our Berkeley Vale yard. Filter by make, then call us to check the part you need. We hold far more stock than we photograph.",
@@ -69,4 +70,9 @@ export default async function GalleryPage() {
       <ContactFormSection />
     </>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/gallery", BASE_METADATA);
 }

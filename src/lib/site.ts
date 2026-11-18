@@ -10,6 +10,8 @@ export const site = {
   name: "Central Coast Auto Parts",
   /** No trailing slash, everything else appends its own. */
   url: "https://centralcoastautoparts.com.au",
+  /** The home page's title, and what any page without one of its own shows. */
+  title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
   description:
     "Quality used car parts in Berkeley Vale, NSW. Engines, gearboxes, body panels and more, all with warranty. Nationwide delivery. Call 02 4388 1818.",
   logo: "/aa.png",

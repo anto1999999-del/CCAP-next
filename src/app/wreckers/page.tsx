@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import JsonLd from "@/components/JsonLd";
@@ -8,7 +9,7 @@ import { makeStock } from "@/lib/parts/make-stock";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Car Wreckers by Make NSW | Central Coast Auto Parts",
   description:
     "Wrecking Hyundai, Kia, Toyota, Subaru, Mazda, Nissan, Ford, Holden and more at Berkeley Vale NSW. Used parts by make, inspected, warranted and shipped Australia-wide.",
@@ -88,4 +89,9 @@ export default async function WreckersHubPage() {
       </section>
     </>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/wreckers", BASE_METADATA);
 }

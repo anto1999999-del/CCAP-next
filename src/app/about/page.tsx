@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Image from "next/image";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
@@ -15,7 +16,7 @@ import { ABOUT_SUPPLY_CARDS, SERVICE_AREAS } from "@/lib/content/sections";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Car Wreckers Berkeley Vale NSW | Central Coast Auto Parts",
   description:
     "A licensed auto dismantler in Berkeley Vale NSW. We supply used engines, gearboxes, panels and electrical parts, all tested and sold with warranty.",
@@ -174,4 +175,9 @@ export default function AboutPage() {
       <ContactFormSection />
     </>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/about", BASE_METADATA);
 }

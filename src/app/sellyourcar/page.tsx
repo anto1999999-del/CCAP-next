@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
 import Container from "@/components/layout/Container";
@@ -10,7 +11,7 @@ import { faqSchema } from "@/lib/faqs";
 import { breadcrumbSchema } from "@/lib/schema/breadcrumbs";
 import { sellYourCarServiceSchema } from "@/lib/schema/sell-your-car";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Sell Your Car for Cash NSW | Central Coast Auto Parts",
   description:
     "Sell your car for cash on the Central Coast NSW. We buy damaged, unwanted and non-running cars and vans. Fast assessment and a free quote.",
@@ -135,4 +136,9 @@ export default function SellYourCarPage() {
       />
     </>
   );
+}
+
+/** The title agent's override for this page, when it has set one. */
+export function generateMetadata(): Promise<Metadata> {
+  return withSeoOverride("/sellyourcar", BASE_METADATA);
 }

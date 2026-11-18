@@ -21,7 +21,7 @@ import "./globals.css";
  */
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
+  title: site.title,
   description: site.description,
   /*
     No `keywords`. Google has ignored the meta keywords tag since 2009 and no
@@ -59,14 +59,14 @@ export const metadata: Metadata = {
       from one address in NSW. `lang` on the document says the same thing.
     */
     locale: "en_AU",
-    title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
+    title: site.title,
     description: site.description,
     url: "/",
     images: [{ url: site.logo }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Used Car Parts Berkeley Vale NSW | Central Coast Auto Parts",
+    title: site.title,
     description:
       "Quality used engines, gearboxes, body panels and more, all with warranty. Trusted car wreckers in Berkeley Vale NSW. Fast dispatch Australia-wide.",
     images: [site.logo],

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import Image from "next/image";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
@@ -41,11 +42,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { page } = await searchParams;
   const number = Number(page) || 1;
+  const base = await withSeoOverride("/blog", BASE_METADATA);
 
-  if (number <= 1) return BASE_METADATA;
+  if (number <= 1) return base;
 
   return {
-    ...BASE_METADATA,
+    ...base,
     alternates: { canonical: `/blog?page=${number}` },
     robots: { index: false, follow: true },
   };

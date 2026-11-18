@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withSeoOverride } from "@/lib/seo/override-store";
 import JsonLd from "@/components/JsonLd";
 import FaqSection from "@/components/FaqSection";
 import PartCard from "@/components/parts/PartCard";
@@ -95,15 +96,16 @@ export async function generateMetadata({
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const params = await searchParams;
+  const base = await withSeoOverride("/products", BASE_METADATA);
 
   // The same builder the links use, and the page number the URL states, so the
   // canonical is the address that was followed rather than a second spelling
   // of it.
   const search = viewQuery(params, Number(one(params, "page")) || 1);
-  if (!search) return BASE_METADATA;
+  if (!search) return base;
 
   return {
-    ...BASE_METADATA,
+    ...base,
     alternates: { canonical: `/products?${search}` },
     robots: { index: false, follow: true },
   };
