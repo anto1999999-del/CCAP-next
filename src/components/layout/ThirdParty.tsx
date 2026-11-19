@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Script from "next/script";
 import { site } from "@/lib/site";
-import { WAKE_EVENT, ensureGtag, track } from "@/lib/analytics/gtag";
+import {
+  ensureGtag,
+  subscribeWake,
+  track,
+  wakeWasRequested,
+} from "@/lib/analytics/gtag";
 import { phoneLinkLocation } from "@/lib/analytics/locations";
 import { THIRD_PARTY_SCRIPT_IDS } from "@/lib/analytics/script-ids";
 
@@ -29,7 +34,9 @@ import { THIRD_PARTY_SCRIPT_IDS } from "@/lib/analytics/script-ids";
  * is nobody to chat to on a dashboard.
  *
  * A conversion (lib/analytics/gtag) does not wait for any of that: it queues
- * its event and dispatches WAKE_EVENT, which brings the script in at once.
+ * its event and asks for the script, which brings it in at once -- including
+ * when the event was tracked before this component mounted, which is the case
+ * on the order confirmation.
  */
 
 declare global {
@@ -42,17 +49,26 @@ declare global {
 /** The events that mean somebody is actually here. */
 const WAKE = ["scroll", "pointerdown", "keydown", "touchstart"] as const;
 
+/** The server never has a tracked event, and hydration must agree with it. */
+const neverOnServer = () => false;
+
 export default function ThirdParty({ enabled }: { enabled: boolean }) {
-  const [awake, setAwake] = useState(false);
+  const [touched, setTouched] = useState(false);
+  // Read, not listened for: the request may be older than this component.
+  const asked = useSyncExternalStore(
+    subscribeWake,
+    wakeWasRequested,
+    neverOnServer,
+  );
+  const awake = touched || asked;
 
   useEffect(() => {
     if (!enabled) return;
 
-    const wake = () => setAwake(true);
+    const wake = () => setTouched(true);
     for (const event of WAKE) {
       window.addEventListener(event, wake, { once: true, passive: true });
     }
-    window.addEventListener(WAKE_EVENT, wake);
 
     /*
       Every tap on a phone number, wherever it is. One listener on the page
@@ -97,7 +113,6 @@ export default function ThirdParty({ enabled }: { enabled: boolean }) {
 
     return () => {
       for (const event of WAKE) window.removeEventListener(event, wake);
-      window.removeEventListener(WAKE_EVENT, wake);
       document.removeEventListener("click", onClick, { capture: true });
       window.clearTimeout(timer);
     };

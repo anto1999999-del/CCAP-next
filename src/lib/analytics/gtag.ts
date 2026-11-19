@@ -29,8 +29,6 @@ declare global {
   }
 }
 
-/** Dispatched to bring Google's script in now instead of on first scroll. */
-export const WAKE_EVENT = "ccap:analytics-wake";
 
 const ADS_ID = process.env.NEXT_PUBLIC_GADS_ID?.trim() ?? "";
 
@@ -83,9 +81,38 @@ export function ensureGtag(): void {
   if (ADS_ID) window.gtag("config", ADS_ID);
 }
 
+/*
+  The request to bring Google's script in now, instead of on first scroll.
+
+  It is remembered, not just announced. This used to be a window event, and an
+  event only reaches whoever is already listening: on the order confirmation
+  the purchase is tracked by a component inside the page, whose effect runs
+  before the loader's (ThirdParty comes after the page in the layout), so the
+  announcement went out to nobody and the script waited for a scroll, a tap or
+  the eight-second backstop. A customer who closed the tab first was not
+  counted. The loader now reads the request whenever it mounts.
+*/
+let wakeRequested = false;
+const wakeListeners = new Set<() => void>();
+
+/** Has anything been tracked on this page load? Read by the loader. */
+export function wakeWasRequested(): boolean {
+  return wakeRequested;
+}
+
+/** Be told when the first event is tracked. Returns the unsubscribe. */
+export function subscribeWake(listener: () => void): () => void {
+  wakeListeners.add(listener);
+  return () => {
+    wakeListeners.delete(listener);
+  };
+}
+
 /** Bring Google's script in now. A no-op where analytics is switched off. */
 function wake(): void {
-  window.dispatchEvent(new Event(WAKE_EVENT));
+  if (wakeRequested) return;
+  wakeRequested = true;
+  for (const listener of wakeListeners) listener();
 }
 
 /**
