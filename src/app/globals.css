@@ -149,6 +149,40 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+   Header menus
+   ---------------------------------------------------------------------------
+   A short drop as a menu opens, so the eye follows where it came from. Only on
+   opening: a menu that animates shut makes the next click wait for it. The
+   reduced-motion rule above flattens both.
+--------------------------------------------------------------------------- */
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.nav-drop {
+  animation: nav-drop 160ms ease-out;
+}
+
+@keyframes nav-sheet {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+.nav-sheet[open] {
+  animation: nav-sheet 200ms ease-out;
+}
+
+/* The page behind the phone menu stays where it was. */
+html:has(dialog.nav-sheet[open]) {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
    Article body
    ---------------------------------------------------------------------------
    Styling for post content, which arrives as HTML rather than as components, so

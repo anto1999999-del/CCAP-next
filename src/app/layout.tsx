@@ -148,7 +148,10 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <Header />
-          {children}
+          {/* Where the header's "Skip to content" lands. */}
+          <div id="main" tabIndex={-1} className="outline-none">
+            {children}
+          </div>
           <Footer />
         </CartProvider>
         <ThirdPartyGate />
