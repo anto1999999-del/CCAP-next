@@ -5,6 +5,7 @@ import Script from "next/script";
 import { site } from "@/lib/site";
 import { WAKE_EVENT, ensureGtag, track } from "@/lib/analytics/gtag";
 import { phoneLinkLocation } from "@/lib/analytics/locations";
+import { THIRD_PARTY_SCRIPT_IDS } from "@/lib/analytics/script-ids";
 
 /**
  * Analytics and the chat widget.
@@ -112,17 +113,17 @@ export default function ThirdParty({ enabled }: { enabled: boolean }) {
   return (
     <>
       <Script
-        id="ga4"
+        id={THIRD_PARTY_SCRIPT_IDS.ga4}
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`}
       />
 
-      <Script id="clarity" strategy="afterInteractive">
+      <Script id={THIRD_PARTY_SCRIPT_IDS.clarity} strategy="afterInteractive">
         {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarity}");`}
       </Script>
 
       <Script
-        id="podium"
+        id={THIRD_PARTY_SCRIPT_IDS.podium}
         strategy="lazyOnload"
         src={`https://connect.podium.com/widget.js#ORG_TOKEN=${podiumToken}`}
       />
