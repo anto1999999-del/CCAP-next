@@ -143,14 +143,21 @@ function matchesText(term: string, hay: Text): boolean {
   return one !== null && found(one, hay);
 }
 
+/** The words of a search, lower case, with stray punctuation at their ends removed. */
+export function searchTerms(query: string): string[] {
+  return (
+    query
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      // "hilux," and "(bt-50)" are searches for hilux and bt-50.
+      .map((term) => term.replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, ""))
+      .filter(Boolean)
+  );
+}
+
 export function matchesQuery(part: CatalogPart, query: string): boolean {
-  const terms = query
-    .trim()
-    .toLowerCase()
-    .split(/\s+/)
-    // "hilux," and "(bt-50)" are searches for hilux and bt-50.
-    .map((term) => term.replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, ""))
-    .filter(Boolean);
+  const terms = searchTerms(query);
   if (terms.length === 0) return true;
 
   const hay = haystack(part);
@@ -171,6 +178,164 @@ export function matchesQuery(part: CatalogPart, query: string): boolean {
     );
     return namesThisPart && matchesText(term, hay.all);
   });
+}
+
+/** Whether a word of the text starts with the term (or its singular): "rim" is not in "trim". */
+function startsAWord(term: string, words: readonly string[]): boolean {
+  const bare = squash(term);
+  const one = singular(bare);
+  return words.some(
+    (word) => word.startsWith(bare) || (one !== null && word.startsWith(one)),
+  );
+}
+
+function wordsOf(text: string): string[] {
+  return asText(text.toLowerCase()).words.split(" ").filter(Boolean);
+}
+
+/**
+ * How well a matching part answers the search, for putting the best first.
+ *
+ * Every part that reaches here already matches every word, so this only
+ * decides order. "carnival door" matched 282 parts and led with window
+ * switches, because their part type spells out "door"; a customer typing that
+ * wants the doors. So each word scores a point for starting a word of what the
+ * part is called, another for starting a word of the supplier's own item name
+ * ("Left Front Door", not "Pwr Dr Wind Switch"), and another when it is the
+ * last word of that name, which is the thing itself: a "Door Handle" is a
+ * handle, a "Left Front Door" is a door.
+ */
+export function nameScore(part: CatalogPart, terms: readonly string[]): number {
+  const called = haystack(part).name.words.split(" ").filter(Boolean);
+  const itemName = wordsOf(part.itemName ?? "");
+  const last = itemName.slice(-1);
+  let score = 0;
+  for (const term of terms) {
+    if (startsAWord(term, called)) score += 1;
+    if (startsAWord(term, itemName)) score += 1;
+    if (startsAWord(term, last)) score += 1;
+  }
+  return score;
+}
+
+/** Best answers first; parts that score the same keep the order they came in. */
+export function rankByName(
+  parts: readonly CatalogPart[],
+  query: string,
+): CatalogPart[] {
+  const terms = searchTerms(query);
+  if (terms.length === 0) return [...parts];
+  return parts
+    .map((part, at) => ({ part, at, score: nameScore(part, terms) }))
+    .sort((a, b) => b.score - a.score || a.at - b.at)
+    .map(({ part }) => part);
+}
+
+/*
+  Spelling.
+
+  Customers type "corola", "forrester" and "alternater", and every word of a
+  search has to match, so one slip found nothing at all, with no hint why. The
+  fix is the one a person behind the counter would make: if a word is not in
+  the catalogue anywhere, read it as the catalogue word it is closest to.
+
+  The vocabulary is every word in the catalogue, counted, and it is built once
+  per catalogue: the nightly sync replaces the array, and the old vocabulary
+  goes with it.
+*/
+
+type Vocabulary = { words: string[]; counts: Map<string, number> };
+
+const vocabularies = new WeakMap<readonly CatalogPart[], Vocabulary>();
+
+function vocabulary(catalog: readonly CatalogPart[]): Vocabulary {
+  const kept = vocabularies.get(catalog);
+  if (kept) return kept;
+
+  const counts = new Map<string, number>();
+  for (const part of catalog) {
+    for (const word of haystack(part).all.words.split(" ")) {
+      if (word) counts.set(word, (counts.get(word) ?? 0) + 1);
+    }
+  }
+  const built = { words: [...counts.keys()], counts };
+  vocabularies.set(catalog, built);
+  return built;
+}
+
+/** Edit distance, giving up as soon as it is past `limit`. */
+function distance(a: string, b: string, limit: number): number {
+  if (Math.abs(a.length - b.length) > limit) return limit + 1;
+  let previous = Array.from({ length: b.length + 1 }, (_, at) => at);
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = [i];
+    let best = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + cost,
+      );
+      best = Math.min(best, current[j]);
+    }
+    if (best > limit) return limit + 1;
+    previous = current;
+  }
+  return previous[b.length];
+}
+
+/**
+ * The search with each unknown word replaced by the closest catalogue word, or
+ * null when there is nothing to correct.
+ *
+ * Only words of letters, five or more of them, are touched: numbers are years
+ * and stock numbers, and a short word is too easily "corrected" into another
+ * real word. A word counts as known when it is part of any catalogue word, so
+ * "head" (of "headlamp") is never rewritten. A correction must be a word that
+ * appears at least three times, so one typo in a supplier note cannot become
+ * the target for everybody else's. The most common of the closest words wins.
+ */
+export function correctQuery(
+  catalog: readonly CatalogPart[],
+  query: string,
+): string | null {
+  const terms = searchTerms(query);
+  if (terms.length === 0) return null;
+
+  const { words, counts } = vocabulary(catalog);
+  let changed = false;
+
+  const corrected = terms.map((term) => {
+    if (!/^[a-z]{5,}$/.test(term)) return term;
+    const one = singular(term);
+    const known = words.some(
+      (word) => word.includes(term) || (one !== null && word.includes(one)),
+    );
+    if (known) return term;
+
+    const limit = term.length >= 8 ? 2 : 1;
+    let best: { word: string; distance: number; count: number } | null = null;
+    for (const word of words) {
+      const count = counts.get(word) ?? 0;
+      if (count < 3 || !/^[a-z]+$/.test(word)) continue;
+      const apart = distance(term, word, limit);
+      if (apart > limit) continue;
+      if (
+        !best ||
+        apart < best.distance ||
+        (apart === best.distance && count > best.count)
+      ) {
+        best = { word, distance: apart, count };
+      }
+    }
+
+    if (!best) return term;
+    changed = true;
+    return best.word;
+  });
+
+  return changed ? corrected.join(" ") : null;
 }
 
 /**

@@ -126,7 +126,7 @@ export default async function ProductsPage({
     server rendered: the old one fetched its parts from the browser, so a
     crawler, and anyone whose scripts had not loaded, saw a spinner.
   */
-  const { page, options, available, syncedAt } = await getCatalogPage({
+  const { page, options, available, syncedAt, search } = await getCatalogPage({
     filters,
     query,
     page: Number(one(params, "page")) || 1,
@@ -167,6 +167,8 @@ export default async function ProductsPage({
             query={query}
             filters={filters}
             resultCount={available ? page.totalResults : null}
+            correctedQuery={search.correctedQuery}
+            suggestions={search.suggestions}
           />
         </Container>
       </div>

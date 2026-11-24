@@ -1,7 +1,7 @@
 import "server-only";
 import { loadCatalog } from "./catalog";
 import { deriveFilterOptions } from "./filter";
-import { orderedMatches, paginate } from "./query";
+import { paginate, searchCatalog, type SearchOutcome } from "./query";
 import type {
   CatalogPart,
   FilterOptions,
@@ -32,7 +32,7 @@ const MAX_CACHED_RESULTS = 32;
 const MAX_CACHED_OPTIONS = 64;
 
 let cachedFor: readonly CatalogPart[] | null = null;
-const orderedResults = new Map<string, CatalogPart[]>();
+const orderedResults = new Map<string, SearchOutcome>();
 const filterOptions = new Map<string, FilterOptions>();
 
 function resetIfCatalogChanged(parts: readonly CatalogPart[]): void {
@@ -61,6 +61,8 @@ export type CatalogView = {
   /** False when no sync has run, so the page can say so rather than show nothing. */
   available: boolean;
   syncedAt: string | null;
+  /** What the search did beyond matching the words as typed. */
+  search: Pick<SearchOutcome, "correctedQuery" | "suggestions">;
 };
 
 export async function getCatalogPage({
@@ -82,12 +84,12 @@ export async function getCatalogPage({
     a slice. Page 47 of a filtered catalogue would otherwise repeat the filter,
     the dedupe and the spread to show twenty rows.
   */
-  const ordered =
+  const outcome =
     orderedResults.get(key) ??
     remember(
       orderedResults,
       key,
-      orderedMatches({ catalog: parts, filters, query }),
+      searchCatalog({ catalog: parts, filters, query }),
       MAX_CACHED_RESULTS,
     );
 
@@ -102,9 +104,13 @@ export async function getCatalogPage({
     );
 
   return {
-    page: paginate(ordered, page),
+    page: paginate(outcome.ordered, page),
     options,
     available,
     syncedAt,
+    search: {
+      correctedQuery: outcome.correctedQuery,
+      suggestions: outcome.suggestions,
+    },
   };
 }

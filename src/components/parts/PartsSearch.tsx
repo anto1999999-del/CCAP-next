@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { SearchSuggestion } from "@/lib/parts/query";
 import type { PartFilters } from "@/lib/parts/types";
 
 /**
@@ -18,11 +19,17 @@ export default function PartsSearch({
   query,
   filters,
   resultCount,
+  correctedQuery = null,
+  suggestions = [],
 }: {
   query: string;
   filters: PartFilters;
   /** Shown once a search has been made, so an empty result reads as an answer. */
   resultCount: number | null;
+  /** The search that was run instead, when the words as typed found nothing. */
+  correctedQuery?: string | null;
+  /** Narrower searches that do find parts, when nothing was found. */
+  suggestions?: readonly SearchSuggestion[];
 }) {
   const hidden: [string, string][] = [
     ["year", filters.year],
@@ -30,6 +37,14 @@ export default function PartsSearch({
     ["model", filters.model],
     ["part_type", filters.partType],
   ];
+
+  /** The same filters, a different search. */
+  const searchHref = (q: string) => {
+    const params = new URLSearchParams();
+    for (const [name, value] of hidden) if (value) params.set(name, value);
+    params.set("q", q);
+    return `/products?${params.toString()}`;
+  };
 
   return (
     <div className="w-full sm:max-w-md">
@@ -71,10 +86,30 @@ export default function PartsSearch({
         <p className="mt-2 text-xs text-gray-400">
           {resultCount === 0
             ? `Nothing matches "${query}".`
-            : `${resultCount?.toLocaleString()} ${resultCount === 1 ? "part" : "parts"} matching "${query}".`}{" "}
+            : correctedQuery
+              ? `No parts match "${query}". Showing ${resultCount?.toLocaleString()} ${resultCount === 1 ? "part" : "parts"} for "${correctedQuery}".`
+              : `${resultCount?.toLocaleString()} ${resultCount === 1 ? "part" : "parts"} matching "${query}".`}{" "}
           <Link href="/products" className="text-brand-text hover:underline">
             Clear
           </Link>
+        </p>
+      )}
+
+      {query && resultCount === 0 && suggestions.length > 0 && (
+        <p className="mt-1 text-xs text-gray-400">
+          In stock now:{" "}
+          {suggestions.map((suggestion, at) => (
+            <span key={suggestion.query}>
+              {at > 0 && " · "}
+              <Link
+                href={searchHref(suggestion.query)}
+                className="text-brand-text hover:underline"
+              >
+                {suggestion.query}
+              </Link>{" "}
+              ({suggestion.count.toLocaleString()})
+            </span>
+          ))}
         </p>
       )}
     </div>

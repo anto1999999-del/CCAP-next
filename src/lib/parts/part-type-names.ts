@@ -116,8 +116,8 @@ export function partTypeLabel(code: string): string {
 const ALSO_KNOWN_AS: Record<string, string[]> = {
   left: ["passenger", "lh", "nearside"],
   right: ["driver", "rh", "offside"],
-  headlamp: ["headlight", "head", "light", "lamp"],
-  taillight: ["tail", "light", "lamp", "rear"],
+  headlamp: ["headlight", "head", "light", "lamp", "headlamp"],
+  taillight: ["tail", "light", "lamp", "rear", "taillamp"],
   lamp: ["light"],
   light: ["lamp"],
   // Not "mirror" alone: nobody calls the interior mirror a wing mirror.

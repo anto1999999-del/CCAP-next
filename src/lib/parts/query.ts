@@ -1,7 +1,12 @@
 import { arrangeParts } from "./arrange";
 import { dedupeParts } from "./identity";
 import { filterParts } from "./filter";
-import { matchesQuery } from "./search";
+import {
+  correctQuery,
+  matchesQuery,
+  rankByName,
+  searchTerms,
+} from "./search";
 import type { CatalogPart, PartFilters, PartsPage } from "./types";
 
 /**
@@ -42,7 +47,94 @@ export function orderedMatches({
   );
 
   const narrowed = Boolean(filters.make || filters.model || query);
-  return arrangeParts(matched, narrowed);
+  // Ranked before arranging: priced parts still come first, and within them the
+  // parts that are what was asked for come before parts that merely mention it.
+  return arrangeParts(rankByName(matched, query), narrowed);
+}
+
+/** A narrower search that does find something, offered when a search finds nothing. */
+export type SearchSuggestion = { query: string; count: number };
+
+export type SearchOutcome = {
+  /** Every matching part, in the order they should be shown. */
+  ordered: CatalogPart[];
+  /** Set when nothing matched as typed and a spelling correction did: the search that was run. */
+  correctedQuery: string | null;
+  /** Set only when nothing matched at all: the same search less one word. */
+  suggestions: SearchSuggestion[];
+};
+
+const MAX_SUGGESTIONS = 3;
+
+/**
+ * A search as the parts page runs it.
+ *
+ * A search that finds something is left exactly as it was: the spelling
+ * correction and the suggestions only run when the words as typed found
+ * nothing, so they can never change a result that was already right. When
+ * they do run, the page says so ("Showing results for ...").
+ *
+ * The suggestions answer the dead end. "hilux gearbox" finds nothing because
+ * there is no HiLux gearbox in stock, and the page used to stop there; now it
+ * offers the HiLux parts and the gearboxes that are in stock instead.
+ */
+export function searchCatalog({
+  catalog,
+  filters,
+  query = "",
+}: {
+  catalog: readonly CatalogPart[];
+  filters: PartFilters;
+  query?: string;
+}): SearchOutcome {
+  const ordered = orderedMatches({ catalog, filters, query });
+  if (ordered.length > 0 || !query.trim()) {
+    return { ordered, correctedQuery: null, suggestions: [] };
+  }
+
+  const corrected = correctQuery(catalog, query);
+  if (corrected) {
+    const found = orderedMatches({ catalog, filters, query: corrected });
+    if (found.length > 0) {
+      return { ordered: found, correctedQuery: corrected, suggestions: [] };
+    }
+  }
+
+  const terms = searchTerms(corrected ?? query);
+  if (terms.length < 2 || terms.length > 5) {
+    return { ordered, correctedQuery: null, suggestions: [] };
+  }
+
+  /*
+    The search less one word, and each word on its own. A short bare number is
+    left out of any suggestion: "200" from "landcruiser 200 alternator" only
+    means something next to the model it belongs to.
+  */
+  const candidates = [
+    ...terms.map((_, dropped) => terms.filter((_, at) => at !== dropped)),
+    // One word alone only when it can stand alone: "box" from "gear box" cannot.
+    ...(terms.length > 2
+      ? terms.filter((term) => term.length >= 4).map((term) => [term])
+      : []),
+  ]
+    .filter((words) => !words.some((word) => /^\d{1,3}$/.test(word)))
+    .map((words) => words.join(" "));
+
+  const suggestions = [...new Set(candidates)]
+    .map((shorter) => ({
+      query: shorter,
+      count: orderedMatches({ catalog, filters, query: shorter }).length,
+    }))
+    .filter((suggestion) => suggestion.count > 0)
+    // Closest to what was typed first: more words kept, then more parts.
+    .sort(
+      (a, b) =>
+        searchTerms(b.query).length - searchTerms(a.query).length ||
+        b.count - a.count,
+    )
+    .slice(0, MAX_SUGGESTIONS);
+
+  return { ordered, correctedQuery: null, suggestions };
 }
 
 /** Cut one page out of an ordered result set. */
