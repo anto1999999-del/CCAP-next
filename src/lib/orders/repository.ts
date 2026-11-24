@@ -44,6 +44,21 @@ function toOrder(document: OrderDocument): Order {
     paymentMethod: document.paymentMethod ?? "",
     pickup: document.pickup === true,
     hidden: document.hidden === true,
+    ...(document.onTheWayAt
+      ? { onTheWayAt: document.onTheWayAt.toISOString() }
+      : {}),
+    ...(document.deliveredAt
+      ? { deliveredAt: document.deliveredAt.toISOString() }
+      : {}),
+    ...(document.statusHistory?.length
+      ? {
+          history: document.statusHistory.map((change) => ({
+            status: change.status,
+            at: change.at.toISOString(),
+            by: change.by,
+          })),
+        }
+      : {}),
     ...(document.supplierOrder
       ? {
           supplier: {
@@ -236,20 +251,32 @@ export async function setStatus(
   orderId: string,
   status: OrderStatus,
 ): Promise<{ changed: boolean; order: Order | null }> {
-  const before = await (
-    await orders()
-  ).findOneAndUpdate(
-    { _id: new ObjectId(orderId) },
-    { $set: { status, updatedAt: new Date() } },
-    { returnDocument: "before" },
+  const collection = await orders();
+  const id = new ObjectId(orderId);
+  const now = new Date();
+
+  /*
+    Only a real move is written to the history and restarts the four-day
+    clock: re-selecting "On Their Way" by mistake must not push the automatic
+    "Delivered" back by four days.
+  */
+  const moved = await collection.findOneAndUpdate(
+    { _id: id, status: { $ne: status } },
+    {
+      $set: {
+        status,
+        updatedAt: now,
+        ...(status === "On Their Way" ? { onTheWayAt: now } : {}),
+        ...(status === "Delivered" ? { deliveredAt: now } : {}),
+      },
+      $push: { statusHistory: { status, at: now, by: "admin" as const } },
+    },
+    { returnDocument: "after" },
   );
+  if (moved) return { changed: true, order: toOrder(moved) };
 
-  if (!before) return { changed: false, order: null };
-
-  return {
-    changed: before.status !== status,
-    order: toOrder({ ...before, status }),
-  };
+  const current = await collection.findOne({ _id: id });
+  return { changed: false, order: current ? toOrder(current) : null };
 }
 
 /** Hide or restore an order. The document itself is never removed. */

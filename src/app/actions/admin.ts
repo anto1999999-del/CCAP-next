@@ -13,7 +13,7 @@ import { sendEmail } from "@/lib/email";
 import { orderStatusUpdate } from "@/lib/emails/orders";
 import { site } from "@/lib/site";
 import { setHidden, setStatus } from "@/lib/orders/repository";
-import { ORDER_STATUSES } from "@/lib/orders/types";
+import { MANUAL_STATUSES } from "@/lib/orders/types";
 
 /**
  * The back office.
@@ -31,7 +31,8 @@ const ObjectIdSchema = z
 
 const StatusSchema = z.object({
   orderId: ObjectIdSchema,
-  status: z.enum(ORDER_STATUSES),
+  // "Delivered" is set by the four-day rule, never by hand (W-006).
+  status: z.enum(MANUAL_STATUSES),
 });
 
 const HideSchema = z.object({

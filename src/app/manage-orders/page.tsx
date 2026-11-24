@@ -5,6 +5,7 @@ import OrderRow from "@/components/admin/OrderRow";
 import { itemHref, listedItemKeys } from "@/lib/orders/listed";
 import { adminOnly } from "@/lib/auth/guard";
 import { countByStatus, listOrders, summarise } from "@/lib/orders/repository";
+import { deliverDueOrders } from "@/lib/orders/deliver-sweep";
 import { ORDER_STATUSES } from "@/lib/orders/types";
 import { formatCents } from "@/lib/parts/price";
 
@@ -52,6 +53,12 @@ export default async function ManageOrdersPage({
     status: params.status ?? "",
     sort: params.sort === "oldest" ? "oldest" : "newest",
   };
+
+  // Due deliveries first, so the list never shows an order a day overdue
+  // because the hourly sweep has not come round yet. Off unless switched on.
+  await deliverDueOrders().catch((error) => {
+    console.error("[auto-deliver] sweep from the order list failed:", error);
+  });
 
   const [page, counts, summary] = await Promise.all([
     listOrders({

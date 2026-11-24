@@ -21,6 +21,19 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
+/**
+ * What somebody in the back office can choose. "Delivered" is not one: an
+ * order on its way becomes Delivered by itself four days later
+ * (src/lib/orders/auto-deliver.ts), as Anto asked on 24 Nov 2026.
+ */
+export const MANUAL_STATUSES = [
+  "Pending",
+  "Processing",
+  "On Their Way",
+] as const;
+
+export type ManualStatus = (typeof MANUAL_STATUSES)[number];
+
 /** Waiting on somebody at the yard, which is what the admin opens to see. */
 export const NEEDS_ACTION: OrderStatus[] = ["Pending", "Processing"];
 
@@ -35,6 +48,12 @@ export type Order = {
   paymentMethod: string;
   pickup: boolean;
   hidden: boolean;
+  /** When it was last sent on its way; absent before 24 Nov 2026. */
+  onTheWayAt?: string;
+  /** When it became Delivered; absent on orders delivered before 24 Nov 2026. */
+  deliveredAt?: string;
+  /** Status changes since 24 Nov 2026, oldest first. */
+  history?: { status: string; at: string; by: "admin" | "auto" }[];
   /**
    * Where the order stands with the yard's Pinnacle Pro. Absent on orders paid
    * before sending was switched on, which were entered there by hand.

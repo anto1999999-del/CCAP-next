@@ -11,7 +11,8 @@ import {
 } from "@/app/actions/admin";
 import { PART_IMAGE_PLACEHOLDER } from "@/lib/parts/images";
 import { formatCents } from "@/lib/parts/price";
-import { ORDER_STATUSES, type Order } from "@/lib/orders/types";
+import { MANUAL_STATUSES, type Order } from "@/lib/orders/types";
+import { DELIVERED_AFTER_DAYS } from "@/lib/orders/auto-deliver";
 import { STATUS_TEXT } from "@/lib/orders/status";
 
 /**
@@ -185,6 +186,27 @@ export default function OrderRow({
                   : undefined
               }
             />
+            {order.onTheWayAt && (
+              <Detail
+                label="On its way"
+                value={AU_DATETIME.format(new Date(order.onTheWayAt))}
+              />
+            )}
+            {order.deliveredAt ? (
+              <Detail
+                label="Delivered"
+                value={`${AU_DATETIME.format(new Date(order.deliveredAt))}${
+                  order.history?.at(-1)?.by === "auto" ? " (automatic)" : ""
+                }`}
+              />
+            ) : (
+              order.status === "On Their Way" && (
+                <Detail
+                  label="Delivered"
+                  value={`Automatically ${DELIVERED_AFTER_DAYS} days after it went on its way`}
+                />
+              )
+            )}
             {/*
               Only on orders paid since sending to Pinnacle was switched on.
               "Not sent" is the one that needs somebody: that order has to be
@@ -285,11 +307,17 @@ function StatusSelect({ id, value }: { id: string; value: string }) {
       onChange={(event) => event.currentTarget.form?.requestSubmit()}
       className="focus:border-brand border-line rounded-lg border bg-field px-3 py-2 text-sm text-white transition-colors focus:outline-none disabled:opacity-60"
     >
-      {ORDER_STATUSES.map((status) => (
+      {MANUAL_STATUSES.map((status) => (
         <option key={status} value={status}>
           {status}
         </option>
       ))}
+      {/* Shown, not chosen: an order becomes Delivered by itself. */}
+      {value === "Delivered" && (
+        <option value="Delivered" disabled>
+          Delivered
+        </option>
+      )}
     </select>
   );
 }

@@ -93,6 +93,12 @@ export type OrderDocument = {
    */
   hidden?: boolean;
   hiddenAt?: Date;
+  /** When the order was last moved to "On Their Way". */
+  onTheWayAt?: Date;
+  /** When it became "Delivered", by hand or four days after it went on its way. */
+  deliveredAt?: Date;
+  /** Every status change since 24 Nov 2026, oldest first. */
+  statusHistory?: { status: string; at: Date; by: "admin" | "auto" }[];
   /** Stripe's id for the payment, so a webhook can find the order it belongs to. */
   paymentIntentId?: string;
   paidAt?: Date;
