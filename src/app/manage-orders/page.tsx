@@ -5,6 +5,7 @@ import OrderRow from "@/components/admin/OrderRow";
 import { itemHref, listedItemKeys } from "@/lib/orders/listed";
 import { adminOnly } from "@/lib/auth/guard";
 import { countByStatus, listOrders, summarise } from "@/lib/orders/repository";
+import { AWAITING_PAYMENT } from "@/lib/orders/list-filter";
 import { ORDER_STATUSES } from "@/lib/orders/types";
 import { formatCents } from "@/lib/parts/price";
 
@@ -67,7 +68,8 @@ export default async function ManageOrdersPage({
   // One catalogue pass for the whole page, not one per line item.
   const listed = await listedItemKeys(page.orders);
 
-  const filters = ["All", ...ORDER_STATUSES, "Hidden"];
+  // Unpaid checkouts have their own filter and are left out of "All".
+  const filters = ["All", ...ORDER_STATUSES, AWAITING_PAYMENT, "Hidden"];
 
   return (
     <AccountShell account={admin} active="/manage-orders" title="Orders">

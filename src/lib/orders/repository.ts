@@ -7,6 +7,11 @@ import {
   type SupplierOrderState,
   type OrderItemDocument,
 } from "../db/mongo";
+import {
+  AWAITING_PAYMENT,
+  orderListFilter,
+  PAID_AND_VISIBLE,
+} from "./list-filter";
 import { NEEDS_ACTION, ORDER_STATUSES } from "./types";
 import type { Order, OrderStatus, OrderSummary } from "./types";
 
@@ -104,7 +109,7 @@ export async function listForUser(userId: string): Promise<Order[]> {
 export type OrderQuery = {
   /** Free text over the part, the customer, their phone, address or order id. */
   search?: string;
-  /** One of the four statuses, "Hidden", or nothing for everything visible. */
+  /** One of the four statuses, "Hidden", "Awaiting payment", or nothing for every paid order. */
   status?: string;
   sort?: "newest" | "oldest";
   page?: number;
@@ -135,33 +140,7 @@ export async function listOrders({
   perPage = 20,
 }: OrderQuery = {}): Promise<OrderPage> {
   const collection = await orders();
-
-  const filter: Record<string, unknown> =
-    status === "Hidden" ? { hidden: true } : { hidden: { $ne: true } };
-
-  if (status && status !== "Hidden") filter.status = status;
-
-  const term = search.trim();
-  if (term) {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const like = { $regex: escaped, $options: "i" };
-    const matches: unknown[] = [
-      { name: like },
-      { email: like },
-      { phone: like },
-      { address: like },
-      { city: like },
-      { "items.name": like },
-      { "items.stockNo": like },
-      { "items.manufacturer": like },
-      { "items.model": like },
-    ];
-
-    // An id is only meaningful whole, so a complete one is matched as well.
-    if (/^[a-f\d]{24}$/i.test(term)) matches.push({ _id: new ObjectId(term) });
-
-    filter.$or = matches;
-  }
+  const filter = orderListFilter(status, search);
 
   const total = await collection.countDocuments(filter);
   const size = Math.min(100, Math.max(1, perPage));
@@ -189,17 +168,25 @@ export async function listOrders({
 export async function countByStatus(): Promise<Record<string, number>> {
   const collection = await orders();
 
-  const [visible, hidden] = await Promise.all([
+  const [visible, hidden, awaiting] = await Promise.all([
     collection
       .aggregate<{ _id: string; n: number }>([
-        { $match: { hidden: { $ne: true } } },
+        { $match: PAID_AND_VISIBLE },
         { $group: { _id: "$status", n: { $sum: 1 } } },
       ])
       .toArray(),
     collection.countDocuments({ hidden: true }),
+    collection.countDocuments({
+      hidden: { $ne: true },
+      status: AWAITING_PAYMENT,
+    }),
   ]);
 
-  const counts: Record<string, number> = { All: 0, Hidden: hidden };
+  const counts: Record<string, number> = {
+    All: 0,
+    Hidden: hidden,
+    [AWAITING_PAYMENT]: awaiting,
+  };
   for (const status of ORDER_STATUSES) counts[status] = 0;
 
   for (const row of visible) {
@@ -279,7 +266,9 @@ export async function summarise(): Promise<OrderSummary> {
   const documents = await (
     await orders()
   )
-    .find({ hidden: { $ne: true } })
+    // Unpaid checkouts are not orders yet: counting them put money that was
+    // never taken into the revenue figures.
+    .find(PAID_AND_VISIBLE)
     .toArray();
 
   const startOfToday = new Date();
