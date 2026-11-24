@@ -7,6 +7,7 @@ import {
   type SupplierOrderState,
   type OrderItemDocument,
 } from "../db/mongo";
+import { orderNumberMatches } from "./order-number";
 import { NEEDS_ACTION, ORDER_STATUSES } from "./types";
 import type { Order, OrderStatus, OrderSummary } from "./types";
 
@@ -49,6 +50,9 @@ function toOrder(document: OrderDocument): Order {
           supplier: {
             state: document.supplierOrder.state,
             message: document.supplierOrder.message,
+            ...(document.supplierOrder.proOrderNumber
+              ? { proOrderNumber: document.supplierOrder.proOrderNumber }
+              : {}),
           },
         }
       : {}),
@@ -102,7 +106,11 @@ export async function listForUser(userId: string): Promise<Order[]> {
 }
 
 export type OrderQuery = {
-  /** Free text over the part, the customer, their phone, address or order id. */
+  /**
+   * Free text over the part, the customer, their phone, address, the order id
+   * (whole, or the six characters the emails and the list show) or the
+   * Pinnacle work order number.
+   */
   search?: string;
   /** One of the four statuses, "Hidden", or nothing for everything visible. */
   status?: string;
@@ -160,6 +168,8 @@ export async function listOrders({
     // An id is only meaningful whole, so a complete one is matched as well.
     if (/^[a-f\d]{24}$/i.test(term)) matches.push({ _id: new ObjectId(term) });
 
+    matches.push(...orderNumberMatches(term));
+
     filter.$or = matches;
   }
 
@@ -183,6 +193,19 @@ export async function listOrders({
     from: total === 0 ? 0 : (safePage - 1) * size + 1,
     to: Math.min(safePage * size, total),
   };
+}
+
+/** Record the work order number Pinnacle Pro gave an order. */
+export async function recordProOrderNumber(
+  orderId: string,
+  proOrderNumber: number,
+): Promise<void> {
+  await (
+    await orders()
+  ).updateOne(
+    { _id: new ObjectId(orderId), supplierOrder: { $exists: true } },
+    { $set: { "supplierOrder.proOrderNumber": proOrderNumber } },
+  );
 }
 
 /** How many orders sit behind each filter, including the hidden ones. */

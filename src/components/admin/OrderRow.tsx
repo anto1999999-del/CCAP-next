@@ -90,6 +90,11 @@ export default function OrderRow({
           title={order.id}
         >
           &hellip;{order.id.slice(-6)}
+          {order.supplier?.proOrderNumber && (
+            <span className="block text-gray-400">
+              WO {order.supplier.proOrderNumber}
+            </span>
+          )}
         </span>
 
         <span className="text-sm whitespace-nowrap text-gray-400 tabular-nums">
@@ -195,7 +200,9 @@ export default function OrderRow({
                 label="Pinnacle"
                 value={
                   order.supplier.state === "sent"
-                    ? "Sent"
+                    ? order.supplier.proOrderNumber
+                      ? `Sent, work order ${order.supplier.proOrderNumber}`
+                      : "Sent, no work order number yet (Pinnacle has not imported it)"
                     : order.supplier.state === "pending"
                       ? "Sending"
                       : `Not sent, enter by hand (${order.supplier.message ?? "no reason recorded"})`

@@ -1,6 +1,7 @@
 import "server-only";
 import {
   readPinnacleReply,
+  readPinnacleStatus,
   type PinnacleOrder,
   type PinnacleOutcome,
   type PinnacleSettings,
@@ -60,6 +61,35 @@ export function pinnacleConfig(): PinnacleConfig | null {
     },
   };
 }
+
+/**
+ * Look an order up in Pinnacle: read-only, and quick to give up, because it
+ * runs while the back office's order list is loading.
+ */
+export async function fetchPinnacleStatus(
+  config: PinnacleConfig,
+  externalOrderReference: string,
+): Promise<ReturnType<typeof readPinnacleStatus>> {
+  const urgId = config.settings.defaultUrgId;
+  const address = `${config.url}/status/${encodeURIComponent(externalOrderReference)}/${encodeURIComponent(urgId)}`;
+
+  try {
+    const response = await fetch(address, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${config.user}:${config.password}`).toString("base64")}`,
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(STATUS_TIMEOUT_MS),
+      cache: "no-store",
+    });
+    return readPinnacleStatus(await response.text());
+  } catch {
+    return null;
+  }
+}
+
+/** A lookup slower than this is skipped and tried on a later page load. */
+const STATUS_TIMEOUT_MS = 4_000;
 
 export async function sendToPinnacle(
   config: PinnacleConfig,

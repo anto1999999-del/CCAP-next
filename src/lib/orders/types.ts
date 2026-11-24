@@ -39,7 +39,12 @@ export type Order = {
    * Where the order stands with the yard's Pinnacle Pro. Absent on orders paid
    * before sending was switched on, which were entered there by hand.
    */
-  supplier?: { state: "pending" | "sent" | "failed"; message?: string };
+  supplier?: {
+    state: "pending" | "sent" | "failed";
+    message?: string;
+    /** The yard's work order number in Pinnacle Pro, once it has one. */
+    proOrderNumber?: number;
+  };
   customer: {
     name: string;
     email: string;

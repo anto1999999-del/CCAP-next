@@ -58,6 +58,12 @@ export type SupplierOrderState = {
   state: "pending" | "sent" | "failed";
   /** Sends that got no usable answer, so the next can decide to give up. */
   attempts: number;
+  /**
+   * Pinnacle Pro's own number for the order (the yard's work order), read
+   * from the API's status lookup once Pinnacle has imported the order. Absent
+   * until then: the API reports 0 for an order it has queued but not imported.
+   */
+  proOrderNumber?: number;
   /** What the API said last, or why the order could not be sent. */
   message?: string;
   updatedAt: Date;

@@ -353,6 +353,38 @@ export type PinnacleOutcome =
   | { kind: "refused"; code: number | null; message: string }
   | { kind: "unclear"; message: string };
 
+/**
+ * Read the status lookup (GET /status/{externalOrderReference}/{urgId}).
+ *
+ * The number that matters is `proOrderNumber`, Pinnacle Pro's own number for
+ * the order, which the yard knows as the work order. It is 0 while the order
+ * is queued but not imported, so 0 means "none yet", not order number zero.
+ * Anything unreadable is null: the lookup is a convenience and is tried again
+ * later.
+ */
+export function readPinnacleStatus(
+  body: string,
+): { proOrderNumber: number | null; proMessage: string } | null {
+  let reply: unknown;
+  try {
+    reply = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  if (typeof reply !== "object" || reply === null) return null;
+
+  const { proOrderNumber, proMessage } = reply as {
+    proOrderNumber?: unknown;
+    proMessage?: unknown;
+  };
+  const number = Number(proOrderNumber);
+
+  return {
+    proOrderNumber: Number.isInteger(number) && number > 0 ? number : null,
+    proMessage: typeof proMessage === "string" ? proMessage.trim() : "",
+  };
+}
+
 /** Error 9: this reference is already there. The earlier send got through. */
 const DUPLICATE_REFERENCE = 9;
 /** Error 0: "We encountered a problem", their name for an unreported fault. */

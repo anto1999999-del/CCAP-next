@@ -5,6 +5,7 @@ import OrderRow from "@/components/admin/OrderRow";
 import { itemHref, listedItemKeys } from "@/lib/orders/listed";
 import { adminOnly } from "@/lib/auth/guard";
 import { countByStatus, listOrders, summarise } from "@/lib/orders/repository";
+import { withWorkOrderNumbers } from "@/lib/supplier/work-orders";
 import { ORDER_STATUSES } from "@/lib/orders/types";
 import { formatCents } from "@/lib/parts/price";
 
@@ -64,7 +65,9 @@ export default async function ManageOrdersPage({
     summarise(),
   ]);
 
-  // One catalogue pass for the whole page, not one per line item.
+  // Work order numbers Pinnacle has issued since the last look, then one
+  // catalogue pass for the whole page, not one per line item.
+  page.orders = await withWorkOrderNumbers(page.orders);
   const listed = await listedItemKeys(page.orders);
 
   const filters = ["All", ...ORDER_STATUSES, "Hidden"];
@@ -109,7 +112,7 @@ export default async function ManageOrdersPage({
             name="q"
             type="search"
             defaultValue={current.q}
-            placeholder="Search part, customer, phone, address or order id"
+            placeholder="Search part, customer, phone, address, order id or work order"
             className="focus:border-brand border-line min-w-0 flex-1 rounded-xl border bg-field px-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors focus:outline-none"
           />
 
